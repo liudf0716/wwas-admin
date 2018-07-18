@@ -1,7 +1,7 @@
 {
-  "name": "manage-system",
-  "version": "2.1.0",
-  "description": "基于Vue.js 2.x系列 + element-ui 内容管理系统解决方案",
+  "name": "wwas-admin",
+  "version": "1.0.0",
+  "description": "wificoin wifidog auth server admin ui",
   "author": "lin-xin <2981207131@qq.com>",
   "private": true,
   "scripts": {
