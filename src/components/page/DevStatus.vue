@@ -23,20 +23,20 @@
         </div>
 
         <el-table :data="listData" border style="width: 100%" ref="multipleTable" v-loading="loading">
-            <el-table-column prop="update_time" label="更新时间" width="180"></el-table-column>
+            <el-table-column prop="update_time" label="设备ID" width="180"></el-table-column>
             <el-table-column prop="status" label="状态" width="100">
                 <template slot-scope="scope">
                     <el-tag :type="scope.row.status == 'offline' ? 'warning' : 'success'" close-transition>{{scope.row.status == 'online'?'在线':(scope.row.status == 'inactive'?'未激活':'离线')}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="mac" label="路由Mac" width="180"></el-table-column>
-            <el-table-column prop="dev_type" label="设备型号" width="140"></el-table-column>
-            <el-table-column prop="rom_version" label="固件版本" width="140"></el-table-column>
-            <el-table-column prop="user_name" label="账号"></el-table-column>
+            <el-table-column prop="mac" label="无线名称" width="180"></el-table-column>
+            <el-table-column prop="dev_type" label="渠道" width="140"></el-table-column>
+            <el-table-column prop="rom_version" label="wifidog运行时长" width="140"></el-table-column>
+            <el-table-column prop="user_name" label="认证平台"></el-table-column>
             <el-table-column label="操作" width="400">
                 <template slot-scope="scope">
-                    <el-button class="btn1" size="small" type="text" @click="reset(scope.row.mac)">重启路由</el-button>
-                    <el-button class="btn1" type="success" @click="clickDialogWifiName(scope.row.mac)">修改无线名称</el-button>
+                    <!--<el-button class="btn1" size="small" type="text" @click="reset(scope.row.mac)">重启路由</el-button>-->
+                    <!--<el-button class="btn1" type="success" @click="clickDialogWifiName(scope.row.mac)">修改无线名称</el-button>-->
                     <el-button class="btn1" size="small" type="info" @click="clickDialogPwd(scope.row.mac)">修改无线密码</el-button>
                     <el-button class="btn1" v-if="curUser=='0' && scope.row.user_name" size="small" type="danger" @click="del(scope.row._id,scope.row.mac,scope.row.user_name)">删除路由</el-button>
                 </template>

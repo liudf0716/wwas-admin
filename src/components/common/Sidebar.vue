@@ -46,6 +46,17 @@
                                 title: '设备状态'
                             }
                         ]
+                    },
+                    {
+                        icon: 'el-icon-document',
+                        index: '5',
+                        title: '认证管理',
+                        subs: [
+                            {
+                                index: 'approve',
+                                title: '认证设置'
+                            }
+                        ]
                     }
                 ]
             }
@@ -86,6 +97,17 @@
                                         {
                                             index: 'devstatus',
                                             title: '设备状态'
+                                        }
+                                    ]
+                                },
+                                {
+                                    icon: 'el-icon-document',
+                                    index: '5',
+                                    title: '认证管理',
+                                    subs: [
+                                        {
+                                            index: 'approve',
+                                            title: '认证设置'
                                         }
                                     ]
                                 }
