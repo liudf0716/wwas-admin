@@ -20,7 +20,7 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        //webServer: 'https://api.rom.kunteng.org.cn:443'
+        //webServer: 'http://wechat.kunteng.org.cn:8001'
         webServer: 'http://192.168.158.18:8001'
     },
     dev: {
@@ -31,7 +31,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                target:'http://192.168.158.18:8001',
+                target:'http://wechat.kunteng.org.cn:8001',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''
