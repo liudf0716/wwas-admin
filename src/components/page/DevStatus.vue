@@ -39,7 +39,7 @@
                     <el-tag :type="scope.row.auth == '0' ? 'warning':'success'" close-transition>{{scope.row.auth == '1'?'已认证':'未认证'}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="150">
+            <el-table-column label="操作">
                 <template slot-scope="scope">
                     <!--<el-button class="btn1" size="small" type="info" @click="clickDialogPwd(scope.row.mac)">修改无线密码</el-button>-->
                     <!--<el-button class="btn1" v-if="curUser=='0' && scope.row.user_name" size="small" type="danger" @click="del(scope.row._id,scope.row.mac,scope.row.user_name)">删除路由</el-button>-->

@@ -7,18 +7,18 @@
             </el-breadcrumb>
         </div>
         <div class='rad-group mb40'>
+            <div class="txt" style="font-size:16px;color:#666;">
+                <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
+                <p>APP_SECRET：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
+                <p>SHOP_ID及对应SSID和secretKey：</p>
+                <p class="txt-small">
+                    <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
+                    <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
+                    <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
+                </p>
+            </div>
             <el-tabs v-model="task_type" type="card" @tab-click="handleClick">
-                <el-tab-pane label="gwId" name="1">
-                    <div class="txt" style="font-size:16px;color:#666;">
-                        <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                        <p>APP_SECRET：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                        <p>SHOP_ID及对应SSID和secretKey：</p>
-                        <p class="txt-small">
-                            <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
-                            <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
-                            <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
-                        </p>
-                    </div>
+                <el-tab-pane label="微信认证" name="1">
                     <div class="form-box tab-cont form-box2">
                         <el-form :model="form0" :rules="rules0" ref="form0" label-width="150px">
                             <!--<el-form-item label="认证方式">-->
@@ -31,42 +31,42 @@
                                 <el-input v-model="form0.gwId" class="diainp"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="appId" prop="appId">
+                            <el-form-item label="APP_ID" prop="appId">
                                 <el-input v-model="form0.appId" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="app_secret" prop="app_secret">
+                            <el-form-item label="APP_SECRET" prop="app_secret">
                                 <el-input v-model="form0.app_secret" class="diainp2"></el-input>
                             </el-form-item>
-                            <el-form-item label="shopId" prop="">
+                            <el-form-item label="SHOP_ID" prop="shop_id">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="无线名称" prop="ssid">
                                 <el-input v-model="form0.ssid" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="secretKey" prop="">
-                                <el-input v-model="form0.secretKey" class="diainp2"></el-input>
-                            </el-form-item>
+                            <!--<el-form-item label="secretKey" prop="">-->
+                                <!--<el-input v-model="form0.secretKey" class="diainp2"></el-input>-->
+                            <!--</el-form-item>-->
 
-                            <el-form-item label="toAddress" prop="">
+                            <el-form-item label="toAddress" prop="toAddress">
                                 <el-input v-model="form0.toAddress" class="diainp2"></el-input>
                             </el-form-item>
                             <el-form-item label="toAmount" prop="toAmount">
                                 <el-input v-model="form0.toAmount" class="diainp2"></el-input>
                             </el-form-item>
 
-                            <el-form-item label="portalUrl" prop="">
+                            <el-form-item label="portalUrl" prop="portalUrl">
                                 <el-input v-model="form0.portalUrl" class="diainp2"></el-input>
                             </el-form-item>
-                            <el-form-item label="duration" prop="">
-                                <el-input v-model="form0.duration" class="diainp"></el-input>
-                            </el-form-item>
+                            <!--<el-form-item label="duration" prop="">-->
+                                <!--<el-input v-model="form0.duration" class="diainp"></el-input>-->
+                            <!--</el-form-item>-->
                             <el-form-item>
                                 <el-button type="primary" @click="onGwidSubmit('form0')">保存</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane label="channelPath" name="2">
+                <el-tab-pane label="WFC认证" name="2">
 
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
@@ -140,15 +140,19 @@
                     duration:''
                 },
                 rules0: {
-                    appId: [
+                    gwId: [
                         {required: true, message: '请输入设备ID', trigger: 'blur'},
                         // {validator: this.validateMac, trigger: 'blur'}
                     ],
-                    app_secret: [
-                        {required: true, message: '请选择app_secret', trigger: 'blur'}
+                    appId: [
+                        {required: true, message: '请输入APP_ID', trigger: 'blur'},
+                        // {validator: this.validateMac, trigger: 'blur'}
                     ],
-                    shopId: [
-                        {required: true, message: '请选择shopId', trigger: 'blur'}
+                    app_secret: [
+                        {required: true, message: '请选择APP_SECRET', trigger: 'blur'}
+                    ],
+                    shop_id: [
+                        {required: true, message: '请选择SHOP_ID', trigger: 'blur'}
                     ],
                     ssid: [
                         {required: true, message: '请输入无线名称', trigger: 'blur'}
@@ -343,10 +347,10 @@
             handleClick:function (tab,event) {
                 var self = this;
                 if(tab.name == '1'){
-                    self.getGwid();
+                    // self.getGwid();
                 }
                 if(tab.name == '2'){
-                    self.getChannelPath();
+                    // self.getChannelPath();
                 }
             },
 
@@ -413,7 +417,7 @@
     .inp100{width:100px;}
     /*.textarea-mac{height:160px;}*/
     .form-box2{width:700px;}
-    .txt{width:700px;padding-left:40px;font-size:15px;color:#666;}
+    .txt{width:700px;padding-left:40px;font-size:15px;color:#666;margin-bottom:30px;}
     .txt p{line-height:36px;}
     .txt .txt-small span{display:block;margin-left:20px;font-size:14px;line-height:26px;}
 </style>
