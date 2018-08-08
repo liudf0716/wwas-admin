@@ -205,7 +205,7 @@
                 var self = this;
                 if(self.curUser == '1'){
                     var filter = {
-                        user_name: localStorage.getItem('ms_username')
+                        channelPath: localStorage.getItem('ms_username')
                     };
                     params['filter'] = filter;
                 }
@@ -414,7 +414,7 @@
                     filter:{"gwId":str}
                 };
                 if(localStorage.getItem('userMsg') == 1){//非超级管理员
-                    params.filter.user_name = localStorage.getItem('ms_username');
+                    params.filter.channelPath = localStorage.getItem('ms_username');
                 }
                 self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
                     self.loading = false;
