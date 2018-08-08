@@ -103,14 +103,14 @@
                 form0: {
                     gwId: '',
 
-                    appId: 'wxfb684aa755dffceb',
+                    appId: '',
                     app_secret: '',
-                    shopId:'641418',
-                    ssid:'ApFreeWiFiDog',
-                    secretKey: 'ca0ddbac646160edfeaf343937f73404',
+                    shopId:'',
+                    ssid:'',
+                    secretKey: '',
 
-                    portalUrl:'https://talkblock.org/',
-                    duration:'3600'
+                    portalUrl:'',
+                    duration:''
                 },
                 rules0: {
                     appId: [
@@ -135,11 +135,11 @@
                 },
                 form1: {
                     channelPath: '',
-                    toAddress:'wZirordpuoJgmRp6wRPKZjAjVruQr5gF7r',
-                    toAmount:'2000000',
+                    toAddress:'',
+                    toAmount:'',
 
-                    portalUrl:'https://talkblock.org/',
-                    duration:'3600'
+                    portalUrl:'',
+                    duration:''
                 },
                 rules1: {
                     toAddress:[
