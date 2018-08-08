@@ -15,9 +15,9 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="sysMemfree" label="剩余内存">
-                    <!--<template slot-scope="scope">-->
-                        <!--{{((scope.row.sysMemfree)/1024).toFixed(2)}}-->
-                    <!--</template>-->
+                    <template slot-scope="scope">
+                        {{((scope.row.sysMemfree)/1024).toFixed(2) + 'M'}}
+                    </template>
                 </el-table-column>
                 <el-table-column prop="sysLoad" label="系统负载"></el-table-column>
                 <el-table-column prop="cpuUsage" label="cpu利用率"></el-table-column>
