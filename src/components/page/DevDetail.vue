@@ -27,37 +27,37 @@
             </el-table>
             <hr style="margin-bottom:40px;height:1px;border:none;border-top:1px solid #ddd;">
             <el-table :data="gwClients" border style="width: 100%" ref="multipleTable">
-                <el-table-column prop="mac" label="路由MAC" width="150"></el-table-column>
-                <el-table-column prop="ip" label="终端IP" width="140"></el-table-column>
-                <el-table-column prop="wired" label="有线设备" width="100">
+                <el-table-column prop="clients.mac" label="路由MAC" width="150"></el-table-column>
+                <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
+                <el-table-column prop="clients.wired" label="有线设备" width="100">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.wired == '1'?'是': '否'}}</el-tag>
+                        <el-tag :type="scope.row.clients.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.wired == '1'?'是': '否'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="name" label="终端名称" width="220"></el-table-column>
-                <el-table-column prop="incoming" label="下行流量" width="120">
+                <el-table-column prop="clients.name" label="终端名称" width="220"></el-table-column>
+                <el-table-column prop="clients.incoming" label="下行流量" width="120">
                     <template slot-scope="scope">
-                        {{bandwidthLabel(scope.row.incoming || 0)}}
+                        {{bandwidthLabel(scope.row.clients.incoming || 0)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="outcoming" label="上行流量" width="120">
+                <el-table-column prop="clients.outcoming" label="上行流量" width="120">
                     <template slot-scope="scope">
-                        {{bandwidthLabel(scope.row.outcoming || 0)}}
+                        {{bandwidthLabel(scope.row.clients.outcoming || 0)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="firstLogin" label="通过认证时间" width="200">
+                <el-table-column prop="clients.firstLogin" label="通过认证时间" width="200">
                     <template slot-scope="scope">
-                        {{dateForm(scope.row.firstLogin)}}
+                        {{dateForm(scope.row.clients.firstLogin)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="onlineTime" label="在线时长" width="150">
+                <el-table-column prop="clients.onlineTime" label="在线时长" width="150">
                     <template slot-scope="scope">
-                        {{timeStamp(scope.row.onlineTime)}}
+                        {{timeStamp(scope.row.clients.onlineTime)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="lastTime" label="最近访问时间" width="200">
+                <el-table-column prop="clients.lastTime" label="最近访问时间" width="200">
                     <template slot-scope="scope">
-                        {{dateForm(scope.row.lastTime)}}
+                        {{dateForm(scope.row.clients.lastTime)}}
                     </template>
                 </el-table-column>
                 <!--<el-table-column prop="pubsub_status" label="升级状态">-->
@@ -186,7 +186,7 @@
                     }
                     if(res.data.ret_code == 0){
                         // self.pageTotal = res.data.extra.count || self.pageTotal;
-                        self.gwClients = res.data.extra.gwClients.clients;
+                        self.gwClients = res.data.extra.gwClients;
                     }else{
                         self.$message.error(res.data.extra)
                     }
