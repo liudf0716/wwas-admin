@@ -23,16 +23,29 @@
         </div>
 
         <el-table :data="listData" border style="width: 100%" ref="multipleTable" v-loading="loading">
-            <el-table-column prop="gwId" label="设备ID" width="180"></el-table-column>
-            <el-table-column prop="deviceStatus" label="状态" width="100">
+            <el-table-column prop="gwId" label="设备ID" width="150"></el-table-column>
+            <el-table-column prop="deviceStatus" label="状态" width="80">
                 <template slot-scope="scope">
                     <el-tag :type="scope.row.deviceStatus == '0' ? 'warning':'success'" close-transition>{{scope.row.deviceStatus == '1'?'在线':'离线'}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column prop="ssid" label="无线名称" width="180"></el-table-column>
+            <el-table-column prop="ssid" label="无线名称" width="150"></el-table-column>
             <el-table-column prop="channelPath" label="渠道" width="140"></el-table-column>
-            <el-table-column prop="name" label="设备名称" width="140"></el-table-column>
-            <el-table-column prop="type" label="设备类型" width="140"></el-table-column>
+            <el-table-column prop="wiredPassed" label="有线免认证" width="110">
+                <template slot-scope="scope">
+                    <el-tag :type="scope.row.wiredPassed == '0' ? 'warning':'success'" close-transition>{{scope.row.wiredPassed == '1'?'已认证':'未认证'}}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="wifidogUptime" label="wifidog运行时长" width="160">
+                <template slot-scope="scope">
+                    {{timeStamp(scope.row.wifidogUptime)}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="lastTime" label="最近上线时间" width="180">
+                <template slot-scope="scope">
+                    {{dateForm(scope.row.lastTime)}}
+                </template>
+            </el-table-column>
             <el-table-column prop="remoteAddress" label="设备IP" width="160"></el-table-column>
             <el-table-column prop="auth" label="认证平台" width="100">
                 <template slot-scope="scope">
@@ -41,6 +54,7 @@
             </el-table-column>
             <el-table-column label="操作">
                 <template slot-scope="scope">
+                    <el-button class="btn1" size="small" type="info" @click="clickDetail(scope.row.gwId)">详情</el-button>
                     <!--<el-button class="btn1" size="small" type="info" @click="clickDialogPwd(scope.row.mac)">修改无线密码</el-button>-->
                     <!--<el-button class="btn1" v-if="curUser=='0' && scope.row.user_name" size="small" type="danger" @click="del(scope.row._id,scope.row.mac,scope.row.user_name)">删除路由</el-button>-->
                 </template>
@@ -140,6 +154,31 @@
             this.getUser();
         },
         methods: {
+            //时间转换
+            timeStamp: function( second_time ){
+                var time = parseInt(second_time) + "秒";
+                if( parseInt(second_time )> 60){
+                    var second = parseInt(second_time) % 60;
+                    var min = parseInt(second_time / 60);
+                    time = min + "分" + second + "秒";
+                    if( min > 60 ){
+                        min = parseInt(second_time / 60) % 60;
+                        var hour = parseInt( parseInt(second_time / 60) /60 );
+                        time = hour + "小时" + min + "分" + second + "秒";
+                        if( hour > 24 ){
+                            hour = parseInt( parseInt(second_time / 60) /60 ) % 24;
+                            var day = parseInt( parseInt( parseInt(second_time / 60) /60 ) / 24 );
+                            time = day + "天" + hour + "小时" + min + "分" + second + "秒";
+                        }
+                    }
+                }
+                return time;
+            },
+            //毫秒数转为时间戳
+            dateForm:function(time){
+                var date = new Date(time);
+                return date.toLocaleString();
+            },
             getUser: function(){
                 var self = this;
                 self.$axios.post(global_.baseUrl+'/admin/info').then(function(res){
@@ -158,6 +197,9 @@
                         }
                     }
                 })
+            },
+            clickDetail: function(mac){
+                this.$router.push({path:'/devdetail',query:{gwId:mac}});
             },
             getData: function(params,url){
                 var self = this;
@@ -369,7 +411,7 @@
                 var mac = self.search_word;
                 var str = (mac.indexOf(':')>=0?mac.replace(/:/g,''):mac).toUpperCase();
                 var params = {
-                    filter:{"mac":str}
+                    filter:{"gwId":str}
                 };
                 if(localStorage.getItem('userMsg') == 1){//非超级管理员
                     params.filter.user_name = localStorage.getItem('ms_username');

@@ -7,61 +7,40 @@
             </el-breadcrumb>
         </div>
         <div class='rad-group mb40'>
-            <div class="txt" style="font-size:16px;color:#666;">
-                <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                <p>APP_SECRET：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                <p>SHOP_ID及对应SSID和secretKey：</p>
-                <p class="txt-small">
-                    <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
-                    <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
-                    <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
-                </p>
-            </div>
             <el-tabs v-model="task_type" type="card" @tab-click="handleClick">
                 <el-tab-pane label="微信认证" name="1">
+                    <div class="txt" style="font-size:16px;color:#666;">
+                        <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
+                        <!--<p>APP_SECRET：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>-->
+                        <p>SHOP_ID及对应SSID和secretKey：</p>
+                        <p class="txt-small">
+                            <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
+                            <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
+                            <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
+                        </p>
+                    </div>
                     <div class="form-box tab-cont form-box2">
                         <el-form :model="form0" :rules="rules0" ref="form0" label-width="150px">
-                            <!--<el-form-item label="认证方式">-->
-                                <!--<el-checkbox-group v-model="form0.type">-->
-                                    <!--<el-checkbox label="WFC支付" name="wfc"></el-checkbox>-->
-                                    <!--<el-checkbox label="微信认证" name="wechat"></el-checkbox>-->
-                                <!--</el-checkbox-group>-->
-                            <!--</el-form-item>-->
-                            <el-form-item label="设备ID" prop="gwId">
-                                <el-input v-model="form0.gwId" class="diainp"></el-input>
-                            </el-form-item>
-
                             <el-form-item label="APP_ID" prop="appId">
                                 <el-input v-model="form0.appId" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="APP_SECRET" prop="app_secret">
-                                <el-input v-model="form0.app_secret" class="diainp2"></el-input>
+                            <el-form-item label="secretKey" prop="secretKey">
+                                <el-input v-model="form0.secretKey" class="diainp2"></el-input>
                             </el-form-item>
-                            <el-form-item label="SHOP_ID" prop="shop_id">
+                            <el-form-item label="SHOP_ID" prop="shopId">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="无线名称" prop="ssid">
                                 <el-input v-model="form0.ssid" class="diainp"></el-input>
                             </el-form-item>
-                            <!--<el-form-item label="secretKey" prop="">-->
-                                <!--<el-input v-model="form0.secretKey" class="diainp2"></el-input>-->
-                            <!--</el-form-item>-->
-
-                            <el-form-item label="toAddress" prop="toAddress">
-                                <el-input v-model="form0.toAddress" class="diainp2"></el-input>
+                            <el-form-item label="跳转" prop="portalUrl">
+                                <el-input v-model="form0.portalUrl" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="toAmount" prop="toAmount">
-                                <el-input v-model="form0.toAmount" class="diainp2"></el-input>
+                            <el-form-item label="时间" prop="duration">
+                                <el-input v-model="form0.duration" class="diainp"></el-input>
                             </el-form-item>
-
-                            <el-form-item label="portalUrl" prop="portalUrl">
-                                <el-input v-model="form0.portalUrl" class="diainp2"></el-input>
-                            </el-form-item>
-                            <!--<el-form-item label="duration" prop="">-->
-                                <!--<el-input v-model="form0.duration" class="diainp"></el-input>-->
-                            <!--</el-form-item>-->
                             <el-form-item>
-                                <el-button type="primary" @click="onGwidSubmit('form0')">保存</el-button>
+                                <el-button type="primary" @click="onWeixinSubmit('form0')">下一步</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -70,46 +49,42 @@
 
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
-                            <el-form-item label="渠道" prop="channelPath">
-                                <el-input v-model="form1.channelPath" class="diainp"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="appId" prop="appId">
-                                <el-input v-model="form1.appId" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="app_secret" prop="">
-                                <el-input v-model="form1.app_secret" class="diainp2"></el-input>
-                            </el-form-item>
-                            <el-form-item label="shopId" prop="">
-                                <el-input v-model="form1.shopId" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="ssid" prop="">
-                                <el-input v-model="form1.ssid" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="secretKey" prop="">
-                                <el-input v-model="form1.secretKey" class="diainp2"></el-input>
-                            </el-form-item>
-
-                            <el-form-item label="toAddress" prop="">
+                            <el-form-item label="钱包地址" prop="toAddress">
                                 <el-input v-model="form1.toAddress" class="diainp2"></el-input>
                             </el-form-item>
-                            <el-form-item label="toAmount" prop="toAmount">
+                            <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp2"></el-input>
                             </el-form-item>
-
-                            <el-form-item label="portalUrl" prop="">
-                                <el-input v-model="form1.portalUrl" class="diainp2"></el-input>
+                            <el-form-item label="跳转" prop="portalUrl">
+                                <el-input v-model="form1.portalUrl" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="duration" prop="">
+                            <el-form-item label="时间" prop="duration">
                                 <el-input v-model="form1.duration" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onChannelPathSubmit('form1')">保存</el-button>
+                                <el-button type="primary" @click="onWificoinSubmit('form1')">保存</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
 
                 </el-tab-pane>
+                <!--<el-tab-pane label="其他设置" name="3">-->
+
+                    <!--<div class="form-box tab-cont form-box2">-->
+                        <!--<el-form ref="form2" :model="form2" :rules="rules1" label-width="150px">-->
+                            <!--<el-form-item label="跳转页面" prop="portalUrl">-->
+                                <!--<el-input v-model="form2.portalUrl" class="diainp2"></el-input>-->
+                            <!--</el-form-item>-->
+                            <!--<el-form-item label="duration" prop="">-->
+                                <!--<el-input v-model="form2.duration" class="diainp"></el-input>-->
+                            <!--</el-form-item>-->
+                            <!--<el-form-item>-->
+                                <!--<el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>-->
+                            <!--</el-form-item>-->
+                        <!--</el-form>-->
+                    <!--</div>-->
+
+                <!--</el-tab-pane>-->
             </el-tabs>
 
         </div>
@@ -123,112 +98,97 @@
     export default {
         data: function () {
             return {
+                params:{},
                 task_type:'1',
                 form0: {
                     gwId: '',
 
-                    appId: '',
+                    appId: 'wxfb684aa755dffceb',
                     app_secret: '',
-                    shopId:'',
-                    ssid:'',
-                    secretKey: '',
+                    shopId:'641418',
+                    ssid:'ApFreeWiFiDog',
+                    secretKey: 'ca0ddbac646160edfeaf343937f73404',
 
-                    toAddress:'',
-                    toAmount:'',
-
-                    portalUrl: '',
-                    duration:''
+                    portalUrl:'https://talkblock.org/',
+                    duration:'3600'
                 },
                 rules0: {
-                    gwId: [
-                        {required: true, message: '请输入设备ID', trigger: 'blur'},
-                        // {validator: this.validateMac, trigger: 'blur'}
-                    ],
                     appId: [
                         {required: true, message: '请输入APP_ID', trigger: 'blur'},
-                        // {validator: this.validateMac, trigger: 'blur'}
                     ],
-                    app_secret: [
-                        {required: true, message: '请选择APP_SECRET', trigger: 'blur'}
+                    secretKey: [
+                        {required: true, message: '请选择secretKey', trigger: 'blur'}
                     ],
-                    shop_id: [
+                    shopId: [
                         {required: true, message: '请选择SHOP_ID', trigger: 'blur'}
                     ],
                     ssid: [
                         {required: true, message: '请输入无线名称', trigger: 'blur'}
                     ],
+                    portalUrl: [
+                        {required: true, message: '请选择跳转页面', trigger: 'blur'}
+                    ],
+                    duration: [
+                        {required: true, message: '请输入时长', trigger: 'blur'}
+                    ]
+
+                },
+                form1: {
+                    channelPath: '',
+                    toAddress:'wZirordpuoJgmRp6wRPKZjAjVruQr5gF7r',
+                    toAmount:'2000000',
+
+                    portalUrl:'https://talkblock.org/',
+                    duration:'3600'
+                },
+                rules1: {
                     toAddress:[
                         { required: true, message: '请选择toAddress', trigger: 'blur'}
                     ],
                     toAmount: [
                         {required: true, message: '请输入toAmount', trigger: 'blur'},
-                        // {validator: this.validateTimeNum, trigger: 'blur'}
                     ],
                     portalUrl: [
-                        {required: true, message: '请输入portalUrl', trigger: 'blur'},
-                        // {validator: this.validateSpace, trigger: 'blur'}
+                        {required: true, message: '请选择跳转页面', trigger: 'blur'}
+                    ],
+                    duration: [
+                        {required: true, message: '请输入时长', trigger: 'blur'}
                     ]
-
                 },
-
-                form1: {
-                    channelPath: '',
-
-                    appId: '',
-                    app_secret: '',
-                    shopId:'',
-                    ssid:'',
-                    secretKey: '',
-
-                    toAddress:'',
-                    toAmount:'',
-
+                form2:{
                     portalUrl: '',
                     duration:''
                 },
-                rules1: {
-                    channelPath: [
-                        {required: true, message: '请输入渠道', trigger: 'blur'},
-                        // {validator: this.validateMac, trigger: 'blur'}
-                    ],
-                    appId: [
-                        {required: true, message: '请输入设备ID', trigger: 'blur'}
-                    ],
+                rules2: {
                     portalUrl: [
                         {required: true, message: '请输入portalUrl', trigger: 'blur'},
-                        // {validator: this.validateTimeNum, trigger: 'blur'}
-                    ],
+                    ]
                 },
 
-                // fullscreenLoading: false,
                 loading:false
             }
         },
         created:function () {
-            this.getGwid();
+            // this.getGwid();
         },
         methods: {
-            onGwidSubmit:function (formName) {
+            onWeixinSubmit:function (formName) {
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
                         var params = {
-                            gwId :self.form0.gwId ,
+                            user_account:localStorage.getItem('ms_username'),
                             weixin:{
-                                appid:self.form0.appid,
+                                appId:self.form0.appId,
                                 shopId:self.form0.shopId,
                                 secretKey:self.form0.secretKey,
                                 ssid:self.form0.ssid,
                             },
-                            wificoin: {
-                                toAddress:self.form0.toAddress,
-                                toAmount:self.form0.toAmount
-                            },
-                            portalUrl:self.form0.portalUrl,
-                            duration:self.form0.duration
+                            portalUrl: self.form0.portalUrl,
+                            duration: self.form0.duration
                         };
                         self.loading = true;
-                        self.$axios.post(global_.baseUrl + '/url',params).then(function (res) {
+                        self.$axios.post(global_.baseUrl + '/setting/weiXinSetting',params).then(function (res) {
                             // console.log(res.data);
                             self.loading = false;
                             if(res.data.ret_code == '1001'){
@@ -238,20 +198,11 @@
                                 },2000)
                             }
                             if(res.data.ret_code == 0){
-                                self.$message({message:'成功',type:'success'});
+                                self.$message({message:res.data.extra,type:'success'});
+                                self.task_type = '2';
                             }else{
                                 self.$message.error(res.data.extra);
                             }
-                            self.form0.router_mac = '';
-                            self.form0.dev_type = '';
-                            self.form0.dest_version = '';
-                            self.form0.firmware_file = '';
-                            self.form0.firmware_md5 = '';
-                            self.form0.upgrade_mode = '1';
-                            self.form0.upgrade_time = '';
-                            self.form0.reflash = '0';
-                            self.form0.operator_name = '';
-                            self.form0.expired_time = '0';
                         })
 
                     } else {
@@ -261,18 +212,12 @@
                 });
 
             },
-            onChannelPathSubmit: function(formName) {
+            onWificoinSubmit: function(formName) {
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
                         var params = {
-                            channelPath :self.form1.channelPath ,
-                            weixin:{
-                                appid:self.form1.appid,
-                                shopId:self.form1.shopId,
-                                secretKey:self.form1.secretKey,
-                                ssid:self.form1.ssid,
-                            },
+                            user_account:localStorage.getItem('ms_username'),
                             wificoin: {
                                 toAddress:self.form1.toAddress,
                                 toAmount:self.form1.toAmount
@@ -280,6 +225,36 @@
                             portalUrl:self.form1.portalUrl,
                             duration:self.form1.duration
                         };
+                        self.loading = true;
+                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',params).then(function (res) {
+                            self.loading = false;
+                            if(res.data.ret_code == '1001'){
+                                self.$message({message:res.data.extra,type:'warning'});
+                                setTimeout(function(){
+                                    self.$router.replace('login');
+                                },2000)
+                            }
+                            if(res.data.ret_code == 0){
+                                self.$message({message:res.data.extra,type:'success'});
+                            }else{
+                                self.$message.error(res.data.extra)
+                            }
+
+                        })
+
+                    } else {
+                        return false;
+                        console.log('验证失败');
+                    }
+                });
+
+            },
+            onLastSubmit: function(formName){
+                var self = this;
+                self.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        self.params.portalUrl = self.form1.portalUrl;
+                        self.params.duration = self.form1.duration;
                         self.loading = true;
                         self.$axios.post(global_.baseUrl + '/url',params).then(function (res) {
                             self.loading = false;
@@ -309,7 +284,6 @@
                         console.log('验证失败');
                     }
                 });
-
             },
             getGwid: function(){//获取数据
                 var self = this;

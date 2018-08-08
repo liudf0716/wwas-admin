@@ -26,7 +26,7 @@
         </div>
         <el-table :data="userData" border style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
             <el-table-column prop="user_account" label="账 号" width="150"></el-table-column>
-            <el-table-column prop="user_name" label="渠道名称"></el-table-column>
+            <el-table-column prop="user_name" label="渠道名称" width="150"></el-table-column>
             <el-table-column prop="user_phone" label="联系电话" width="130"></el-table-column>
             <el-table-column prop="user_status" label="冻结状态" width="120">
                 <template slot-scope="scope">
@@ -50,7 +50,7 @@
                     <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.user_account)">重置密码</el-button>
                     <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="toRouter(scope.row.user_account)">导入路由</el-button>
                     <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="outRouter(scope.row.user_account)">导出路由</el-button>
-                    <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="delRouter(scope.row.user_account)">删除路由</el-button>
+                    <!--<el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="delRouter(scope.row.user_account)">删除路由</el-button>-->
                     <el-button class="btn1" size="small" v-if="scope.row.user_status =='0' && scope.row.user_type =='1'" @click="revoke(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">冻结账户</el-button>
                     <el-button class="btn1" size="small" v-else-if="scope.row.user_status =='1' && scope.row.user_type =='1'" @click="restore(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">解冻账户</el-button>
                     <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="success" @click="toEnter(scope.row.user_account)">点击进入</el-button>
