@@ -26,6 +26,10 @@ export default new Router({
                         component: resolve => require(['../components/page/DevStatus.vue'], resolve)     // vue-datasource组件
                 },
                 {
+                    path: '/devdetail',
+                    component: resolve => require(['../components/page/DevDetail.vue'], resolve)     // vue-datasource组件
+                },
+                {
                     path: '/approve',
                     component: resolve => require(['../components/page/Approve.vue'], resolve)     // vue-datasource组件
                 }

@@ -53,7 +53,7 @@
                                 <el-input v-model="form1.toAddress" class="diainp2"></el-input>
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
-                                <el-input v-model="form1.toAmount" class="diainp2"></el-input>
+                                <el-input v-model="form1.toAmount" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="跳转" prop="portalUrl">
                                 <el-input v-model="form1.portalUrl" class="diainp"></el-input>
@@ -68,23 +68,23 @@
                     </div>
 
                 </el-tab-pane>
-                <!--<el-tab-pane label="其他设置" name="3">-->
+                <!--<el-tab-pane label="其他设置" name="3">
 
-                    <!--<div class="form-box tab-cont form-box2">-->
-                        <!--<el-form ref="form2" :model="form2" :rules="rules1" label-width="150px">-->
-                            <!--<el-form-item label="跳转页面" prop="portalUrl">-->
-                                <!--<el-input v-model="form2.portalUrl" class="diainp2"></el-input>-->
-                            <!--</el-form-item>-->
-                            <!--<el-form-item label="duration" prop="">-->
-                                <!--<el-input v-model="form2.duration" class="diainp"></el-input>-->
-                            <!--</el-form-item>-->
-                            <!--<el-form-item>-->
-                                <!--<el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>-->
-                            <!--</el-form-item>-->
-                        <!--</el-form>-->
-                    <!--</div>-->
+                    <div class="form-box tab-cont form-box2">
+                        <el-form ref="form2" :model="form2" :rules="rules1" label-width="150px">
+                            <el-form-item label="跳转页面" prop="portalUrl">
+                                <el-input v-model="form2.portalUrl" class="diainp2"></el-input>
+                            </el-form-item>
+                            <el-form-item label="duration" prop="">
+                                <el-input v-model="form2.duration" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
 
-                <!--</el-tab-pane>-->
+                </el-tab-pane>-->
             </el-tabs>
 
         </div>
@@ -101,14 +101,11 @@
                 params:{},
                 task_type:'1',
                 form0: {
-                    gwId: '',
-
                     appId: '',
                     app_secret: '',
                     shopId:'',
                     ssid:'',
                     secretKey: '',
-
                     portalUrl:'',
                     duration:''
                 },
@@ -129,15 +126,14 @@
                         {required: true, message: '请选择跳转页面', trigger: 'blur'}
                     ],
                     duration: [
-                        {required: true, message: '请输入时长', trigger: 'blur'}
+                        {required: true, message: '请输入时长', trigger: 'blur'},
+                        {validator: this.validateTimeNum, trigger: 'blur'}
                     ]
 
                 },
                 form1: {
-                    channelPath: '',
                     toAddress:'',
                     toAmount:'',
-
                     portalUrl:'',
                     duration:''
                 },
@@ -146,22 +142,14 @@
                         { required: true, message: '请选择toAddress', trigger: 'blur'}
                     ],
                     toAmount: [
-                        {required: true, message: '请输入toAmount', trigger: 'blur'},
+                        {required: true, message: '请输入toAmount', trigger: 'blur'}
                     ],
                     portalUrl: [
                         {required: true, message: '请选择跳转页面', trigger: 'blur'}
                     ],
                     duration: [
-                        {required: true, message: '请输入时长', trigger: 'blur'}
-                    ]
-                },
-                form2:{
-                    portalUrl: '',
-                    duration:''
-                },
-                rules2: {
-                    portalUrl: [
-                        {required: true, message: '请输入portalUrl', trigger: 'blur'},
+                        {required: true, message: '请输入时长', trigger: 'blur'},
+                        {validator: this.validateTimeNum, trigger: 'blur'}
                     ]
                 },
 
@@ -169,7 +157,7 @@
             }
         },
         created:function () {
-            // this.getGwid();
+            this.getData();
         },
         methods: {
             onWeixinSubmit:function (formName) {
@@ -285,9 +273,12 @@
                     }
                 });
             },
-            getGwid: function(){//获取数据
+            getData: function(){//获取数据
                 var self = this;
-                self.$axios.post(global_.baseUrl+'/url').then(function(res){
+                var params = {
+                    user_account:localStorage.getItem('ms_username')
+                }
+                self.$axios.post(global_.baseUrl+'/setting/getSetting',params).then(function(res){
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
@@ -295,10 +286,31 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        var gwidData = res.data.extra;
-                        self.form0.appId = gwidData.appId;
+                        console.log(res.data);
+                        var requestData = res.data.extra;
+                        self.form0.appId = requestData.appId;
+                        self.form0.shopId = requestData.shopId;
+                        self.form0.secretKey = requestData.secretKey;
+                        self.form0.ssid = requestData.ssid;
+                        self.form0.portalUrl = requestData.portalUrl;
+                        self.form0.duration = String(requestData.duration);
+
+                        self.form1.toAddress = requestData.toAddress;
+                        self.form1.toAmount = String(requestData.toAmount);
+                        self.form1.portalUrl = requestData.portalUrl;
+                        self.form1.duration = String(requestData.duration);
                     }
                 })
+            },
+            validateTimeNum: function (rule, value, callback) {
+                var self = this;
+                var reg = /^\d+$/;
+                if(!reg.test(value)){
+                    callback(new  Error('输入必须是数字'));
+                }else{
+                    callback();
+                }
+
             },
             getChannelPath: function(){
                 var self = this;
