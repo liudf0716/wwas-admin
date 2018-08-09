@@ -2,15 +2,15 @@
     <div class="footer">
 
         <div class="p">This site is powered by the open source&nbsp;
-            <a target="_blank" href="https://github.com/zone117x/node-open-mining-portal/">NOMP</a>&nbsp;
-            project created by Matthew Little and licensed under the&nbsp;
+            <a target="_blank" href="https://github.com/wificoin-project/">WiFicoin Opensource Project</a>&nbsp;
+            project created by wificoin team &nbsp;
             <a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL</a>
         </div>
         <div class="p">
-            <i class="el-icon-star-on"></i>&nbsp; Support this project by donating&nbsp;<i class="fa fa-btc"></i>&nbsp;BTC: 1KRotMnQpxu3sePQnsVLRy3EraRFYfJQFR
+            <i class="el-icon-star-on"></i>&nbsp; Support this project by donating&nbsp;<i class="fa fa-btc"></i>&nbsp;<a target="_blank" href="https://wfc.xyblock.net/#/wifiPortal/donate">WFC</a>
         </div>
         <div class="p" id="communityFooter">
-            Community&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=4ADDSev">QQ群(331230369)</a>
+            Community&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)</a>
             &nbsp;&nbsp;|&nbsp;&nbsp;
             <a target="_blank" href="https://wfc.xyblock.net">WFC</a>
             &nbsp;&nbsp;|&nbsp;&nbsp;
