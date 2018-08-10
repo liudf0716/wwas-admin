@@ -40,9 +40,9 @@
                         {{bandwidthLabel(scope.row.clients.incoming || 0)}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="clients.outcoming" label="上行流量" width="120">
+                <el-table-column prop="clients.outgoing" label="上行流量" width="120">
                     <template slot-scope="scope">
-                        {{bandwidthLabel(scope.row.clients.outcoming || 0)}}
+                        {{bandwidthLabel(scope.row.clients.outgoing || 0)}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="clients.firstLogin" label="通过认证时间" width="200">
