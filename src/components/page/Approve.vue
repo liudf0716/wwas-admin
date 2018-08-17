@@ -144,7 +144,7 @@
                     ],
                     toAmount: [
                         {required: true, message: '请输入金额', trigger: 'blur'},
-                        {validator: this.validateTimeNum, trigger: 'blur'}
+                        {validator: this.validateNum, trigger: 'blur'}
                     ],
                     portalUrl: [
                         {required: true, message: '请选择跳转页面', trigger: 'blur'}
@@ -303,6 +303,16 @@
                         self.form1.duration = String(requestData.duration);
                     }
                 })
+            },
+            validateNum: function (rule, value, callback) {
+                var self = this;
+                var reg = /^\d+(\.\d+)?$/; //非负浮点数
+                if(!reg.test(value)){
+                    callback(new  Error('输入必须是数字'));
+                }else{
+                    callback();
+                }
+
             },
             validateTimeNum: function (rule, value, callback) {
                 var self = this;
