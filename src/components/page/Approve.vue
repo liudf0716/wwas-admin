@@ -30,9 +30,9 @@
                             <el-form-item label="SHOP_ID" prop="shopId">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="无线名称" prop="ssid">
-                                <el-input v-model="form0.ssid" class="diainp"></el-input>
-                            </el-form-item>
+                            <!--<el-form-item label="无线名称" prop="ssid">-->
+                                <!--<el-input v-model="form0.ssid" class="diainp"></el-input>-->
+                            <!--</el-form-item>-->
                             <el-form-item label="跳转" prop="portalUrl">
                                 <el-input v-model="form0.portalUrl" class="diainp"></el-input>
                             </el-form-item>
@@ -51,6 +51,7 @@
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
                             <el-form-item label="钱包地址" prop="toAddress">
                                 <el-input v-model="form1.toAddress" class="diainp2"></el-input>
+                                <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 20px;color:#20a0ff;">查看地址</a>
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp"></el-input>
@@ -119,9 +120,9 @@
                     shopId: [
                         {required: true, message: '请选择SHOP_ID', trigger: 'blur'}
                     ],
-                    ssid: [
-                        {required: true, message: '请输入无线名称', trigger: 'blur'}
-                    ],
+                    // ssid: [
+                    //     {required: true, message: '请输入无线名称', trigger: 'blur'}
+                    // ],
                     portalUrl: [
                         {required: true, message: '请选择跳转页面', trigger: 'blur'}
                     ],
@@ -139,10 +140,11 @@
                 },
                 rules1: {
                     toAddress:[
-                        { required: true, message: '请选择toAddress', trigger: 'blur'}
+                        { required: true, message: '请输入钱包地址', trigger: 'blur'}
                     ],
                     toAmount: [
-                        {required: true, message: '请输入toAmount', trigger: 'blur'}
+                        {required: true, message: '请输入金额', trigger: 'blur'},
+                        {validator: this.validateTimeNum, trigger: 'blur'}
                     ],
                     portalUrl: [
                         {required: true, message: '请选择跳转页面', trigger: 'blur'}
@@ -170,7 +172,7 @@
                                 appId:self.form0.appId,
                                 shopId:self.form0.shopId,
                                 secretKey:self.form0.secretKey,
-                                ssid:self.form0.ssid,
+                                // ssid:self.form0.ssid,
                             },
                             portalUrl: self.form0.portalUrl,
                             duration: self.form0.duration
@@ -398,8 +400,8 @@
 <style>
     .mb40 {margin-bottom: 40px;}
     .tab-cont {padding: 40px; /*border-top:1px solid #dfe6ec;*/}
-    .diainp{width:217px;}
-    .diainp2{width:450px;}
+    .diainp{width:260px;}
+    .diainp2{width:260px;}
     .inp100{width:100px;}
     /*.textarea-mac{height:160px;}*/
     .form-box2{width:700px;}

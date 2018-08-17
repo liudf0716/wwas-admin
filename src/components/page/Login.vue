@@ -15,14 +15,31 @@
                 <!--<div class="login-btn">-->
                     <!--<el-button type="text" @click="register">用户注册</el-button>-->
                 <!--</div>-->
-                <!--<p style="font-size:12px;line-height:30px;color:#999;">Tips : 用户名和密码随便填。</p>-->
+                <p style="font-size:12px;line-height:30px;color:#ccc;">用户注册请先加群联系相关人员</p>
             </el-form>
+        </div>
+        <div class="footer">
+
+            <div class="p">This site is powered by the open source&nbsp;
+                <a target="_blank" href="https://github.com/wificoin-project/">WiFicoin Opensource Project</a>&nbsp;
+                project created by wificoin team &nbsp;
+                <!--<a href="http://www.gnu.org/licenses/gpl-2.0.html">GPL</a>-->
+            </div>
+            <div class="p">
+                <i class="el-icon-star-on"></i>&nbsp; Support this project by donating&nbsp;<i class="fa fa-btc"></i>&nbsp;<a target="_blank" href="https://wfc.xyblock.net/#/wifiPortal/donate">WFC</a>
+            </div>
+            <div class="p" id="communityFooter">
+                Community&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)</a>
+                <!--&nbsp;&nbsp;|&nbsp;&nbsp;-->
+                <!--<iframe src="http://ghbtns.com/github-btn.html?user=liudf0716&amp;repo=node-open-mining-portal&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="140" height="20"></iframe>-->
+            </div>
+
         </div>
     </div>
 </template>
-
 <script>
     import axios from 'axios';
+    import  md5 from 'js-md5';
     import global_ from 'components/common/Global';
     export default {
         data: function(){
@@ -74,7 +91,8 @@
                     if (valid) {
                         let params = {
                             user_account: self.ruleForm.username,
-                            user_password: self.ruleForm.password
+                            user_password: md5(self.ruleForm.password)
+                            // user_password: self.ruleForm.password
                         };
                         self.$axios.post(global_.baseUrl + '/admin/login',params).then(function(res){
                             // console.log(res);
@@ -138,5 +156,26 @@
     .login-btn button{
         width:100%;
         height:36px;
+    }
+    .footer{
+        position: absolute;
+        box-sizing: border-box;
+        width: 100%;
+        color: #999;
+        text-align: center;
+        font-size:14px;
+        margin-top:30px;
+        border-top:1px solid rgba(60,60,60,.4);
+        padding-top:30px;
+        bottom:0;
+        padding-bottom:30px;
+    }
+    .footer .p{
+        height:30px;
+        line-height:30px;
+    }
+    .footer a{
+        font-size:15px;
+        color:#4db3ff;
     }
 </style>

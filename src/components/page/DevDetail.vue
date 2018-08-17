@@ -166,9 +166,9 @@
             //连接设备速率转换
             bandwidthLabel: function(by){
                 var kby = (by / 1024).toFixed(2);
-                var uby = 'KB/s';
+                var uby = 'KB';
                 if (kby >= 1024) {
-                    uby = 'MB/s';
+                    uby = 'MB';
                     kby = (kby / 1024).toFixed(2);
                 }
                 return kby + " " + uby;
