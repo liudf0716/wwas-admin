@@ -12,10 +12,11 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
                 </div>
-                <!--<div class="login-btn">-->
+                <div class="login-btn">
                     <!--<el-button type="text" @click="register">用户注册</el-button>-->
-                <!--</div>-->
-                <p style="font-size:12px;line-height:30px;color:#ccc;">用户注册请先加群联系相关人员</p>
+                    <a class="login-btn-a" href="https://jq.qq.com/?_wv=1027&k=5StVwau" target="_blank">用户注册</a>
+                </div>
+                <p style="font-size:12px;line-height:30px;color:#aaa;">用户注册请先加群联系相关人员</p>
             </el-form>
         </div>
         <div class="footer">
@@ -124,6 +125,32 @@
 </script>
 
 <style scoped>
+
+    .login-btn-a{
+        display: inline-block;
+        width:100%;
+        height:36px;
+        line-height: 36px;
+        font-size:14px;
+        color:#4db3ff;
+        margin:15px 0 0 0;
+        border:1px solid #4db3ff;
+        border-radius: 3px;
+    }
+    .login-btn-a{
+        /*display: inline-block;*/
+        /*width:100%;*/
+        /*height:36px;*/
+        /*line-height: 36px;*/
+        /*font-size:14px;*/
+        /*color:#fff;*/
+        /*margin:15px 0 0 0;*/
+        /*background-color:#4db3ff;*/
+        /*border-radius: 3px;*/
+    }
+    .login-btn-a:hover{
+        background-color:#f5f5f5;
+    }
     .login-wrap{
         position: relative;
         width:100%;
@@ -144,7 +171,7 @@
         left:50%;
         top:50%;
         width:300px;
-        height:160px;
+        height:210px;
         margin:-150px 0 0 -190px;
         padding:40px;
         border-radius: 5px;

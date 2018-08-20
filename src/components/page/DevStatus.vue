@@ -41,12 +41,12 @@
                     {{timeStamp(scope.row.wifidogUptime)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="lastTime" label="最近上线时间" width="180">
+            <el-table-column prop="lastTime" label="最近上线时间" width="190">
                 <template slot-scope="scope">
                     {{dateForm(scope.row.lastTime)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="remoteAddress" label="设备IP" width="160"></el-table-column>
+            <el-table-column prop="remoteAddress" label="设备IP" width="150"></el-table-column>
             <el-table-column prop="auth" label="认证平台" width="100">
                 <template slot-scope="scope">
                     <el-tag :type="scope.row.auth == '0' ? 'warning':'success'" close-transition>{{scope.row.auth == '1'?'已认证':'未认证'}}</el-tag>

@@ -31,7 +31,7 @@
                 <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
                 <el-table-column prop="clients.wired" label="有线设备" width="100">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.wired == '1'?'是': '否'}}</el-tag>
+                        <el-tag :type="scope.row.clients.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.clients.wired == '1'?'是': '否'}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="clients.name" label="终端名称" width="220"></el-table-column>
@@ -201,7 +201,7 @@
                     filter:{"gwId":self.curGwid}
                 };
                 if(localStorage.getItem('userMsg') == 1){//非超级管理员
-                    params.filter.user_name = localStorage.getItem('ms_username');
+                    params.filter.channelPath = localStorage.getItem('ms_username');
                 }
                 self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
                     self.loading = false;
