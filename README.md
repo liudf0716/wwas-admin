@@ -46,7 +46,7 @@ npm run dev
 
 # 运营平台
 
-[查看运营平台请戳这里](http://wifidog.kunteng.org.cn)
+[查看运营平台请戳这里](http://wifidog.kunteng.org.cn:8001)
 
 # 捐赠
 
