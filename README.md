@@ -34,7 +34,7 @@ npm run dev
 
 # 另外
 
-该项目的运行需要[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的后台支持，如需要了解[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的使用，请移步到[此]（https://github.com/wificoin-project/wificoin-wifidog-auth-server）
+该项目的运行需要[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的后台支持，如需要了解[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的使用，请移步到：https://github.com/wificoin-project/wificoin-wifidog-auth-server
 
 如果只做前端开发，请忽略这句话。
 
