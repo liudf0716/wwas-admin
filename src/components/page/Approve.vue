@@ -30,15 +30,6 @@
                             <el-form-item label="SHOP_ID" prop="shopId">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
                             </el-form-item>
-                            <!--<el-form-item label="无线名称" prop="ssid">-->
-                                <!--<el-input v-model="form0.ssid" class="diainp"></el-input>-->
-                            <!--</el-form-item>-->
-                            <el-form-item label="跳转" prop="portalUrl">
-                                <el-input v-model="form0.portalUrl" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="时间" prop="duration">
-                                <el-input v-model="form0.duration" class="diainp"></el-input>
-                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onWeixinSubmit('form0')">下一步</el-button>
                             </el-form-item>
@@ -51,33 +42,44 @@
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
                             <el-form-item label="钱包地址" prop="toAddress">
                                 <el-input v-model="form1.toAddress" class="diainp2"></el-input>
-                                <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 20px;color:#20a0ff;">查看地址</a>
+                                <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="跳转" prop="portalUrl">
-                                <el-input v-model="form1.portalUrl" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="时间" prop="duration">
-                                <el-input v-model="form1.duration" class="diainp"></el-input>
-                            </el-form-item>
+                            <!--<el-form-item label="跳转" prop="portalUrl">-->
+                                <!--<el-input v-model="form1.portalUrl" class="diainp"></el-input>-->
+                            <!--</el-form-item>-->
+                            <!--<el-form-item label="时间" prop="duration">-->
+                                <!--<el-input v-model="form1.duration" class="diainp"></el-input>-->
+                                <!--<span style="padding:5px 12px;">小时</span>-->
+                            <!--</el-form-item>-->
                             <el-form-item>
-                                <el-button type="primary" @click="onWificoinSubmit('form1')">保存</el-button>
+                                <el-button type="primary" @click="onWificoinSubmit('form1')">下一步</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
 
                 </el-tab-pane>
-                <!--<el-tab-pane label="其他设置" name="3">
+                <el-tab-pane label="其他设置" name="3">
 
                     <div class="form-box tab-cont form-box2">
-                        <el-form ref="form2" :model="form2" :rules="rules1" label-width="150px">
-                            <el-form-item label="跳转页面" prop="portalUrl">
-                                <el-input v-model="form2.portalUrl" class="diainp2"></el-input>
+                        <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
+
+                            <el-form-item label="跳转" prop="portalUrl">
+                                <el-input v-model="form2.portalUrl" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="duration" prop="">
-                                <el-input v-model="form2.duration" class="diainp"></el-input>
+                            <el-form-item label="时间" prop="duration">
+                                <!--<el-input v-model="form0.duration" class="diainp"></el-input>-->
+                                <el-select v-model="form2.duration" class="diainp" placeholder="请选择" @change="changeDuration">
+                                    <el-option
+                                        v-for="item in durations"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                    </el-option>
+                                </el-select>
+                                <span style="padding:5px 12px;">小时</span>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
@@ -85,9 +87,86 @@
                         </el-form>
                     </div>
 
-                </el-tab-pane>-->
+                </el-tab-pane>
             </el-tabs>
+            <!--<el-steps class="steps-tit" :active="active" finish-status="success" align-center>
+                <el-step title="微信认证"></el-step>
+                <el-step title="WFC认证"></el-step>
+                <el-step title="其他设置"></el-step>
+            </el-steps>
+            <div v-if="active==0" label="微信认证" name="1">
+                <div class="txt" style="font-size:16px;color:#666;">
+                    <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
+                    <p>SHOP_ID及对应SSID和secretKey：</p>
+                    <p class="txt-small">
+                        <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
+                        <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
+                        <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
+                    </p>
+                </div>
+                <div class="form-box tab-cont form-box2">
+                    <el-form :model="form0" :rules="rules0" ref="form0" label-width="150px">
+                        <el-form-item label="APP_ID" prop="appId">
+                            <el-input v-model="form0.appId" class="diainp"></el-input>
+                        </el-form-item>
+                        <el-form-item label="secretKey" prop="secretKey">
+                            <el-input v-model="form0.secretKey" class="diainp2"></el-input>
+                        </el-form-item>
+                        <el-form-item label="SHOP_ID" prop="shopId">
+                            <el-input v-model="form0.shopId" class="diainp"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onWeixinSubmit1('form0')">下一步</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+            <div v-if="active==1">
 
+                <div class="form-box tab-cont form-box2">
+                    <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
+                        <el-form-item label="钱包地址" prop="toAddress">
+                            <el-input v-model="form1.toAddress" class="diainp2"></el-input>
+                            <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
+                        </el-form-item>
+                        <el-form-item label="金额(WFC)" prop="toAmount">
+                            <el-input v-model="form1.toAmount" class="diainp"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="prev">上一步</el-button>
+                            <el-button type="primary" @click="onWificoinSubmit1('form1')">下一步</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+
+            </div>
+            <div v-if="active== 2">
+                <div class="form-box tab-cont form-box2">
+                    <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
+                        <el-form-item label="跳转" prop="portalUrl">
+                            <el-input v-model="form2.portalUrl" class="diainp"></el-input>
+                        </el-form-item>
+                        <el-form-item label="时间" prop="duration">
+                            <el-select v-model="form2.duration" class="diainp" placeholder="请选择" @change="changeDuration">
+                                <el-option
+                                    v-for="item in durations"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                                </el-option>
+                            </el-select>
+                            <span style="padding:5px 12px;">小时</span>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="prev">上一步</el-button>
+                            <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+            <div v-if="active == 3" class="last-cont">
+                <p>{{resultExtra}}</p>
+            </div>-->
         </div>
 
     </div>
@@ -100,6 +179,7 @@
         data: function () {
             return {
                 params:{},
+                active:0,
                 task_type:'1',
                 form0: {
                     appId: '',
@@ -107,36 +187,25 @@
                     shopId:'',
                     ssid:'',
                     secretKey: '',
-                    portalUrl:'',
-                    duration:''
+                    // portalUrl:'',
+                    // duration:''
                 },
+                durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 rules0: {
                     appId: [
                         {required: true, message: '请输入APP_ID', trigger: 'blur'},
                     ],
                     secretKey: [
-                        {required: true, message: '请选择secretKey', trigger: 'blur'}
+                        {required: true, message: '请输入secretKey', trigger: 'blur'}
                     ],
                     shopId: [
-                        {required: true, message: '请选择SHOP_ID', trigger: 'blur'}
-                    ],
-                    // ssid: [
-                    //     {required: true, message: '请输入无线名称', trigger: 'blur'}
-                    // ],
-                    portalUrl: [
-                        {required: true, message: '请选择跳转页面', trigger: 'blur'}
-                    ],
-                    duration: [
-                        {required: true, message: '请输入时长', trigger: 'blur'},
-                        {validator: this.validateTimeNum, trigger: 'blur'}
+                        {required: true, message: '请输入SHOP_ID', trigger: 'blur'}
                     ]
 
                 },
                 form1: {
                     toAddress:'',
                     toAmount:'',
-                    portalUrl:'',
-                    duration:''
                 },
                 rules1: {
                     toAddress:[
@@ -145,13 +214,18 @@
                     toAmount: [
                         {required: true, message: '请输入金额', trigger: 'blur'},
                         {validator: this.validateNum, trigger: 'blur'}
-                    ],
+                    ]
+                },
+                form2: {
+                    portalUrl:'',
+                    duration:''
+                },
+                rules2: {
                     portalUrl: [
-                        {required: true, message: '请选择跳转页面', trigger: 'blur'}
+                        {required: true, message: '请输入跳转页面', trigger: 'blur'}
                     ],
                     duration: [
-                        {required: true, message: '请输入时长', trigger: 'blur'},
-                        {validator: this.validateTimeNum, trigger: 'blur'}
+                        {required: true, message: '请选择时长', trigger: 'change'}
                     ]
                 },
 
@@ -162,39 +236,24 @@
             this.getData();
         },
         methods: {
+            prev: function(){
+                this.active--;
+            },
             onWeixinSubmit:function (formName) {
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        var params = {
+                        self.params = {
                             user_account:localStorage.getItem('ms_username'),
                             weixin:{
                                 appId:self.form0.appId,
                                 shopId:self.form0.shopId,
                                 secretKey:self.form0.secretKey,
                                 // ssid:self.form0.ssid,
-                            },
-                            portalUrl: self.form0.portalUrl,
-                            duration: self.form0.duration
+                            }
                         };
-                        self.loading = true;
-                        self.$axios.post(global_.baseUrl + '/setting/weiXinSetting',params).then(function (res) {
-                            // console.log(res.data);
-                            self.loading = false;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == 0){
-                                self.$message({message:res.data.extra,type:'success'});
-                                self.task_type = '2';
-                            }else{
-                                self.$message.error(res.data.extra);
-                            }
-                        })
-
+                        self.active = 1;
+                        self.task_type = '2';
                     } else {
                         return false;
                         console.log('验证失败');
@@ -206,32 +265,12 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        var params = {
-                            user_account:localStorage.getItem('ms_username'),
-                            wificoin: {
-                                toAddress:self.form1.toAddress,
-                                toAmount:self.form1.toAmount
-                            },
-                            portalUrl:self.form1.portalUrl,
-                            duration:self.form1.duration
+                        self.params.wificoin = {
+                            toAddress:self.form1.toAddress,
+                            toAmount:self.form1.toAmount
                         };
-                        self.loading = true;
-                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',params).then(function (res) {
-                            self.loading = false;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == 0){
-                                self.$message({message:res.data.extra,type:'success'});
-                            }else{
-                                self.$message.error(res.data.extra)
-                            }
-
-                        })
-
+                        self.active = 2;
+                        self.task_type = '3';
                     } else {
                         return false;
                         console.log('验证失败');
@@ -243,11 +282,12 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        self.params.portalUrl = self.form1.portalUrl;
-                        self.params.duration = self.form1.duration;
+                        self.params.portalUrl = self.form2.portalUrl;
+                        self.params.duration = self.form2.duration;
                         self.loading = true;
-                        self.$axios.post(global_.baseUrl + '/url',params).then(function (res) {
+                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
                             self.loading = false;
+                            self.active = 3;
                             if(res.data.ret_code == '1001'){
                                 self.$message({message:res.data.extra,type:'warning'});
                                 setTimeout(function(){
@@ -256,17 +296,10 @@
                             }
                             if(res.data.ret_code == 0){
                                 self.$message({message:res.data.extra,type:'success'});
+
                             }else{
                                 self.$message.error(res.data.extra)
                             }
-                            self.form2.route_mac = '';
-                            self.form2.script_name = '';
-                            self.form2.script_mode = '1';
-                            self.form2.upgrade_time = '';
-                            self.form2.expired_time = '0';
-                            self.form2.isTime = true;
-                            self.form2.operator = '';
-
                         })
 
                     } else {
@@ -294,15 +327,19 @@
                         self.form0.shopId = requestData.shopId;
                         self.form0.secretKey = requestData.secretKey;
                         self.form0.ssid = requestData.ssid;
-                        self.form0.portalUrl = requestData.portalUrl;
-                        self.form0.duration = String(requestData.duration);
+                        self.form2.portalUrl = requestData.portalUrl;
+                        self.form2.duration = String(requestData.duration);
 
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
-                        self.form1.portalUrl = requestData.portalUrl;
-                        self.form1.duration = String(requestData.duration);
+                        // self.form1.portalUrl = requestData.portalUrl;
+                        // self.form1.duration = String(requestData.duration);
                     }
                 })
+            },
+            changeDuration: function(value){
+                var self = this;
+                self.form2.duration = String(value);
             },
             validateNum: function (rule, value, callback) {
                 var self = this;
@@ -408,6 +445,8 @@
     }
 </script>
 <style>
+    .last-cont{}
+    .steps-tit{margin-bottom:30px;}
     .mb40 {margin-bottom: 40px;}
     .tab-cont {padding: 40px; /*border-top:1px solid #dfe6ec;*/}
     .diainp{width:260px;}
