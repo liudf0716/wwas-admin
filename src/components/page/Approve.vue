@@ -222,7 +222,8 @@
                 },
                 rules2: {
                     portalUrl: [
-                        {required: true, message: '请输入跳转页面', trigger: 'blur'}
+                        {required: true, message: '请输入跳转页面', trigger: 'blur'},
+                        {validator: this.validateUrl, trigger: 'blur'}
                     ],
                     duration: [
                         {required: true, message: '请选择时长', trigger: 'change'}
@@ -280,31 +281,60 @@
             },
             onLastSubmit: function(formName){
                 var self = this;
-                self.$refs[formName].validate(function (valid) {
-                    if (valid) {
-                        self.params.portalUrl = self.form2.portalUrl;
-                        self.params.duration = self.form2.duration;
-                        self.loading = true;
-                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
-                            self.loading = false;
-                            self.active = 3;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == 0){
-                                self.$message({message:res.data.extra,type:'success'});
+                self.$refs['form0'].validate(function (valid) {
+                    if(valid){
+
+                        self.$refs['form1'].validate(function (valid) {
+                            if(valid){
+
+                                self.$refs[formName].validate(function (valid) {
+                                    if (valid) {
+                                        self.params.user_account = localStorage.getItem('ms_username');
+                                        self.params.weixin = {
+                                            appId:self.form0.appId,
+                                            shopId:self.form0.shopId,
+                                            secretKey:self.form0.secretKey,
+                                            // ssid:self.form0.ssid,
+                                        };
+                                        self.params.wificoin = {
+                                            toAddress:self.form1.toAddress,
+                                            toAmount:self.form1.toAmount
+                                        };
+                                        self.params.portalUrl = self.form2.portalUrl;
+                                        self.params.duration = self.form2.duration;
+                                        self.loading = true;
+                                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
+                                            self.loading = false;
+                                            self.active = 3;
+                                            if(res.data.ret_code == '1001'){
+                                                self.$message({message:res.data.extra,type:'warning'});
+                                                setTimeout(function(){
+                                                    self.$router.replace('login');
+                                                },2000)
+                                            }
+                                            if(res.data.ret_code == 0){
+                                                self.$message({message:res.data.extra,type:'success'});
+
+                                            }else{
+                                                self.$message.error(res.data.extra)
+                                            }
+                                        })
+
+                                    } else {
+                                        return false;
+                                        console.log('验证失败');
+                                    }
+                                });
 
                             }else{
-                                self.$message.error(res.data.extra)
+                                self.task_type = '2';
+                                return false;
                             }
-                        })
+                        });
 
-                    } else {
+                    }else{
+                        self.task_type = '1';
                         return false;
-                        console.log('验证失败');
                     }
                 });
             },
@@ -340,6 +370,16 @@
             changeDuration: function(value){
                 var self = this;
                 self.form2.duration = String(value);
+            },
+            validateUrl: function (rule, value, callback) {
+                var self = this;
+                var reg = /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
+                if(!reg.test(value)){
+                    callback(new  Error('请输入正确网址，如(http://baidu.com)'));
+                }else{
+                    callback();
+                }
+
             },
             validateNum: function (rule, value, callback) {
                 var self = this;
@@ -396,24 +436,6 @@
                 }else{
                     callback();
                 }
-            },
-            validateTimeNum: function (rule, value, callback) {
-                var self = this;
-                var reg = /^\d+$/;
-                if(!reg.test(value)){
-                    callback(new  Error('输入必须是数字'));
-                }
-                // if(!self.form0.isTime || !self.form1.isTime){
-                if((self.task_type == '1' && self.isValidTime0) || (self.task_type == '2' && self.isValidTime1) || (self.task_type == '3' && self.isValidTime2)){
-                    if(!reg.test(value) || Number(value)<24){
-                        callback(new Error('输入必须是数字,且不小于24'));
-                    }else{
-                        callback();
-                    }
-                }else{
-                    callback();
-                }
-
             },
             validateMac: function (rule, value, callback) {
                 var self = this;
