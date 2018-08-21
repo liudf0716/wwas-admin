@@ -48,7 +48,34 @@ npm run dev
 
 # 运营平台
 
-[查看运营平台请戳这里](http://wifidog.kunteng.org.cn:8001)
+[申请免费使用运营平台请戳这里](http://wifidog.kunteng.org.cn:8001)
+
+# 部分截图
+
+### 登录
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/login.png"/>
+
+### 渠道管理
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/qudao.png"/>
+
+### 设备管理
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/device.png"/>
+
+### 微信认证配置
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/weixin_auth.png"/>
+
+### wfc支付认证配置
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/wfc_auth.png"/>
+
+### 其他认证配置
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/other_auth.png"/>
+
 
 # 捐赠
 
