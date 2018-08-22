@@ -30,7 +30,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                target:'http://wechat.kunteng.org.cn:8001',
+                target:'http://wifidog.kunteng.org.cn:8001',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''
