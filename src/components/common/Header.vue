@@ -37,6 +37,7 @@
     </div>
 </template>
 <script>
+    import  md5 from 'js-md5';
     import global_ from 'components/common/Global';
     export default {
         data() {
@@ -85,14 +86,34 @@
                 self.$refs[formName].validate(function(valid){
                     if(valid){
                         var params = {
-                            user_account: self.form.user_account,
-                            user_password:self.form.user_password,
-                            user_new_password: self.form.user_new_password
+                            user_account: md5(self.form.user_account),
+                            user_password: md5(self.form.user_password),
+                            user_new_password: md5(self.form.user_new_password)
                         };
                         self.$axios.post(global_.baseUrl+'/admin/change',params).then(function(res){
                             if(res.data.ret_code == 0){
                                 self.showDialogPwd = false;
-                                self.$message({message:res.data.extra,type:'success'})
+                                self.$message({message:res.data.extra,type:'success'});
+
+                                self.$axios.post(global_.baseUrl+'/admin/logout').then(function(res){//退出重新登录
+                                    if(res.data.ret_code == '1001'){
+                                        self.$message({message:res.data.extra,type:'warning'});
+                                        setTimeout(function(){
+                                            self.$router.replace('login');
+                                        },2000)
+                                    }
+                                    if(res.data.ret_code == 0){
+                                        // self.$message({message:res.data.extra,type:'success'});
+                                        localStorage.removeItem('ms_username');
+                                        localStorage.removeItem('userMsg');
+                                        self.$router.push('/login');
+                                    }else{
+                                        self.$message.error(res.data.extra);
+                                    }
+                                },function(err){
+                                    self.$message.error(err);
+                                });
+
                             }else{
                                 self.$message.error(res.data.extra);
                             }
