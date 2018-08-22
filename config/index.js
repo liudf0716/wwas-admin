@@ -20,8 +20,7 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        //webServer: 'http://wechat.kunteng.org.cn:8001'
-        webServer: 'http://192.168.158.18:8001'
+        webServer: 'http://wifidog.kunteng.org.cn:8001'
     },
     dev: {
         env: require('./dev.env'),
