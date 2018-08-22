@@ -36,7 +36,20 @@ npm run dev
 
 该项目的运行需要[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的后台支持，如需要了解[WWAS](https://github.com/wificoin-project/wificoin-wifidog-auth-server)的使用，请移步到：https://github.com/wificoin-project/wificoin-wifidog-auth-server
 
-如果只做前端开发，请忽略这句话。
+使用方法如下：
+
+1.git clone https://github.com/wificoin-project/wwas-admin.git
+
+2.cd wwas-admin
+
+3.npm install
+
+4.npm run build
+
+5.把生成的dist文件夹整个复制到WWAS的public目录下即可。
+
+
+如果只做前端开发，请忽略这段话。
 
 # 说明
 
