@@ -210,6 +210,7 @@
 </template>
 
 <script>
+    import  md5 from 'js-md5';
     import global_ from 'components/common/Global';
     var crypto = require('crypto');
     export default {
@@ -475,7 +476,7 @@
                     }
                     let params = {
                         user_account:self.form.user,
-                        user_password:self.form.password,
+                        user_password:md5(self.form.password),
                         user_name:self.form.name,
                         user_phone:self.form.tel,
                         user_city:self.form.selectProv+self.form.selectCity+self.form.addr
@@ -576,8 +577,8 @@
                     if(valid){
                         var params = {
                             user_account: self.curAccount,
-                            user_password:self.formP.user_password,
-                            user_new_password: self.formP.user_new_password
+                            user_password:md5(self.formP.user_password),
+                            user_new_password: md5(self.formP.user_new_password)
                         };
                         self.fullscreenLoading  = true;
                         self.$axios.post(global_.baseUrl+'/admin/change',params).then(function(res){
