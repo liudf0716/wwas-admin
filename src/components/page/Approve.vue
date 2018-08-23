@@ -25,7 +25,7 @@
                                 <el-input v-model="form0.appId" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="secretKey" prop="secretKey">
-                                <el-input v-model="form0.secretKey" class="diainp2"></el-input>
+                                <el-input v-model="form0.secretKey" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="SHOP_ID" prop="shopId">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
@@ -41,7 +41,7 @@
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
                             <el-form-item label="钱包地址" prop="toAddress">
-                                <el-input v-model="form1.toAddress" class="diainp2"></el-input>
+                                <el-input v-model="form1.toAddress" class="diainp"></el-input>
                                 <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
@@ -89,84 +89,6 @@
 
                 </el-tab-pane>
             </el-tabs>
-            <!--<el-steps class="steps-tit" :active="active" finish-status="success" align-center>
-                <el-step title="微信认证"></el-step>
-                <el-step title="WFC认证"></el-step>
-                <el-step title="其他设置"></el-step>
-            </el-steps>
-            <div v-if="active==0" label="微信认证" name="1">
-                <div class="txt" style="font-size:16px;color:#666;">
-                    <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                    <p>SHOP_ID及对应SSID和secretKey：</p>
-                    <p class="txt-small">
-                        <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
-                        <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
-                        <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
-                    </p>
-                </div>
-                <div class="form-box tab-cont form-box2">
-                    <el-form :model="form0" :rules="rules0" ref="form0" label-width="150px">
-                        <el-form-item label="APP_ID" prop="appId">
-                            <el-input v-model="form0.appId" class="diainp"></el-input>
-                        </el-form-item>
-                        <el-form-item label="secretKey" prop="secretKey">
-                            <el-input v-model="form0.secretKey" class="diainp2"></el-input>
-                        </el-form-item>
-                        <el-form-item label="SHOP_ID" prop="shopId">
-                            <el-input v-model="form0.shopId" class="diainp"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="onWeixinSubmit1('form0')">下一步</el-button>
-                        </el-form-item>
-                    </el-form>
-                </div>
-            </div>
-            <div v-if="active==1">
-
-                <div class="form-box tab-cont form-box2">
-                    <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
-                        <el-form-item label="钱包地址" prop="toAddress">
-                            <el-input v-model="form1.toAddress" class="diainp2"></el-input>
-                            <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
-                        </el-form-item>
-                        <el-form-item label="金额(WFC)" prop="toAmount">
-                            <el-input v-model="form1.toAmount" class="diainp"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="prev">上一步</el-button>
-                            <el-button type="primary" @click="onWificoinSubmit1('form1')">下一步</el-button>
-                        </el-form-item>
-                    </el-form>
-                </div>
-
-            </div>
-            <div v-if="active== 2">
-                <div class="form-box tab-cont form-box2">
-                    <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
-                        <el-form-item label="跳转" prop="portalUrl">
-                            <el-input v-model="form2.portalUrl" class="diainp"></el-input>
-                        </el-form-item>
-                        <el-form-item label="时间" prop="duration">
-                            <el-select v-model="form2.duration" class="diainp" placeholder="请选择" @change="changeDuration">
-                                <el-option
-                                    v-for="item in durations"
-                                    :key="item"
-                                    :label="item"
-                                    :value="item">
-                                </el-option>
-                            </el-select>
-                            <span style="padding:5px 12px;">小时</span>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="prev">上一步</el-button>
-                            <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
-                        </el-form-item>
-                    </el-form>
-                </div>
-            </div>
-            <div v-if="active == 3" class="last-cont">
-                <p>{{resultExtra}}</p>
-            </div>-->
         </div>
 
     </div>
@@ -466,7 +388,7 @@
         }
     }
 </script>
-<style>
+<style scoped>
     .last-cont{}
     .steps-tit{margin-bottom:30px;}
     .mb40 {margin-bottom: 40px;}
