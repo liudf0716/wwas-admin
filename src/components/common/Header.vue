@@ -91,6 +91,12 @@
                             user_new_password: md5(self.form.user_new_password)
                         };
                         self.$axios.post(global_.baseUrl+'/admin/change',params).then(function(res){
+                            if(res.data.ret_code == '1001'){
+                                        self.$message({message:res.data.extra,type:'warning'});
+                                        setTimeout(function(){
+                                            self.$router.replace('login');
+                                        },2000)
+                            }
                             if(res.data.ret_code == 0){
                                 self.showDialogPwd = false;
                                 self.$message({message:res.data.extra,type:'success'});
