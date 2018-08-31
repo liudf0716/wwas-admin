@@ -33,7 +33,7 @@
             <el-table-column prop="channelPath" label="渠道" width="140"></el-table-column>
             <el-table-column prop="wiredPassed" label="有线免认证" width="110">
                 <template slot-scope="scope">
-                    <el-tag :type="scope.row.wiredPassed == '0' ? 'warning':'success'" close-transition>{{scope.row.wiredPassed == '1'?'已认证':'未认证'}}</el-tag>
+                    <el-tag :type="scope.row.wiredPassed == '0' ? 'warning':'success'" close-transition>{{scope.row.wiredPassed == '1'?'已开启':'未开启'}}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="wifidogUptime" label="wifidog运行时长" width="160">
