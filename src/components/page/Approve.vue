@@ -61,7 +61,30 @@
                     </div>
 
                 </el-tab-pane>
-                <el-tab-pane label="其他设置" name="3">
+                <el-tab-pane label="短信认证" name="3">
+
+                    <div class="form-box tab-cont form-box2">
+                        <el-form ref="form3" :model="form3" :rules="rules3" label-width="150px">
+                            <el-form-item label="AccessKeyId" prop="appId">
+                                <el-input v-model="form3.appId" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="AccessKeySecret" prop="appSecret">
+                                <el-input v-model="form3.appSecret" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="SignName" prop="smsSignName">
+                                <el-input v-model="form3.smsSignName" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="TemplateCode" prop="smsTemplateCode">
+                                <el-input v-model="form3.smsTemplateCode" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="onDuanxinSubmit('form3')">下一步</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+
+                </el-tab-pane>
+                <el-tab-pane label="其他设置" name="4">
 
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
@@ -151,6 +174,27 @@
                         {required: true, message: '请选择时长', trigger: 'change'}
                     ]
                 },
+                form3:{
+                    appId:'',
+                    appSecret:'',
+                    smsSignName:'',
+                    smsTemplateCode:''
+                },
+                rules3: {
+                    appId: [
+                        {required: true, message: '请输入AccessKeyId', trigger: 'blur'},
+                    ],
+                    appSecret: [
+                        {required: true, message: '请输入AccessKeySecret', trigger: 'blur'}
+                    ],
+                    smsSignName: [
+                        {required: true, message: '请输入SignName', trigger: 'blur'}
+                    ],
+                    smsTemplateCode:[
+                        {required: true, message: '请输入TemplateCode', trigger: 'blur'}
+                    ]
+
+                },
 
                 loading:false
             }
@@ -188,12 +232,31 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
+                        self.params.sms = {
+                            appId:self.form3.appId,
+                            appSecret:self.form3.appSecret,
+                            smsSignName:self.form3.smsSignName,
+                            smsTemplateCode:self.form3.smsTemplateCode
+                        };
+                        self.active = 2;
+                        self.task_type = '3';
+                    } else {
+                        return false;
+                        console.log('验证失败');
+                    }
+                });
+
+            },
+            onDuanxinSubmit: function(formName) {
+                var self = this;
+                self.$refs[formName].validate(function (valid) {
+                    if (valid) {
                         self.params.wificoin = {
                             toAddress:self.form1.toAddress,
                             toAmount:self.form1.toAmount
                         };
-                        self.active = 2;
-                        self.task_type = '3';
+                        self.active = 3;
+                        self.task_type = '4';
                     } else {
                         return false;
                         console.log('验证失败');
@@ -227,7 +290,7 @@
                                         self.loading = true;
                                         self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
                                             self.loading = false;
-                                            self.active = 3;
+                                            self.active = 4;
                                             if(res.data.ret_code == '1001'){
                                                 self.$message({message:res.data.extra,type:'warning'});
                                                 setTimeout(function(){
