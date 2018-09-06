@@ -232,11 +232,9 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        self.params.sms = {
-                            appId:self.form3.appId,
-                            appSecret:self.form3.appSecret,
-                            smsSignName:self.form3.smsSignName,
-                            smsTemplateCode:self.form3.smsTemplateCode
+                        self.params.wificoin = {
+                            toAddress:self.form1.toAddress,
+                            toAmount:self.form1.toAmount
                         };
                         self.active = 2;
                         self.task_type = '3';
@@ -251,9 +249,11 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        self.params.wificoin = {
-                            toAddress:self.form1.toAddress,
-                            toAmount:self.form1.toAmount
+                        self.params.sms = {
+                            appId:self.form3.appId,
+                            appSecret:self.form3.appSecret,
+                            smsSignName:self.form3.smsSignName,
+                            smsTemplateCode:self.form3.smsTemplateCode
                         };
                         self.active = 3;
                         self.task_type = '4';
@@ -336,7 +336,7 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        console.log(res.data);
+                        // console.log(res.data);
                         var requestData = res.data.extra;
                         self.form0.appId = requestData.appId;
                         self.form0.shopId = requestData.shopId;
@@ -349,6 +349,10 @@
                         self.form1.toAmount = String(requestData.toAmount);
                         // self.form1.portalUrl = requestData.portalUrl;
                         // self.form1.duration = String(requestData.duration);
+                        self.form3.appId = requestData.smsAppId;
+                        self.form3.appSecret = requestData.smsAppSecret;
+                        self.form3.smsSignName = requestData.smsSignName;
+                        self.form3.smsTemplateCode = requestData.smsTemplateCode;
                     }
                 })
             },
