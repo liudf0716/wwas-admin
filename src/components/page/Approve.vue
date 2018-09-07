@@ -63,25 +63,49 @@
                 </el-tab-pane>
                 <el-tab-pane label="短信认证" name="3">
 
-                    <div class="form-box tab-cont form-box2">
-                        <el-form ref="form3" :model="form3" :rules="rules3" label-width="150px">
-                            <el-form-item label="AccessKeyId" prop="appId">
-                                <el-input v-model="form3.appId" class="diainp"></el-input>
+                    <el-form class="form-box tab-cont form-box2">
+                        <el-form ref="form3" :model="form3" label-width="150px">
+                            <el-form-item label="短信服务商" prop="dxchoose">
+                                <el-select v-model="dxchoose" placeholder="请选择短信服务商" @change="changeDxchoose">
+                                    <el-option label="阿里" value="ali"></el-option>
+                                    <el-option label="网易" value="wy"></el-option>
+                                </el-select>
                             </el-form-item>
-                            <el-form-item label="AccessKeySecret" prop="appSecret">
-                                <el-input v-model="form3.appSecret" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="SignName" prop="smsSignName">
-                                <el-input v-model="form3.smsSignName" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="TemplateCode" prop="smsTemplateCode">
-                                <el-input v-model="form3.smsTemplateCode" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" @click="onDuanxinSubmit('form3')">下一步</el-button>
-                            </el-form-item>
+                            <el-form ref="formAli" :model="formAli" :rules="rulesAli" label-width="150px" v-show="dxchoose == 'ali'">
+                                <el-form-item label="AccessKeyId" prop="appId">
+                                    <el-input v-model="formAli.appId" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="AccessKeySecret" prop="appSecret">
+                                    <el-input v-model="formAli.appSecret" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="SignName" prop="smsSignName">
+                                    <el-input v-model="formAli.smsSignName" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="TemplateCode" prop="smsTemplateCode">
+                                    <el-input v-model="formAli.smsTemplateCode" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onDuanxinSubmit('formAli')">下一步</el-button>
+                                </el-form-item>
+                            </el-form>
+                            <el-form ref="formWy" :model="formWy" :rules="rulesWy" label-width="150px" v-show="dxchoose == 'wy'">
+                                <el-form-item label="AppKey" prop="wyAppId">
+                                    <el-input v-model="formWy.wyAppId" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="AppSecret" prop="wyAppSecret">
+                                    <el-input v-model="formWy.wyAppSecret" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="TemplateId" prop="wyTemplateId">
+                                    <el-input v-model="formWy.wyTemplateId" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
+                                </el-form-item>
+                            </el-form>
+
+
                         </el-form>
-                    </div>
+                    </el-form>
 
                 </el-tab-pane>
                 <el-tab-pane label="其他设置" name="4">
@@ -175,12 +199,15 @@
                     ]
                 },
                 form3:{
+
+                },
+                formAli:{
                     appId:'',
                     appSecret:'',
                     smsSignName:'',
                     smsTemplateCode:''
                 },
-                rules3: {
+                rulesAli: {
                     appId: [
                         {required: true, message: '请输入AccessKeyId', trigger: 'blur'},
                     ],
@@ -195,6 +222,24 @@
                     ]
 
                 },
+                formWy:{
+                    wyAppId:'',
+                    wyAppSecret:'',
+                    wyTemplateId:''
+                },
+                rulesWy: {
+                    wyAppId: [
+                        {required: true, message: '请输入AppKey', trigger: 'blur'},
+                    ],
+                    wyAppSecret: [
+                        {required: true, message: '请输入AppSecret', trigger: 'blur'}
+                    ],
+                    wyTemplateId: [
+                        {required: true, message: '请输入TemplateId', trigger: 'blur'}
+                    ]
+
+                },
+                dxchoose:'ali',
 
                 loading:false
             }
@@ -249,12 +294,21 @@
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        self.params.sms = {
-                            appId:self.form3.appId,
-                            appSecret:self.form3.appSecret,
-                            smsSignName:self.form3.smsSignName,
-                            smsTemplateCode:self.form3.smsTemplateCode
-                        };
+                        if(formName == 'formAli'){
+                            self.params.sms = {
+                                appId:self.formAli.appId,
+                                appSecret:self.formAli.appSecret,
+                                smsSignName:self.formAli.smsSignName,
+                                smsTemplateCode:self.formAli.smsTemplateCode
+                            };
+                        }else{
+                            self.params.sms = {
+                                wyAppId:self.formWy.wyAppId,
+                                wyAppSecret:self.formWy.wyAppSecret,
+                                wyTemplateId:self.formWy.wyTemplateId
+                            };
+                        }
+
                         self.active = 3;
                         self.task_type = '4';
                     } else {
@@ -347,14 +401,27 @@
 
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
-                        // self.form1.portalUrl = requestData.portalUrl;
-                        // self.form1.duration = String(requestData.duration);
-                        self.form3.appId = requestData.smsAppId;
-                        self.form3.appSecret = requestData.smsAppSecret;
-                        self.form3.smsSignName = requestData.smsSignName;
-                        self.form3.smsTemplateCode = requestData.smsTemplateCode;
+
+                        if(!requestData.smsWyAppId){
+                            self.formAli.appId = requestData.smsAppId;
+                            self.formAli.appSecret = requestData.smsAppSecret;
+                            self.formAli.smsSignName = requestData.smsSignName;
+                            self.formAli.smsTemplateCode = requestData.smsTemplateCode;
+                        }
+                        if(!requestData.smsAppId){
+                            self.formWy.wyAppId = requestData.smsWyAppId;
+                            self.formWy.wyAppSecret = requestData.smsWyAppSecret;
+                            self.formWy.wyTemplateId = requestData.smsWyTemplateId;
+                        }
+
+                        self.dxchoose = !requestData.smsWyAppId?'ali':'wy';
                     }
                 })
+            },
+            changeDxchoose: function(e){
+                var self = this;
+                self.dxchoose = e;
+
             },
             changeDuration: function(value){
                 var self = this;
