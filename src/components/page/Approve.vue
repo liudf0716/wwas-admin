@@ -296,6 +296,7 @@
                     if (valid) {
                         if(formName == 'formAli'){
                             self.params.sms = {
+                                selected:self.dxchoose,
                                 appId:self.formAli.appId,
                                 appSecret:self.formAli.appSecret,
                                 smsSignName:self.formAli.smsSignName,
@@ -303,6 +304,7 @@
                             };
                         }else{
                             self.params.sms = {
+                                selected:self.dxchoose,
                                 wyAppId:self.formWy.wyAppId,
                                 wyAppSecret:self.formWy.wyAppSecret,
                                 wyTemplateId:self.formWy.wyTemplateId
@@ -402,19 +404,19 @@
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
 
-                        if(!requestData.smsWyAppId){
-                            self.formAli.appId = requestData.smsAppId;
-                            self.formAli.appSecret = requestData.smsAppSecret;
-                            self.formAli.smsSignName = requestData.smsSignName;
-                            self.formAli.smsTemplateCode = requestData.smsTemplateCode;
-                        }
-                        if(!requestData.smsAppId){
-                            self.formWy.wyAppId = requestData.smsWyAppId;
-                            self.formWy.wyAppSecret = requestData.smsWyAppSecret;
-                            self.formWy.wyTemplateId = requestData.smsWyTemplateId;
-                        }
 
-                        self.dxchoose = !requestData.smsWyAppId?'ali':'wy';
+                        self.formAli.appId = requestData.smsAppId;
+                        self.formAli.appSecret = requestData.smsAppSecret;
+                        self.formAli.smsSignName = requestData.smsSignName;
+                        self.formAli.smsTemplateCode = requestData.smsTemplateCode;
+
+
+                        self.formWy.wyAppId = requestData.smsWyAppId;
+                        self.formWy.wyAppSecret = requestData.smsWyAppSecret;
+                        self.formWy.wyTemplateId = requestData.smsWyTemplateId;
+
+
+                        self.dxchoose = requestData.smsSelected;
                     }
                 })
             },
