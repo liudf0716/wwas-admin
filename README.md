@@ -85,6 +85,10 @@ npm run dev
 
 <img src="https://github.com/wificoin-project/wwas-admin/blob/master/wfc_auth.png"/>
 
+### 短信认证配置
+
+<img src="https://github.com/wificoin-project/wwas-admin/blob/master/sms-auth.png"/>
+
 ### 其他认证配置
 
 <img src="https://github.com/wificoin-project/wwas-admin/blob/master/other_auth.png"/>
