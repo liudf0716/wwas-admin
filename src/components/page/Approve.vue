@@ -42,7 +42,7 @@
                         <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
                             <el-form-item label="钱包地址" prop="toAddress">
                                 <el-input v-model="form1.toAddress" class="diainp"></el-input>
-                                <a href="https://wfc.kunteng.org/#/tabs/receive" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
+                                <a href="https://wfc.wificoin.club/" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp"></el-input>
@@ -67,8 +67,8 @@
                         <el-form ref="form3" :model="form3" label-width="150px">
                             <el-form-item label="短信服务商" prop="dxchoose">
                                 <el-select v-model="dxchoose" placeholder="请选择短信服务商" @change="changeDxchoose">
-                                    <el-option label="阿里" value="ali"></el-option>
-                                    <el-option label="网易" value="wy"></el-option>
+                                    <el-option label="阿里云" value="ali"></el-option>
+                                    <el-option label="网易云信" value="wy"></el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form ref="formAli" :model="formAli" :rules="rulesAli" label-width="150px" v-show="dxchoose == 'ali'">
