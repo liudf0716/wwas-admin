@@ -20,7 +20,7 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        webServer: 'http://wifidog.kunteng.org.cn:8001'
+        webServer: 'https://wifidog.kunteng.org.cn'
     },
     dev: {
         env: require('./dev.env'),
