@@ -343,6 +343,24 @@
                                         };
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
+
+                                        if(self.dxchoose == 'ali'){
+                                            self.params.sms = {
+                                                selected:self.dxchoose,
+                                                appId:self.formAli.appId,
+                                                appSecret:self.formAli.appSecret,
+                                                smsSignName:self.formAli.smsSignName,
+                                                smsTemplateCode:self.formAli.smsTemplateCode
+                                            }
+                                        }else{
+                                            self.params.sms = {
+                                                selected:self.dxchoose,
+                                                wyAppId:self.formWy.wyAppId,
+                                                wyAppSecret:self.formWy.wyAppSecret,
+                                                wyTemplateId:self.formWy.wyTemplateId
+                                            }
+                                        }
+
                                         self.loading = true;
                                         self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
                                             self.loading = false;
