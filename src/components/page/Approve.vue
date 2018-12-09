@@ -47,13 +47,6 @@
                             <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp"></el-input>
                             </el-form-item>
-                            <!--<el-form-item label="跳转" prop="portalUrl">-->
-                                <!--<el-input v-model="form1.portalUrl" class="diainp"></el-input>-->
-                            <!--</el-form-item>-->
-                            <!--<el-form-item label="时间" prop="duration">-->
-                                <!--<el-input v-model="form1.duration" class="diainp"></el-input>-->
-                                <!--<span style="padding:5px 12px;">小时</span>-->
-                            <!--</el-form-item>-->
                             <el-form-item>
                                 <el-button type="primary" @click="onWificoinSubmit('form1')">下一步</el-button>
                             </el-form-item>
@@ -61,7 +54,26 @@
                     </div>
 
                 </el-tab-pane>
-                <el-tab-pane label="短信认证" name="3">
+                
+                <el-tab-pane label="用户密码认证" name="3">
+
+                    <div class="form-box tab-cont form-box2">
+                        <el-form ref="form4" :model="form4" :rules="rules4" label-width="150px">
+                            <el-form-item label="用户名" prop="username">
+                                <el-input v-model="form4.username" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="用户密码" prop="password">
+                                <el-input v-model="form4.password" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="onPasswordSubmit('form4')">下一步</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+
+                </el-tab-pane>
+                
+                <el-tab-pane label="短信认证" name="4">
 
                     <el-form class="form-box tab-cont form-box2">
                         <el-form ref="form3" :model="form3" label-width="150px">
@@ -108,7 +120,7 @@
                     </el-form>
 
                 </el-tab-pane>
-                <el-tab-pane label="其他设置" name="4">
+                <el-tab-pane label="其他设置" name="5">
 
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
@@ -184,6 +196,18 @@
                         {required: true, message: '请输入金额', trigger: 'blur'},
                         {validator: this.validateNum, trigger: 'blur'}
                     ]
+                },
+                form4: {
+                  username:'',
+                  password:'',
+                },
+                rules4: {
+                  username:[
+                    { required: true, message: '请输入用户名', trigger: 'blur'}
+                  ],
+                  password:[
+                    { required: true, message: '请输入用户名密码', trigger: 'blur'}
+                  ]
                 },
                 form2: {
                     portalUrl:'',
@@ -280,6 +304,23 @@
                         self.params.wificoin = {
                             toAddress:self.form1.toAddress,
                             toAmount:self.form1.toAmount
+                        };
+                        self.active = 2;
+                        self.task_type = '3';
+                    } else {
+                        return false;
+                        console.log('验证失败');
+                    }
+                });
+
+            },
+            onPasswordSubmit: function(formName) {
+              var self = this;
+                self.$refs[formName].validate(function (valid) {
+                    if (valid) {
+                        self.params.user = {
+                            user:self.form4.usernmae,
+                            password:self.form4.password
                         };
                         self.active = 2;
                         self.task_type = '3';
@@ -422,7 +463,9 @@
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
 
-
+                        self.form4.usernmae = requestData.user;
+                        self.form4.password = requestData.password;
+                        
                         self.formAli.appId = requestData.smsAppId;
                         self.formAli.appSecret = requestData.smsAppSecret;
                         self.formAli.smsSignName = requestData.smsSignName;
