@@ -168,8 +168,6 @@
                     shopId:'',
                     ssid:'',
                     secretKey: '',
-                    // portalUrl:'',
-                    // duration:''
                 },
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 rules0: {
@@ -285,7 +283,6 @@
                                 appId:self.form0.appId,
                                 shopId:self.form0.shopId,
                                 secretKey:self.form0.secretKey,
-                                // ssid:self.form0.ssid,
                             }
                         };
                         self.active = 1;
@@ -382,6 +379,12 @@
                                             toAddress:self.form1.toAddress,
                                             toAmount:self.form1.toAmount
                                         };
+					
+					self.params.user = {
+						user:self.form4.username,
+						password:self.form4.password
+					};
+
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
 
@@ -463,7 +466,7 @@
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
 
-                        self.form4.usernmae = requestData.user;
+                        self.form4.username = requestData.user;
                         self.form4.password = requestData.password;
                         
                         self.formAli.appId = requestData.smsAppId;
