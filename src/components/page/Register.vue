@@ -15,7 +15,7 @@
                 <el-form-item label="联系方式" prop="phone">
                     <el-input v-model="ruleForm.phone" placeholder="电话号码"></el-input>
                 </el-form-item>
-                <el-form-item label="所在城市" prop="city">
+                <el-form-item label="所在城市" prop="city" style="display: none;">
                     <el-select size="small" style="width: 110px"
                                v-model="ruleForm.selectProv"
                                placeholder="请选择省份"
@@ -44,7 +44,7 @@
                     <el-button type="primary" @click="submitForm('ruleForm')">注 册</el-button>
                 </div>
                 <div class="login-btn">
-                    <el-button type="text" @click="back">返回登录</el-button>
+                    <el-button class="login-btn-btn" type="text" @click="back">返回登录</el-button>
                 </div>
             </el-form>
         </div>
@@ -54,6 +54,7 @@
 <script>
     import axios from 'axios';
     import global_ from 'components/common/Global';
+    import  md5 from 'js-md5';
     export default {
         data: function(){
             return {
@@ -89,55 +90,28 @@
                     phone: [
                         { required: true, message: '请输入联系方式', trigger: 'blur' }
                     ],
-//                    city: [
-//                        { required: true, message: '请选择所在城市', trigger: 'change' }
-//                    ],
                 }
             }
         },
         created:function(){
-//            this.getData();
+
         },
         methods: {
-            getData: function(){
-                var self = this;
-                console.log(global_.timeStamp('417865'));
-//                self.$axios({
-//                    method:'get',
-////                    header: { "content-type": "application/json" },
-//                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-//                    url:'https://wifi.kunteng.org/cgi-bin/luci/admin/system/getDeviceInfo?wx=wlife' ,
-//                    data:{wx:'wlife'}
-//                }).then(function(response) {
-////                        response.data.pipe(fs.createWriteStream('ada_lovelace.jpg'))
-//                        console.log(response);
-//                    },function(err){
-////                        console.log(err);
-//                });
-                var params = {
-                    wx:'wlife'
-                };
-//                self.$axios.get('https://wifi.kunteng.org/cgi-bin/luci/admin/system/getDeviceInfo',{params}).then(function(res){
-//                    console.log(res);
-//                })
-
-
-            },
             submitForm:function(formName) {
                 const self = this;
                 self.$refs[formName].validate(function(valid){
                     if (valid) {
                         var params = {
                             user_account: self.ruleForm.account,
-                            user_password: self.ruleForm.password,
+                            user_password: md5(self.ruleForm.password),
                             user_name: self.ruleForm.name,
                             user_phone:self.ruleForm.phone,
                             user_city:self.ruleForm.selectProv + self.ruleForm.selectCity
 
                         };
-                        console.log(params);
+                        //console.log(params);
                         self.$axios.post(global_.baseUrl + '/admin/register',params).then(function(res){
-                            console.log(res);
+                            //console.log(res);
                             if(res.data.ret_code == 0){
                                 self.$message('注册成功！');
                                 // localStorage.setItem('ms_username',self.ruleForm.account);
@@ -157,23 +131,6 @@
                     }
                 });
             },
-            getProv: function(prov){
-                let tempCity=[];
-                this.citys=[];
-                this.selectCity='';
-                let allCity=global_.allCity;
-                for (var val of allCity){
-                    if (prov == val.prov){
-//                        console.log(val);
-                        tempCity.push({label: val.label, value: val.label})
-                    }
-                }
-                this.citys = tempCity;
-            },
-            getCity: function (city) {
-//                console.log(city);
-//                console.log(this.selectCity)
-            },
             back: function(){
                 this.$router.push('/login');
             }
@@ -189,7 +146,7 @@
     }
     .ms-title{
         position: absolute;
-        top:50%;
+        top:46%;
         width:100%;
         margin-top: -230px;
         text-align: center;
@@ -200,7 +157,7 @@
     .ms-login{
         position: absolute;
         left:50%;
-        top:50%;
+        top:46%;
         width:300px;
         /*height:160px;*/
         margin:-150px 0 0 -190px;
@@ -214,5 +171,12 @@
     .login-btn button{
         width:100%;
         height:36px;
+    }
+    .login-btn-btn{
+        color:#4db3ff;
+        margin:15px 0 0 0;
+        background-color:#fff;
+        border:1px solid #4db3ff;
+        border-radius: 3px;
     }
 </style>

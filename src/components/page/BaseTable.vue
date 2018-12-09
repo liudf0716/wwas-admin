@@ -1,69 +1,88 @@
 <template>
     <div class="table" v-loading="loading2">
-        <div class="crumbs">
-            <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
-                <el-breadcrumb-item>渠道列表</el-breadcrumb-item>
-            </el-breadcrumb>
+        <div v-if="isSuper =='0'?true:false">
+            <div class="crumbs">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
+                    <el-breadcrumb-item>渠道列表</el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
+            <el-form :inline="true" class="handle-box">
+                <el-form-item>
+                    <el-button type="primary" icon="plus" :disabled="isSuper=='0'?false:true" class="handle-del mr10" @click="dialogFormVisible=true">新建子渠道</el-button>
+                </el-form-item>
+                <el-form-item label="">
+                    <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="search" :disabled="isSuper=='0'?false:true" @click="search">查询</el-button>
+                </el-form-item>
+            </el-form>
+            <div class='rad-group' v-if="isSuper =='0'?true:false">
+                <el-radio-group v-model="radio3" @change="changeTab">
+                    <el-radio-button label="all">全部</el-radio-button>
+                    <el-radio-button label="0">未冻结</el-radio-button>
+                    <el-radio-button label="1">已冻结</el-radio-button>
+                </el-radio-group>
+            </div>
+            <el-table :data="userData" border style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
+                <el-table-column prop="user_account" label="账 号" width="150"></el-table-column>
+                <el-table-column prop="user_name" label="渠道名称"></el-table-column>
+                <el-table-column prop="user_phone" label="联系电话" width="130"></el-table-column>
+                <el-table-column prop="user_status" label="冻结状态" width="120">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.user_status == '1' ? 'warning' : 'success'" close-transition>{{scope.row.user_status=='1'?'已冻结':'未冻结'}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="渠道类型" width="120">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.user_type == '0' ? 'danger' : 'info'" close-transition>{{scope.row.user_type == '0'?'超级管理员':'管理员'}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="user_create_time" label="创建时间" width="150"></el-table-column>
+                <el-table-column label="在线设备" width="100">
+                    <template slot-scope="scope">
+                        <el-tag type="warning">{{scope.row.user_online_count + '/ ' + scope.row.user_device_count}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="380">
+                    <template slot-scope="scope">
+                        <!--<el-button class="btn1" size="small" type="text" @click="resetPwd(scope.row.user_account)">修改密码</el-button>-->
+                        <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.user_account)">重置密码</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="toRouter(scope.row.user_account)">导入路由</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="outRouter(scope.row.user_account)">导出路由</el-button>
+                        <!--<el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="delRouter(scope.row.user_account)">删除路由</el-button>-->
+                        <el-button class="btn1" size="small" v-if="scope.row.user_status =='0' && scope.row.user_type =='1'" @click="revoke(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">冻结账户</el-button>
+                        <el-button class="btn1" size="small" v-else-if="scope.row.user_status =='1' && scope.row.user_type =='1'" @click="restore(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">解冻账户</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="success" @click="toEnter(scope.row.user_account)">点击进入</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination
+                    @current-change ="handleCurrentChange"
+                    :current-page="currentPage"
+                    layout="prev, pager, next"
+                    :total="pageTotal">
+                </el-pagination>
+            </div>
         </div>
-        <el-form :inline="true" class="handle-box">
-            <el-form-item>
-                <el-button type="primary" icon="plus" :disabled="isSuper=='0'?false:true" class="handle-del mr10" @click="dialogFormVisible=true">新建子渠道</el-button>
-            </el-form-item>
-            <el-form-item label="">
-                <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" icon="search" :disabled="isSuper=='0'?false:true" @click="search">查询</el-button>
-            </el-form-item>
-        </el-form>
-        <div class='rad-group' v-if="isSuper =='0'?true:false">
-            <el-radio-group v-model="radio3" @change="changeTab">
-                <el-radio-button label="all">全部</el-radio-button>
-                <el-radio-button label="0">未冻结</el-radio-button>
-                <el-radio-button label="1">已冻结</el-radio-button>
-            </el-radio-group>
-        </div>
-        <el-table :data="userData" border style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
-            <el-table-column prop="user_account" label="账 号" width="150"></el-table-column>
-            <el-table-column prop="user_name" label="渠道名称" width="150"></el-table-column>
-            <el-table-column prop="user_phone" label="联系电话" width="130"></el-table-column>
-            <el-table-column prop="user_status" label="冻结状态" width="120">
-                <template slot-scope="scope">
-                    <el-tag :type="scope.row.user_status == '1' ? 'warning' : 'success'" close-transition>{{scope.row.user_status=='1'?'已冻结':'未冻结'}}</el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column label="渠道类型" width="140">
-                <template slot-scope="scope">
-                    <el-tag :type="scope.row.user_type == '0' ? 'danger' : 'info'" close-transition>{{scope.row.user_type == '0'?'超级管理员':'管理员'}}</el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column prop="user_create_time" label="创建时间" width="150"></el-table-column>
-            <el-table-column label="在线设备" width="100">
-                <template slot-scope="scope">
-                    <el-tag type="warning">{{scope.row.user_online_count + '/ ' + scope.row.user_device_count}}</el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="450">
-                <template slot-scope="scope">
-                    <!--<el-button class="btn1" size="small" type="text" @click="resetPwd(scope.row.user_account)">修改密码</el-button>-->
-                    <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.user_account)">重置密码</el-button>
-                    <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="toRouter(scope.row.user_account)">导入路由</el-button>
-                    <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="outRouter(scope.row.user_account)">导出路由</el-button>
-                    <!--<el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="delRouter(scope.row.user_account)">删除路由</el-button>-->
-                    <el-button class="btn1" size="small" v-if="scope.row.user_status =='0' && scope.row.user_type =='1'" @click="revoke(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">冻结账户</el-button>
-                    <el-button class="btn1" size="small" v-else-if="scope.row.user_status =='1' && scope.row.user_type =='1'" @click="restore(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">解冻账户</el-button>
-                    <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="success" @click="toEnter(scope.row.user_account)">点击进入</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <div class="pagination">
-            <el-pagination
-                @current-change ="handleCurrentChange"
-                :current-page="currentPage"
-                layout="prev, pager, next"
-                :total="pageTotal">
-            </el-pagination>
+        <div v-if="isSuper == '0'?false:true">
+            <div class="crumbs">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
+                    <!--<el-breadcrumb-item>渠道信息</el-breadcrumb-item>-->
+                </el-breadcrumb>
+            </div>
+            <el-table :data="noSuperData" border style="width: 100%" ref="multipleTable">
+                <el-table-column prop="user_account" label="账 号"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button class="btn1" size="small" type="success" @click="toRouter(scope.row.user_account)">导入路由</el-button>
+                        <el-button class="btn1" size="small" type="warning" @click="outRouter(scope.row.user_account)">导出路由</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
         </div>
         <el-dialog title="修改密码" :visible.sync="showDialogPwd" class="digcont">
             <el-form :model="formP" ref="formP" :rules="rulesP">
@@ -221,6 +240,7 @@
                 isSuper:localStorage.getItem('userMsg'),
                 loading2:false,
                 dialogFormVisible: false,
+                noSuperData:[],
                 form: {
                     user:'',
                     password:'',
@@ -318,7 +338,7 @@
             }
         },
         created: function(){
-           this.getUsers({},'all');
+            this.getUsers({},'all');
         },
         methods: {
             getUsers: function(params,url){//获取渠道列表
@@ -333,7 +353,10 @@
                         },2000)
                     }
                     if(res.data.ret_code == '1010'){//权限不足
-                        self.emptyMsg = res.data.extra;
+                        // self.emptyMsg = res.data.extra;
+                        self.noSuperData = [{
+                            user_account:self.formP.user_account
+                        }]
                     }
                     if(res.data.ret_code == 0){
                         self.pageTotal = res.data.extra.count || self.pageTotal;
@@ -708,7 +731,7 @@
                 self.$refs[formName].validate(function(valid){
                     if(valid){
                         var params = {
-                             user_name: self.curAccount3,
+                            user_name: self.curAccount3,
                             route_mac:self.formRouter3.route_mac
                         };
                         return false;
