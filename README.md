@@ -94,6 +94,3 @@ npm run dev
 <img src="https://github.com/wificoin-project/wwas-admin/blob/master/other_auth.png"/>
 
 
-# 捐赠
-
-wfc: [weiKbu9DYg26gH2zucSHJHgH5KsuuZd3wW](https://wfc.xyblock.net/#/wifiPortal/donate)
