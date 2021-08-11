@@ -20,7 +20,7 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        webServer: 'http://127.0.0.1:8001'
+        webServer: 'http://172.96.252.145:8080'
     },
     dev: {
         env: require('./dev.env'),
@@ -30,7 +30,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
-                target:'http://127.0.0.1:8001',
+                target:'http://172.96.252.145:8080',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''
