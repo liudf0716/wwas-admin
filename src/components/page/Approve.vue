@@ -30,6 +30,9 @@
                             <el-form-item label="SHOP_ID" prop="shopId">
                                 <el-input v-model="form0.shopId" class="diainp"></el-input>
                             </el-form-item>
+                            <el-form-item label="启用">
+                                <el-switch v-model="form0.enable" class="diainp"></el-switch>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onWeixinSubmit('form0')">下一步</el-button>
                             </el-form-item>
@@ -46,6 +49,9 @@
                             </el-form-item>
                             <el-form-item label="金额(WFC)" prop="toAmount">
                                 <el-input v-model="form1.toAmount" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="启用">
+                                <el-switch v-model="form1.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onWificoinSubmit('form1')">下一步</el-button>
@@ -64,6 +70,9 @@
                             </el-form-item>
                             <el-form-item label="用户密码" prop="password">
                                 <el-input v-model="form4.password" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="启用">
+                                <el-switch v-model="form4.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onPasswordSubmit('form4')">下一步</el-button>
@@ -96,6 +105,9 @@
                                 <el-form-item label="TemplateCode" prop="smsTemplateCode">
                                     <el-input v-model="formAli.smsTemplateCode" class="diainp"></el-input>
                                 </el-form-item>
+                                <el-form-item label="启用">
+                                    <el-switch v-model="formAli.enable" class="diainp"></el-switch>
+                                </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formAli')">下一步</el-button>
                                 </el-form-item>
@@ -109,6 +121,9 @@
                                 </el-form-item>
                                 <el-form-item label="TemplateId" prop="wyTemplateId">
                                     <el-input v-model="formWy.wyTemplateId" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="启用">
+                                    <el-switch v-model="formWy.enable" class="diainp"></el-switch>
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
@@ -168,6 +183,7 @@
                     shopId:'',
                     ssid:'',
                     secretKey: '',
+                    enable: false,
                 },
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 rules0: {
@@ -185,6 +201,7 @@
                 form1: {
                     toAddress:'',
                     toAmount:'',
+                    enable: false,
                 },
                 rules1: {
                     toAddress:[
@@ -198,6 +215,7 @@
                 form4: {
                   username:'',
                   password:'',
+                  enable: true,
                 },
                 rules4: {
                   username:[
@@ -227,7 +245,8 @@
                     appId:'',
                     appSecret:'',
                     smsSignName:'',
-                    smsTemplateCode:''
+                    smsTemplateCode:'',
+                    enable:true,
                 },
                 rulesAli: {
                     appId: [
@@ -247,7 +266,8 @@
                 formWy:{
                     wyAppId:'',
                     wyAppSecret:'',
-                    wyTemplateId:''
+                    wyTemplateId:'',
+                    enable: true,
                 },
                 rulesWy: {
                     wyAppId: [
@@ -283,6 +303,7 @@
                                 appId:self.form0.appId,
                                 shopId:self.form0.shopId,
                                 secretKey:self.form0.secretKey,
+                                enable:self.form0.enable,
                             }
                         };
                         self.active = 1;
@@ -300,7 +321,8 @@
                     if (valid) {
                         self.params.wificoin = {
                             toAddress:self.form1.toAddress,
-                            toAmount:self.form1.toAmount
+                            toAmount:self.form1.toAmount,
+                            enable:self.form1.enable,
                         };
                         self.active = 2;
                         self.task_type = '3';
@@ -317,10 +339,11 @@
                     if (valid) {
                         self.params.user = {
                             user:self.form4.usernmae,
-                            password:self.form4.password
+                            password:self.form4.password,
+                            enable:self.form4.enable,
                         };
-                        self.active = 2;
-                        self.task_type = '3';
+                        self.active = 3;
+                        self.task_type = '4';
                     } else {
                         return false;
                         console.log('验证失败');
@@ -338,19 +361,21 @@
                                 appId:self.formAli.appId,
                                 appSecret:self.formAli.appSecret,
                                 smsSignName:self.formAli.smsSignName,
-                                smsTemplateCode:self.formAli.smsTemplateCode
+                                smsTemplateCode:self.formAli.smsTemplateCode,
+                                enable:self.formAli.enable,
                             };
                         }else{
                             self.params.sms = {
                                 selected:self.dxchoose,
                                 wyAppId:self.formWy.wyAppId,
                                 wyAppSecret:self.formWy.wyAppSecret,
-                                wyTemplateId:self.formWy.wyTemplateId
+                                wyTemplateId:self.formWy.wyTemplateId,
+                                enable:self.formWy.enable,
                             };
                         }
 
-                        self.active = 3;
-                        self.task_type = '4';
+                        self.active = 4;
+                        self.task_type = '5';
                     } else {
                         return false;
                         console.log('验证失败');
@@ -374,16 +399,19 @@
                                             shopId:self.form0.shopId,
                                             secretKey:self.form0.secretKey,
                                             // ssid:self.form0.ssid,
+                                            enable:self.form0.enable,
                                         };
                                         self.params.wificoin = {
                                             toAddress:self.form1.toAddress,
-                                            toAmount:self.form1.toAmount
+                                            toAmount:self.form1.toAmount,
+                                            enable:self.form1.enable,
                                         };
 					
-					self.params.user = {
-						user:self.form4.username,
-						password:self.form4.password
-					};
+					                    self.params.user = {
+						                    user:self.form4.username,
+						                    password:self.form4.password,
+                                            enable:self.form4.enable,
+					                    };
 
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
@@ -394,14 +422,16 @@
                                                 appId:self.formAli.appId,
                                                 appSecret:self.formAli.appSecret,
                                                 smsSignName:self.formAli.smsSignName,
-                                                smsTemplateCode:self.formAli.smsTemplateCode
+                                                smsTemplateCode:self.formAli.smsTemplateCode,
+                                                enable:self.formAli.enable,
                                             }
                                         }else{
                                             self.params.sms = {
                                                 selected:self.dxchoose,
                                                 wyAppId:self.formWy.wyAppId,
                                                 wyAppSecret:self.formWy.wyAppSecret,
-                                                wyTemplateId:self.formWy.wyTemplateId
+                                                wyTemplateId:self.formWy.wyTemplateId,
+                                                enable:self.formWy.enable,
                                             }
                                         }
 
@@ -460,24 +490,29 @@
                         self.form0.shopId = requestData.shopId;
                         self.form0.secretKey = requestData.secretKey;
                         self.form0.ssid = requestData.ssid;
+                        self.form0.enable = requestData.wxEnable;
                         self.form2.portalUrl = requestData.portalUrl;
                         self.form2.duration = String(requestData.duration);
 
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
+                        self.form1.enable = requestData.wfcEnable;
 
                         self.form4.username = requestData.user;
                         self.form4.password = requestData.password;
+                        self.form4.enable = requestData.userEnable;
                         
                         self.formAli.appId = requestData.smsAppId;
                         self.formAli.appSecret = requestData.smsAppSecret;
                         self.formAli.smsSignName = requestData.smsSignName;
                         self.formAli.smsTemplateCode = requestData.smsTemplateCode;
+                        self.formAli.enable = requestData.smsAliEnable;
 
 
                         self.formWy.wyAppId = requestData.smsWyAppId;
                         self.formWy.wyAppSecret = requestData.smsWyAppSecret;
                         self.formWy.wyTemplateId = requestData.smsWyTemplateId;
+                        self.formWy.enable = requestData.smsWyEnable;
 
 
                         self.dxchoose = requestData.smsSelected;
