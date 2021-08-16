@@ -236,7 +236,7 @@
         data: function() {
             return {
                 uploadUrl:global_.baseUrl+'/device/import/excel',
-                radio3:'all',
+                radio3:'online',
                 isSuper:localStorage.getItem('userMsg'),
                 loading2:false,
                 dialogFormVisible: false,
