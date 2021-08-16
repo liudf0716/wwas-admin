@@ -8,9 +8,9 @@
         </div>
         <div class='rad-group'>
             <el-radio-group v-model="radio3" @change="changeTab">
-                <el-radio-button label="all">全部</el-radio-button>
                 <el-radio-button label="online">在线</el-radio-button>
                 <el-radio-button label="offline">离线</el-radio-button>
+                <el-radio-button label="all">全部</el-radio-button>
             </el-radio-group>
             <el-form :inline="true" class="handle-box2">
                 <el-form-item label="">
@@ -111,7 +111,7 @@
         data: function(){
             const self = this;
             return {
-                radio3:'all',
+                radio3:'online',
                 search_word:'',
                 loading:false,
                 pageTotal:0,
