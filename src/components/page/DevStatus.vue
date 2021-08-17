@@ -191,9 +191,9 @@
                     if(res.data.ret_code == 0){
                         self.curUser = res.data.ret_msg;
                         if(self.curUser == '1'){//普通管理员
-                            self.getData({filter:{channelPath:localStorage.getItem('ms_username')}},'online')
+                            self.getData({filter:{channelPath:localStorage.getItem('ms_username')}},'')
                         }else if(self.curUser == '0'){
-                            self.getData({},'online')
+                            self.getData({},'')
                         }
                     }
                 })
