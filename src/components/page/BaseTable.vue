@@ -80,6 +80,7 @@
                     <template slot-scope="scope">
                         <el-button class="btn1" size="small" type="success" @click="toRouter(scope.row.user_account)">导入路由</el-button>
                         <el-button class="btn1" size="small" type="warning" @click="outRouter(scope.row.user_account)">导出路由</el-button>
+                        <el-button class="btn1" size="small" type="success" @click="outUser(scope.row.user_account)">导出用户</el-button>
                     </template>
                 </el-table-column>
             </el-table>
