@@ -80,7 +80,7 @@
                     <template slot-scope="scope">
                         <el-button class="btn1" size="small" type="success" @click="toRouter(scope.row.user_account)">导入路由</el-button>
                         <el-button class="btn1" size="small" type="warning" @click="outRouter(scope.row.user_account)">导出路由</el-button>
-                        <el-button class="btn1" size="small" type="success" @click="outUser(scope.row.user_account)">导出用户</el-button>
+                        <el-button class="btn1" size="small" type="success" @click="outClient(scope.row.user_account)">导出用户</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -650,6 +650,40 @@
                 };
                 self.loading  = true;
                 self.$axios.post(global_.baseUrl+'/device/export',params).then(function(res){
+                    self.loading  = false;
+                    if(res.data.ret_code == '1001'){
+                        self.$message({message:res.data.extra,type:'warning'});
+                        setTimeout(function(){
+                            self.$router.replace('login');
+                        },2000)
+                    }
+                    if(res.data.ret_code == 0){
+                        const aLink = document.createElement('a');
+                        const evt = document.createEvent('MouseEvents');
+                        // var evt = document.createEvent("HTMLEvents")
+                        evt.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                        var str = res.data.extra;
+                        var index = str.lastIndexOf("\/");
+                        str  = str .substring(index + 1, str .length);
+                        aLink.download = str;
+                        aLink.href = global_.baseUrl+res.data.extra;
+                        aLink.dispatchEvent(evt);
+                        self.$message({message:'导出成功',type:'success'})
+                    }else{
+                        self.$message.error(res.data.extra);
+                    }
+                },function(err){
+                    self.loading  = false;
+                    self.$message.error(err);
+                })
+            },
+            outClient: function(account) {
+                var self = this;
+                var params = {
+                    user_account: account
+                };
+                self.loading  = true;
+                self.$axios.post(global_.baseUrl+'/client/export',params).then(function(res){
                     self.loading  = false;
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
