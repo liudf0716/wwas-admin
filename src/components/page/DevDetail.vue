@@ -65,11 +65,11 @@
                         <!--<el-tag :type="scope.row.pubsub_status == 'response_ok' ? 'success' : (scope.row.pubsub_status == 'response_fail'?'danger':'warning')" close-transition>{{scope.row.pubsub_status == 'response_ok'?'成功': (scope.row.pubsub_status == 'response_fail'?'失败':'执行中')}}</el-tag>-->
                     <!--</template>-->
                 <!--</el-table-column>-->
-                <!--<el-table-column label="操作">-->
-                    <!--<template slot-scope="scope">-->
-                        <!--<el-button class="btn1" type="info" size="small" @click="handleEdit(scope.row.mac)">详情</el-button>-->
-                    <!--</template>-->
-                <!--</el-table-column>-->
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button class="btn1" type="info" size="small" @click="handleEdit(scope.row.mac)">下线</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
         <div class="pagination">
