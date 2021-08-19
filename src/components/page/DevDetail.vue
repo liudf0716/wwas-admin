@@ -67,7 +67,7 @@
                 <!--</el-table-column>-->
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-button class="btn1" type="info" size="small" @click="handleEdit(scope.row.mac)">下线</el-button>
+                        <el-button class="btn1" type="info" size="small" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -226,7 +226,7 @@
                 self.getDetailData(params);
 
             },
-            handleEdit: function(mac){
+            handleCltOffline: function(mac){
                 this.$router.push({path:'/updateromstatus',query:{curid:this.curId,curmac:mac,curRadio:this.curRadio}});
             },
             changePage:function(values) {
