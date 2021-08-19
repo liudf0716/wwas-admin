@@ -67,7 +67,7 @@
                 <!--</el-table-column>-->
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-button class="btn1" type="info" size="small" @click="handleEdit(scope.row.mac)">下线</el-button>
+                        <el-button class="btn1" type="info" size="small" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -226,8 +226,24 @@
                 self.getDetailData(params);
 
             },
-            handleEdit: function(mac){
-                this.$router.push({path:'/updateromstatus',query:{curid:this.curId,curmac:mac,curRadio:this.curRadio}});
+            handleCltOffline: function(mac){
+                var self = this;
+                var params = {
+                    filter:{"gwId":mac}
+                };
+                
+                self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
+                    self.loading = false;
+                    if(res.data.ret_code == '1001'){
+                        self.$message({message:res.data.extra,type:'warning'});
+                        setTimeout(function(){
+                            self.$router.replace('login');
+                        },2000)
+                    }
+                    if(res.data.ret_code == 0){
+                        self.devMsgData = res.data.extra.query;
+                    }
+                })
             },
             changePage:function(values) {
                 this.information.pagination.per_page = values.perpage;
