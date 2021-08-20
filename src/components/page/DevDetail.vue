@@ -229,19 +229,16 @@
             handleCltOffline: function(mac){
                 var self = this;
                 var params = {
-                    filter:{"gwId":mac}
+                    filter:{"gwId":self.curGwid, "clients.mac":mac}
                 };
                 
-                self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
+                self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
                     self.loading = false;
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
                             self.$router.replace('login');
                         },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.devMsgData = res.data.extra.query;
                     }
                 })
             },
