@@ -155,6 +155,24 @@
                                 </el-select>
                                 <span style="padding:5px 12px;">小时</span>
                             </el-form-item>
+                            <el-form-item label="背景图片" prop="backgroundUrl">
+                                <el-upload
+                                    class="upload-demo"
+                                    :action="actionUrl"
+                                    ref="upload"
+                                    name="file_name"
+                                    with-credentials="true"
+                                    list-type="picture"
+                                    :data="backgroundUrl"
+                                    :beforeUpload="beforeUpload"
+                                    :on-change="handleChange"
+                                    :on-success="handleSuccess"
+                                    :file-list="fileList"
+                                    :auto-upload="true">
+                                    <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
+                                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过1M</div>
+                                </el-upload>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
                             </el-form-item>
@@ -162,6 +180,7 @@
                     </div>
 
                 </el-tab-pane>
+
             </el-tabs>
         </div>
 
@@ -282,7 +301,8 @@
 
                 },
                 dxchoose:'ali',
-
+                actionUrl: global_.baseUrl + '/setting/uploadBgImage',
+                fileList: [],
                 loading:false
             }
         },
@@ -415,7 +435,9 @@
 
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
-
+                                        if (self.fileList.length > 0)
+                                            self.params.backgroundUrl = self.fileList[0].response;
+                                        
                                         if(self.dxchoose == 'ali'){
                                             self.params.sms = {
                                                 selected:self.dxchoose,
@@ -484,7 +506,6 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        // console.log(res.data);
                         var requestData = res.data.extra;
                         self.form0.appId = requestData.appId;
                         self.form0.shopId = requestData.shopId;
@@ -619,6 +640,30 @@
                     }
                 }
                 return temp;
+            },
+            beforeUpload: function(file){
+                var testmsg=file.name.substring(file.name.lastIndexOf('.')+1);
+                const extension = testmsg === 'png';
+                const extension2 = testmsg === 'jpg';
+                const isLt2M = file.size / 1024 / 1024 < 1;
+                if (!extension && !extension2) {
+                    this.$message({message:'上传图片只支持png或者jpg格式!',type:'warning'});
+                    return false;
+                }
+                if (!isLt2M) {
+                    this.$message({message:'上传图片大小不能超过 1MB!',type:'warning'});
+                    return false;
+                }
+                
+                return true;
+            },
+            handleSuccess: function(response, file, fileList) {
+                if (response.ret_code == 0) {
+                    file.response = response.extra;
+                    this.fileList.push(file);
+                } else {
+                    this.$message.error(response.extra);
+                }
             },
         }
     }

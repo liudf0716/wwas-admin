@@ -179,13 +179,13 @@
                                     :on-success="handleSuccess"
                                     :file-list="fileList"
                                     :auto-upload="false">
-                                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>                                   
                                 </el-upload>
                             </el-form-item>
                         </el-form>
                     </div>
                     <div class="mt30">
-                        <el-button @click="showDialog = false">取 消</el-button>
+                        <el-button @click="showDialog == false">取 消</el-button>
                         <el-button type="primary" @click="fileAdd('formMacfile')">保 存</el-button>
                     </div>
                 </el-tab-pane>
