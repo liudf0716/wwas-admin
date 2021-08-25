@@ -437,6 +437,7 @@
                                         self.params.duration = self.form2.duration;
                                         if (self.fileList.length > 0)
                                             self.params.backgroundUrl = self.fileList[0].response;
+                                        self.fileList.pop();
                                         
                                         if(self.dxchoose == 'ali'){
                                             self.params.sms = {
