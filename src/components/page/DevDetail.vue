@@ -68,6 +68,7 @@
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button class="btn1" type="info" size="small" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
+                        <el-button class="btn1" type="info" size="small" @click="handleBlockClient(scope.row.clients.telNumber)">电话黑名单</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -239,8 +240,28 @@
                         setTimeout(function(){
                             self.$router.replace('login');
                         },2000)
+                    } else if(res.data.ret_code == 0){
+                        self.gwClients = res.data.extra.gwClients;
                     }
-                })
+                });
+            },
+            handleBlockClient: function(telNumber) {
+                var self = this;
+                var params = {
+                    filter:{'gwId':self.curGwid, 'clients.telNumber':telnumber, 'clients.isTelBlocked':false}
+                };
+
+                self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
+                    self.loading = false;
+                    if(res.data.ret_code == '1001'){
+                        self.$message({message:res.data.extra,type:'warning'});
+                        setTimeout(function(){
+                            self.$router.replace('login');
+                        },2000)
+                    }else if(res.data.ret_code == 0){
+                        self.gwClients = res.data.extra.gwClients;
+                    }
+                });
             },
             changePage:function(values) {
                 this.information.pagination.per_page = values.perpage;
