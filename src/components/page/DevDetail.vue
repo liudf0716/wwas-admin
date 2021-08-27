@@ -29,11 +29,23 @@
             <el-table :data="gwClients" border style="width: 100%" ref="multipleTable">
                 <el-table-column prop="clients.mac" label="路由MAC" width="150"></el-table-column>
                 <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
-                <el-table-column prop="clients.wired" label="有线设备" width="100">
+                <el-table-column prop="clients.authType" label="认证方式" width="150">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.clients.authType == '1' ? 'success' : 'info'" close-transition>{{scope.row.clients.authType == '1'?'电话认证': '其他认证'}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="clients.telNumber" label="电话号码" width="200">
+                    <template slot-scope="scope">
+                        <el-tag :type="scope.row.clients.telNumber == '' ? 'success' : 'info'" close-transition>{{scope.row.clients.telNumber == ''?'无电话号码': scope.row.clients.telNumber}}</el-tag>
+                    </template>
+                </el-table-column>
+                <!--
+                <el-table-column prop="clients.wired" label="有线设备" width="50">
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.clients.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.clients.wired == '1'?'是': '否'}}</el-tag>
                     </template>
                 </el-table-column>
+                -->
                 <el-table-column prop="clients.name" label="终端名称" width="220"></el-table-column>
                 <el-table-column prop="clients.incoming" label="下行流量" width="120">
                     <template slot-scope="scope">
@@ -45,11 +57,13 @@
                         {{bandwidthLabel(scope.row.clients.outgoing || 0)}}
                     </template>
                 </el-table-column>
+                <!--
                 <el-table-column prop="clients.firstLogin" label="通过认证时间" width="200">
                     <template slot-scope="scope">
                         {{dateForm(scope.row.clients.firstLogin)}}
                     </template>
                 </el-table-column>
+                -->
                 <el-table-column prop="clients.onlineTime" label="在线时长" width="150">
                     <template slot-scope="scope">
                         {{timeStamp(scope.row.clients.onlineTime)}}
@@ -65,10 +79,10 @@
                         <!--<el-tag :type="scope.row.pubsub_status == 'response_ok' ? 'success' : (scope.row.pubsub_status == 'response_fail'?'danger':'warning')" close-transition>{{scope.row.pubsub_status == 'response_ok'?'成功': (scope.row.pubsub_status == 'response_fail'?'失败':'执行中')}}</el-tag>-->
                     <!--</template>-->
                 <!--</el-table-column>-->
-                <el-table-column label="操作">
+                <el-table-column label="操作" width=200>
                     <template slot-scope="scope">
-                        <el-button class="btn1" type="info" size="small" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
-                        <el-button class="btn1" type="info" size="small" @click="handleBlockClient(scope.row.clients.telNumber)">电话黑名单</el-button>
+                        <el-button class="btn1" type="warning" size="small" v-if="!scope.row.clients.kickoff" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
+                        <el-button class="btn1" type="danger" size="small" v-if="!scope.row.clients.isTelBlocked" :disabled="scope.row.clients.telNumber == ''" @click="handleBlockClient(scope.row.clients.telNumber)">电话黑名单</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -235,6 +249,7 @@
                 
                 self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
                     self.loading = false;
+                    console.log("res is " + res);
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
@@ -248,7 +263,7 @@
             handleBlockClient: function(telNumber) {
                 var self = this;
                 var params = {
-                    filter:{'gwId':self.curGwid, 'clients.telNumber':telnumber, 'clients.isTelBlocked':false}
+                    filter:{'gwId':self.curGwid, 'clients.telNumber':telNumber, 'clients.isTelBlocked':false}
                 };
 
                 self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
