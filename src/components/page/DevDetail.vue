@@ -269,7 +269,7 @@
             handleBlockClient: function(telNumber, isTelBlocked) {
                 var self = this;
                 var params = {
-                    filter:{'gwId':self.curGwid, 'clients.telNumber':telNumber, 'clients.isTelBlocked':isTelBlocked}
+                    filter:{"gwId":self.curGwid, "clients.telNumber":telNumber, "clients.isTelBlocked":isTelBlocked}
                 };
 
                 self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
