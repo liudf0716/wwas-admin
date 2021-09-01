@@ -36,7 +36,7 @@
                 </el-table-column>
                 <el-table-column prop="clients.telNumber" label="电话号码" width="200">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.telNumber == '' ? 'success' : 'info'" close-transition>{{scope.row.clients.telNumber == ''?'无电话号码': scope.row.clients.telNumber}}</el-tag>
+                        <el-tag :type="scope.row.clients.telNumber == '' ? 'info' : 'success'" close-transition>{{scope.row.clients.telNumber == ''?'无电话号码': scope.row.clients.telNumber}}</el-tag>
                     </template>
                 </el-table-column>
                 <!--
@@ -57,13 +57,6 @@
                         {{bandwidthLabel(scope.row.clients.outgoing || 0)}}
                     </template>
                 </el-table-column>
-                <!--
-                <el-table-column prop="clients.firstLogin" label="通过认证时间" width="200">
-                    <template slot-scope="scope">
-                        {{dateForm(scope.row.clients.firstLogin)}}
-                    </template>
-                </el-table-column>
-                -->
                 <el-table-column prop="clients.onlineTime" label="在线时长" width="150">
                     <template slot-scope="scope">
                         {{timeStamp(scope.row.clients.onlineTime)}}
@@ -71,7 +64,9 @@
                 </el-table-column>
                 <el-table-column prop="clients.lastTime" label="最近访问时间" width="200">
                     <template slot-scope="scope">
-                        {{dateForm(scope.row.clients.lastTime)}}
+                        <el-tag :type="isOffline(scope.row.clients.lastTime) ? 'warning':'success'" close-transition>
+                            {{dateForm(scope.row.clients.lastTime)}}
+                        </el-tag>
                     </template>
                 </el-table-column>
                 <!--<el-table-column prop="pubsub_status" label="升级状态">-->
@@ -82,7 +77,7 @@
                 <el-table-column label="操作" width=200>
                     <template slot-scope="scope">
                         <el-button class="btn1" type="warning" size="small" v-if="!scope.row.clients.kickoff" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
-                        <el-button class="btn1" type="danger" size="small" v-if="!scope.row.clients.isTelBlocked" :disabled="scope.row.clients.telNumber == ''" @click="handleBlockClient(scope.row.clients.telNumber)">电话黑名单</el-button>
+                        <el-button class="btn1" :type="scope.row.clients.isTelBlocked?danger:success" size="small" :disabled="scope.row.clients.telNumber == ''" @click="handleBlockClient(scope.row.clients.telNumber,scope.row.clients.isTelBlocked)">{{scope.row.clients.isTelBlocked?'解除电话黑名单':'电话黑名单'}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -173,8 +168,19 @@
                 }
                 return time;
             },
+            isOffline:function(time){
+                var now             = new Date();
+                var nowTime	        = now.getTime();
+                if ((nowTime - time) > 60*5)
+                    return true;
+                return false;
+            },
             //毫秒数转为时间戳
             dateForm:function(time){
+                var now             = new Date();
+                var nowTime	        = now.getTime();
+                if ((nowTime - time) > 60*5)
+                    return "用户离线";
                 var date = new Date(time);
                 return date.toLocaleString();
             },
@@ -260,10 +266,10 @@
                     }
                 });
             },
-            handleBlockClient: function(telNumber) {
+            handleBlockClient: function(telNumber, isTelBlocked) {
                 var self = this;
                 var params = {
-                    filter:{'gwId':self.curGwid, 'clients.telNumber':telNumber, 'clients.isTelBlocked':false}
+                    filter:{'gwId':self.curGwid, 'clients.telNumber':telNumber, 'clients.isTelBlocked':isTelBlocked}
                 };
 
                 self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
