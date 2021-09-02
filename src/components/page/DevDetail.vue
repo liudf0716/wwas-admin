@@ -77,7 +77,7 @@
                 <el-table-column label="操作" width=200>
                     <template slot-scope="scope">
                         <el-button class="btn1" type="warning" size="small" v-if="!scope.row.clients.kickoff" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
-                        <el-button class="btn1" :type="scope.row.clients.isTelBlocked?danger:success" size="small" :disabled="scope.row.clients.telNumber == ''" @click="handleBlockClient(scope.row.clients.telNumber,scope.row.clients.isTelBlocked)">{{scope.row.clients.isTelBlocked?'解除电话黑名单':'电话黑名单'}}</el-button>
+                        <el-button class="btn1" :type="!scope.row.clients.isTelBlocked?'danger':'success'" size="small" :disabled="scope.row.clients.telNumber == ''" @click="handleBlockClient(scope.row.clients.mac,scope.row.clients.isTelBlocked)">{{scope.row.clients.isTelBlocked?'解除电话黑名单':'电话黑名单'}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -255,7 +255,6 @@
                 
                 self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
                     self.loading = false;
-                    console.log("res is " + res);
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
@@ -266,12 +265,12 @@
                     }
                 });
             },
-            handleBlockClient: function(telNumber, isTelBlocked) {
+            handleBlockClient: function(mac, isTelBlocked) {
                 var self = this;
                 var params = {
-                    filter:{'gwId':self.curGwid, 'clients.telNumber':telNumber, 'clients.isTelBlocked':isTelBlocked}
+                    filter:{"gwId":self.curGwid, "mac":mac, "isTelBlocked":isTelBlocked}
                 };
-
+                console.log('params is ' + params.filter);
                 self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
                     self.loading = false;
                     if(res.data.ret_code == '1001'){
