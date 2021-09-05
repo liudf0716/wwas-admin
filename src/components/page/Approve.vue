@@ -283,7 +283,10 @@
                         {required: true, message: '请选择时长', trigger: 'change'}
                     ],
                     multiDevOL: [
-                        {required: true, message: '请选择台数', trigger: 'change'}
+                        {required: true, message: '请选择能一个电话号能同时认证路由器的台数', trigger: 'change'}
+                    ],
+                    clientTimeout: [
+                        {required: true, message: '选择客户超时认证时间', trigger: 'change'}
                     ],
                 },
                 form3:{
@@ -466,9 +469,12 @@
                                         self.params.duration = self.form2.duration;
                                         self.param.multiDevOL = self.form2.multiDevOL;
                                         self.param.clientTimeout = self.form2.clientTimeout;
-                                        if (self.fileList.length > 0)
+                                        if (self.fileList.length > 0) {
                                             self.params.backgroundUrl = self.fileList[0].response;
-                                        self.fileList.pop();
+                                            self.fileList.pop();
+                                        } else {
+                                            self.params.backgroundUrl = '/static/img/lg_pic.png';
+                                        }
                                         
                                         if(self.dxchoose == 'ali'){
                                             self.params.sms = {
