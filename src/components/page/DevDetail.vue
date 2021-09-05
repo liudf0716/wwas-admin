@@ -253,17 +253,27 @@
                     filter:{"gwId":self.curGwid, "clients.mac":mac}
                 };
                 
-                self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    } else if(res.data.ret_code == 0){
-                        self.gwClients = res.data.extra.gwClients;
-                    }
-                });
+                this.$confirm('此操作将该用户踢下线, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                    self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
+                        self.loading = false;
+                        if(res.data.ret_code == '1001'){
+                            self.$message({message:res.data.extra,type:'warning'});
+                            setTimeout(function(){
+                                self.$router.replace('login');
+                            },2000)
+                        } else if(res.data.ret_code == 0){
+                            self.gwClients = res.data.extra.gwClients;
+                            this.$message({
+                                type: 'success',
+                                message: '操作成功!'
+                            });
+                        }
+                    });
+                }
             },
             handleBlockClient: function(mac, isTelBlocked) {
                 var self = this;
@@ -271,17 +281,27 @@
                     filter:{"gwId":self.curGwid, "mac":mac, "isTelBlocked":isTelBlocked}
                 };
                 console.log('params is ' + params.filter);
-                self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }else if(res.data.ret_code == 0){
-                        self.gwClients = res.data.extra.gwClients;
-                    }
-                });
+                this.$confirm('此操作将禁止该电话号认证上网, 是否继续?', '提示', {
+                  confirmButtonText: '确定',
+                  cancelButtonText: '取消',
+                  type: 'warning'
+                }).then(() => {
+                    self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
+                        self.loading = false;
+                        if(res.data.ret_code == '1001'){
+                            self.$message({message:res.data.extra,type:'warning'});
+                            setTimeout(function(){
+                                self.$router.replace('login');
+                            },2000)
+                        }else if(res.data.ret_code == 0){
+                            self.gwClients = res.data.extra.gwClients;
+                            this.$message({
+                                type: 'success',
+                                message: '操作成功!'
+                            });
+                        }
+                    });
+                }
             },
             changePage:function(values) {
                 this.information.pagination.per_page = values.perpage;
