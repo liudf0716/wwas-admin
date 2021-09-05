@@ -158,7 +158,7 @@
                             <el-form-item label="单手机号能同时认证的设备数" prop="multiDevOL">
                                 <el-select v-model="form2.multiDevOL" class="diainp" placeholder="请选择" @change="changeMultiDevOL">
                                     <el-option
-                                        v-for="item in mutiDevOLs"
+                                        v-for="item in multiDevOLs"
                                         :key="item"
                                         :label="item"
                                         :value="item">
