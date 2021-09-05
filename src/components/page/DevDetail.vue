@@ -9,6 +9,7 @@
         <div>
             <h4>基本信息</h4>
             <el-table :data="devMsgData" border style="width: 100%;margin:20px 0 40px;" ref="multipleTable">
+                <el-table-column prop="" label="在线客户"></el-table-column>
                 <el-table-column prop="sysUptime" label="系统运行时长" width="160">
                     <template slot-scope="scope">
                         {{timeStamp(scope.row.sysUptime)}}
