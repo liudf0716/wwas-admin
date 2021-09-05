@@ -273,7 +273,7 @@
                             });
                         }
                     });
-                }
+                });
             },
             handleBlockClient: function(mac, isTelBlocked) {
                 var self = this;
@@ -301,7 +301,7 @@
                             });
                         }
                     });
-                }
+                });
             },
             changePage:function(values) {
                 this.information.pagination.per_page = values.perpage;
