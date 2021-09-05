@@ -155,6 +155,17 @@
                                 </el-select>
                                 <span style="padding:5px 12px;">小时</span>
                             </el-form-item>
+                            <el-form-item label="单手机号能同时认证的设备数" prop="multiDevOL">
+                                <el-select v-model="form2.multiDevOL" class="diainp" placeholder="请选择" @change="changeMultiDevOL">
+                                    <el-option
+                                        v-for="item in mutiDevOLs"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                    </el-option>
+                                </el-select>
+                                <span style="padding:5px 12px;">台</span>
+                            </el-form-item>
                             <el-form-item label="背景图片" prop="backgroundUrl">
                                 <el-upload
                                     class="upload-demo"
@@ -205,6 +216,7 @@
                     enable: false,
                 },
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
+                multiDevOLs:[1,2,3,4,5,6],
                 rules0: {
                     appId: [
                         {required: true, message: '请输入APP_ID', trigger: 'blur'},
@@ -246,7 +258,8 @@
                 },
                 form2: {
                     portalUrl:'',
-                    duration:''
+                    duration:'',
+                    multiDevOL:'',
                 },
                 rules2: {
                     portalUrl: [
@@ -255,7 +268,10 @@
                     ],
                     duration: [
                         {required: true, message: '请选择时长', trigger: 'change'}
-                    ]
+                    ],
+                    multiDevOL: [
+                        {required: true, message: '请选择台数', trigger: 'change'}
+                    ],
                 },
                 form3:{
 
@@ -435,6 +451,7 @@
 
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
+                                        
                                         if (self.fileList.length > 0)
                                             self.params.backgroundUrl = self.fileList[0].response;
                                         self.fileList.pop();
@@ -515,6 +532,7 @@
                         self.form0.enable = requestData.wxEnable;
                         self.form2.portalUrl = requestData.portalUrl;
                         self.form2.duration = String(requestData.duration);
+                        self.form2.multiDevOL = requestData.multiDevOL;
 
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
@@ -549,6 +567,10 @@
             changeDuration: function(value){
                 var self = this;
                 self.form2.duration = String(value);
+            },
+            changeMultiDevOL: function(value) {
+                var self = this;
+                self.form2.multiDevOL = String(value);
             },
             validateUrl: function (rule, value, callback) {
                 var self = this;
