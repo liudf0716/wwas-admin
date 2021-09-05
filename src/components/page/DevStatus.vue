@@ -29,7 +29,10 @@
                     <el-tag :type="scope.row.deviceStatus == '0' ? 'warning':'success'" close-transition>{{scope.row.deviceStatus == '1'?'在线':'离线'}}</el-tag>
                 </template>
             </el-table-column>
+            <!--
             <el-table-column prop="ssid" label="无线名称" width="150"></el-table-column>
+            -->
+            <el-table-column prop='onlineClients' label="在线客户数" width="110"></el-table-column>
             <el-table-column prop="channelPath" label="渠道" width="140"></el-table-column>
             <el-table-column prop="wiredPassed" label="有线免认证" width="110">
                 <template slot-scope="scope">
