@@ -166,6 +166,17 @@
                                 </el-select>
                                 <span style="padding:5px 12px;">台</span>
                             </el-form-item>
+                            <el-form-item label="客户超时认证时间" prop="clientTimeout">
+                                <el-select v-model="form2.clientTimeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
+                                    <el-option
+                                        v-for="item in clientTimeoutOp"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                    </el-option>
+                                </el-select>
+                                <span style="padding:5px 12px;">分钟</span>
+                            </el-form-item>
                             <el-form-item label="背景图片" prop="backgroundUrl">
                                 <el-upload
                                     class="upload-demo"
@@ -217,6 +228,7 @@
                 },
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 multiDevOLs:[1,2,3,4,5,6],
+                clientTimeoutOp:[2,4,6,8,10,20,30,60,120,360],
                 rules0: {
                     appId: [
                         {required: true, message: '请输入APP_ID', trigger: 'blur'},
@@ -260,6 +272,7 @@
                     portalUrl:'',
                     duration:'',
                     multiDevOL:'',
+                    clientTimeout:'',
                 },
                 rules2: {
                     portalUrl: [
@@ -451,7 +464,8 @@
 
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
-                                        
+                                        self.param.multiDevOL = self.form2.multiDevOL;
+                                        self.param.clientTimeout = self.form2.clientTimeout;
                                         if (self.fileList.length > 0)
                                             self.params.backgroundUrl = self.fileList[0].response;
                                         self.fileList.pop();
@@ -533,7 +547,8 @@
                         self.form2.portalUrl = requestData.portalUrl;
                         self.form2.duration = String(requestData.duration);
                         self.form2.multiDevOL = requestData.multiDevOL;
-
+                        self.form2.clientTimeout = requestData.clientTimeout;
+                        
                         self.form1.toAddress = requestData.toAddress;
                         self.form1.toAmount = String(requestData.toAmount);
                         self.form1.enable = requestData.wfcEnable;
@@ -571,6 +586,10 @@
             changeMultiDevOL: function(value) {
                 var self = this;
                 self.form2.multiDevOL = String(value);
+            },
+            changeClientTimeout: function(value) {
+                var self = this;
+                self.form2.clientTimeout = String(value);
             },
             validateUrl: function (rule, value, callback) {
                 var self = this;
