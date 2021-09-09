@@ -467,8 +467,8 @@
 
                                         self.params.portalUrl = self.form2.portalUrl;
                                         self.params.duration = self.form2.duration;
-                                        self.param.multiDevOL = self.form2.multiDevOL;
-                                        self.param.clientTimeout = self.form2.clientTimeout;
+                                        self.params.multiDevOL = self.form2.multiDevOL;
+                                        self.params.clientTimeout = self.form2.clientTimeout;
                                         if (self.fileList.length > 0) {
                                             self.params.backgroundUrl = self.fileList[0].response;
                                             self.fileList.pop();
