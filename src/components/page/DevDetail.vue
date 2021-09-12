@@ -281,7 +281,7 @@
                     filter:{"gwId":self.curGwid, "mac":mac, "isTelBlocked":isTelBlocked}
                 };
                 console.log('params is ' + params.filter);
-                this.$confirm(!isTelBlocked?'此操作将禁止该电话号认证上网功能, 是否继续?':'此操作将恢复该电话号认证上网功能，是否继续?', '提示', {
+                this.$confirm(isTelBlocked==false?'此操作将禁止该电话号认证上网功能, 是否继续?':'此操作将恢复该电话号认证上网功能，是否继续?', '提示', {
                   confirmButtonText: '确定',
                   cancelButtonText: '取消',
                   type: 'warning'
