@@ -39,11 +39,13 @@
                     <el-tag :type="scope.row.wiredPassed == '0' ? 'warning':'success'" close-transition>{{scope.row.wiredPassed == '1'?'已开启':'未开启'}}</el-tag>
                 </template>
             </el-table-column>
+            <!-- 
             <el-table-column prop="wifidogUptime" label="wifidog运行时长" width="160">
                 <template slot-scope="scope">
                     {{timeStamp(scope.row.wifidogUptime)}}
                 </template>
             </el-table-column>
+            -->
             <el-table-column prop="lastTime" label="最近上线时间" width="190">
                 <template slot-scope="scope">
                     {{dateForm(scope.row.lastTime)}}
