@@ -41,7 +41,7 @@
                 </el-table-column>
                 <el-table-column prop="clients.telNumber" label="电话号码" width="150">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.telNumber == '' ? 'info' : 'success'" close-transition>{{scope.row.clients.telNumber == ''?'无电话号码': scope.row.clients.telNumber}}</el-tag>
+                        <el-tag :type="scope.row.clients.telNumber == '' ? 'info' : 'success'" close-transition>{{displayClientPhone(scope.row.clients)}}</el-tag>
                     </template>
                 </el-table-column>
                 <!--
@@ -325,6 +325,14 @@
                         onlineUser++;
                 }
                 return onlineUser;
+            },
+            displayClientPhone:function(client) {
+                if (client.authType != 1)
+                    return '号码不展示';
+                if (client.telNumber == '')
+                    return '无电话号码';
+                
+                return client.telNumber;
             },
         },
     }
