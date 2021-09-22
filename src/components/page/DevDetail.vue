@@ -9,11 +9,7 @@
         <div>
             <h4>基本信息</h4>
             <el-table :data="devMsgData" border style="width: 100%;margin:20px 0 40px;" ref="multipleTable">
-                <el-table-column prop="onlineUser" label="在线用户" width="160">
-                    <template slot-scope="scope">
-                        {{currentOnlineUser()}}
-                    </template>
-                </el-table-column>
+                <el-table-column prop="onlineClients" label="在线用户" width="160"></el-table-column>
                 <el-table-column prop="sysUptime" label="系统运行时长" width="160">
                     <template slot-scope="scope">
                         {{timeStamp(scope.row.sysUptime)}}
@@ -325,14 +321,6 @@
                         onlineUser++;
                 }
                 return onlineUser;
-            },
-            displayClientPhone:function(client) {
-                if (client.authType != 1)
-                    return '号码不展示';
-                if (client.telNumber == '')
-                    return '无电话号码';
-                
-                return client.telNumber;
             },
         },
     }
