@@ -311,16 +311,13 @@
             onSearch:function(searchQuery) {
                 this.query = searchQuery;
             },
-            currentOnlineUser:function(clients) {
-                var onlineUser = 0;
-                var now             = new Date();
-                var nowTime	        = now.getTime();
-                for (var i = 0; i < gwClients.length; i++)
-                {
-                    if ((nowTime - gwClients[i].lastTime) <= 60*5*1000)
-                        onlineUser++;
-                }
-                return onlineUser;
+            displayClientPhone:function(client) {
+                if (client.authType != 1)
+                    return '号码不展示';
+                if (client.telNumber == '')
+                    return '无电话号码';
+                
+                return client.telNumber;
             },
         },
     }
