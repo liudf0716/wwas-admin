@@ -11,7 +11,7 @@
             <el-table :data="devMsgData" border style="width: 100%;margin:20px 0 40px;" ref="multipleTable">
                 <el-table-column prop="onlineUser" label="在线用户" width="160">
                     <template slot-scope="scope">
-                        {{currentOnlineUser(scope.row.clients)}}
+                        {{currentOnlineUser()}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="sysUptime" label="系统运行时长" width="160">
@@ -319,9 +319,9 @@
                 var onlineUser = 0;
                 var now             = new Date();
                 var nowTime	        = now.getTime();
-                for (var i = 0; i < clients.length; i++)
+                for (var i = 0; i < gwClients.length; i++)
                 {
-                    if ((nowTime - clients[i].lastTime) <= 60*5*1000)
+                    if ((nowTime - gwClients[i].lastTime) <= 60*5*1000)
                         onlineUser++;
                 }
                 return onlineUser;
