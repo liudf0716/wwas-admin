@@ -9,6 +9,11 @@
         <div>
             <h4>基本信息</h4>
             <el-table :data="devMsgData" border style="width: 100%;margin:20px 0 40px;" ref="multipleTable">
+                <el-table-column prop="onlineUser" label="在线用户" width="160">
+                    <template slot-scope="scope">
+                        {{currentOnlineUser(scope.row.clients)}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="sysUptime" label="系统运行时长" width="160">
                     <template slot-scope="scope">
                         {{timeStamp(scope.row.sysUptime)}}
@@ -29,7 +34,7 @@
             <el-table :data="gwClients" border style="width: 100%" ref="multipleTable">
                 <el-table-column prop="clients.mac" label="路由MAC" width="180"></el-table-column>
                 <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
-                <el-table-column prop="clients.authType" label="认证方式" width="120">
+                <el-table-column prop="clients.authType" label="当前认证方式" width="120">
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.clients.authType == 1 ? 'success' : 'info'" close-transition>{{scope.row.clients.authType == 1?'电话认证': '其他认证'}}</el-tag>
                     </template>
@@ -309,7 +314,18 @@
             },
             onSearch:function(searchQuery) {
                 this.query = searchQuery;
-            }
+            },
+            currentOnlineUser:function(clients) {
+                var onlineUser = 0;
+                var now             = new Date();
+                var nowTime	        = now.getTime();
+                for (var i = 0; i < clients.length; i++)
+                {
+                    if ((nowTime - clients[i].lastTime) <= 60*5*1000)
+                        onlineUser++;
+                }
+                return onlineUser;
+            },
         },
     }
 </script>
