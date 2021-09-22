@@ -31,7 +31,7 @@
                 <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
                 <el-table-column prop="clients.authType" label="认证方式" width="120">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.authType == '1' ? 'success' : 'info'" close-transition>{{scope.row.clients.authType == '1'?'电话认证': '其他认证'}}</el-tag>
+                        <el-tag :type="scope.row.clients.authType == 1 ? 'success' : 'info'" close-transition>{{scope.row.clients.authType == 1?'电话认证': '其他认证'}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="clients.telNumber" label="电话号码" width="150">
