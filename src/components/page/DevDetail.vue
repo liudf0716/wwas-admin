@@ -172,7 +172,7 @@
             isOffline:function(time){
                 var now             = new Date();
                 var nowTime	        = now.getTime();
-                if ((nowTime - time) > 60*5*1000)
+                if ((nowTime - time) > 60*2*1000)
                     return true;
                 return false;
             },
@@ -180,7 +180,7 @@
             dateForm:function(time){
                 var now             = new Date();
                 var nowTime	        = now.getTime();
-                if ((nowTime - time) > 60*5*1000)
+                if ((nowTime - time) > 60*2*1000)
                     return "用户离线";
                 var date = new Date(time);
                 return date.toLocaleString();
