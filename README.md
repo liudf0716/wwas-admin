@@ -1,5 +1,5 @@
 # wwas-admin介绍
-WWAS(wificoin wifidog auth server) 是一个支持[apfree wifidog](https://github.com/liudf0716/apfree_wifidog)的认证服务平台
+WWAS(wireless wifidog auth server) 是一个支持[apfree-wifidog](https://github.com/liudf0716/apfree-wifidog)的认证服务平台
 
 wwas-admin是WWAS的管理配置前端，其主要功能包括：
 
@@ -12,8 +12,6 @@ wwas-admin是WWAS的管理配置前端，其主要功能包括：
 > 用户管理设备详情
 
 > 认证用户列表详情
-
-> wfc认证配置
 
 > 微信认证配置
 
@@ -59,9 +57,6 @@ npm run dev
 
 >  项目交流群：331230369(QQ) 424031785(QQ)
 
-# 运营平台
-
-[申请免费使用运营平台请戳这里](https://wifidog.kunteng.org.cn)
 
 # 部分截图
 
@@ -80,10 +75,6 @@ npm run dev
 ### 微信认证配置
 
 <img src="https://github.com/wificoin-project/wwas-admin/blob/master/weixin_auth.png"/>
-
-### wfc支付认证配置
-
-<img src="https://github.com/wificoin-project/wwas-admin/blob/master/wfc_auth.png"/>
 
 ### 短信认证配置
 
