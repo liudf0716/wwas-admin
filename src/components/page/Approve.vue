@@ -20,72 +20,61 @@
                         </p>
                     </div>
                     <div class="form-box tab-cont form-box2">
-                        <el-form :model="form0" :rules="rules0" ref="form0" label-width="150px">
+                        <el-form :model="form_wx" :rules="rules_wx" ref="form_wx" label-width="150px">
                             <el-form-item label="APP_ID" prop="appId">
-                                <el-input v-model="form0.appId" class="diainp"></el-input>
+                                <el-input v-model="form_wx.appId" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="secretKey" prop="secretKey">
-                                <el-input v-model="form0.secretKey" class="diainp"></el-input>
+                                <el-input v-model="form_wx.secretKey" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="SHOP_ID" prop="shopId">
-                                <el-input v-model="form0.shopId" class="diainp"></el-input>
+                                <el-input v-model="form_wx.shopId" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="启用">
-                                <el-switch v-model="form0.enable" class="diainp"></el-switch>
+                                <el-switch v-model="form_wx.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onWeixinSubmit('form0')">下一步</el-button>
+                                <el-button type="primary" @click="onWeixinSubmit('form_wx')">下一步</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane label="WFC认证" name="2">
 
+                <el-tab-pane label="一键免认证" name="2">
                     <div class="form-box tab-cont form-box2">
-                        <el-form ref="form1" :model="form1" :rules="rules1" label-width="150px">
-                            <el-form-item label="钱包地址" prop="toAddress">
-                                <el-input v-model="form1.toAddress" class="diainp"></el-input>
-                                <a href="https://wfc.wificoin.club/" target="_blank" style="padding:5px 12px;color:#20a0ff;">查看地址</a>
-                            </el-form-item>
-                            <el-form-item label="金额(WFC)" prop="toAmount">
-                                <el-input v-model="form1.toAmount" class="diainp"></el-input>
-                            </el-form-item>
+                        <el-form ref="form_onekey" :model="form_onekey"  label-width="150px">
                             <el-form-item label="启用">
-                                <el-switch v-model="form1.enable" class="diainp"></el-switch>
+                                <el-switch v-model="form_onekey.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onWificoinSubmit('form1')">下一步</el-button>
+                                <el-button type="primary" @click="onLastSubmit('form_onekey')">下一步</el-button>
                             </el-form-item>
                         </el-form>
-                    </div>
-
                 </el-tab-pane>
-                
+
                 <el-tab-pane label="用户密码认证" name="3">
-
                     <div class="form-box tab-cont form-box2">
-                        <el-form ref="form4" :model="form4" :rules="rules4" label-width="150px">
+                        <el-form ref="form_user" :model="form_user" :rules="rules_user" label-width="150px">
                             <el-form-item label="用户名" prop="username">
-                                <el-input v-model="form4.username" class="diainp"></el-input>
+                                <el-input v-model="form_user.username" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="用户密码" prop="password">
-                                <el-input v-model="form4.password" class="diainp"></el-input>
+                                <el-input v-model="form_user.password" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="启用">
-                                <el-switch v-model="form4.enable" class="diainp"></el-switch>
+                                <el-switch v-model="form_user.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onPasswordSubmit('form4')">下一步</el-button>
+                                <el-button type="primary" @click="onPasswordSubmit('form_user')">下一步</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
-
-                </el-tab-pane>
+                </el-tab-pane> 
                 
                 <el-tab-pane label="短信认证" name="4">
 
                     <el-form class="form-box tab-cont form-box2">
-                        <el-form ref="form3" :model="form3" label-width="150px">
+                        <el-form ref="form_dx" :model="form_dx" label-width="150px">
                             <el-form-item label="短信服务商" prop="dxchoose">
                                 <el-select v-model="dxchoose" placeholder="请选择短信服务商" @change="changeDxchoose">
                                     <el-option label="阿里云" value="ali"></el-option>
@@ -138,14 +127,13 @@
                 <el-tab-pane label="其他设置" name="5">
 
                     <div class="form-box tab-cont form-box2">
-                        <el-form ref="form2" :model="form2" :rules="rules2" label-width="150px">
+                        <el-form ref="form_other" :model="form_other" :rules="rules_other" label-width="150px">
 
                             <el-form-item label="跳转" prop="portalUrl">
-                                <el-input v-model="form2.portalUrl" class="diainp"></el-input>
+                                <el-input v-model="form_other.portalUrl" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="时间" prop="duration">
-                                <!--<el-input v-model="form0.duration" class="diainp"></el-input>-->
-                                <el-select v-model="form2.duration" class="diainp" placeholder="请选择" @change="changeDuration">
+                                <el-select v-model="form_other.duration" class="diainp" placeholder="请选择" @change="changeDuration">
                                     <el-option
                                         v-for="item in durations"
                                         :key="item"
@@ -156,7 +144,7 @@
                                 <span style="padding:5px 12px;">小时</span>
                             </el-form-item>
                             <el-form-item label="单手机号能同时认证的设备数" prop="multiDevOL">
-                                <el-select v-model="form2.multiDevOL" class="diainp" placeholder="请选择" @change="changeMultiDevOL">
+                                <el-select v-model="form_other.multiDevOL" class="diainp" placeholder="请选择" @change="changeMultiDevOL">
                                     <el-option
                                         v-for="item in multiDevOLs"
                                         :key="item"
@@ -167,7 +155,7 @@
                                 <span style="padding:5px 12px;">台</span>
                             </el-form-item>
                             <el-form-item label="客户超时认证时间" prop="clientTimeout">
-                                <el-select v-model="form2.clientTimeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
+                                <el-select v-model="form_other.clientTimeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
                                     <el-option
                                         v-for="item in clientTimeoutOp"
                                         :key="item"
@@ -218,7 +206,7 @@
                 params:{},
                 active:0,
                 task_type:'1',
-                form0: {
+                form_wx: {
                     appId: '',
                     app_secret: '',
                     shopId:'',
@@ -229,7 +217,7 @@
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 multiDevOLs:[1,2,3,4,5,6],
                 clientTimeoutOp:[2,4,6,8,10,20,30,60,120,360],
-                rules0: {
+                rules_wx: {
                     appId: [
                         {required: true, message: '请输入APP_ID', trigger: 'blur'},
                     ],
@@ -241,26 +229,15 @@
                     ]
 
                 },
-                form1: {
-                    toAddress:'',
-                    toAmount:'',
-                    enable: false,
+                form_onekey: {
+                    enable: true,
                 },
-                rules1: {
-                    toAddress:[
-                        { required: true, message: '请输入钱包地址', trigger: 'blur'}
-                    ],
-                    toAmount: [
-                        {required: true, message: '请输入金额', trigger: 'blur'},
-                        {validator: this.validateNum, trigger: 'blur'}
-                    ]
-                },
-                form4: {
+                form_user: {
                   username:'',
                   password:'',
                   enable: true,
                 },
-                rules4: {
+                rules_user: {
                   username:[
                     { required: true, message: '请输入用户名', trigger: 'blur'}
                   ],
@@ -268,13 +245,13 @@
                     { required: true, message: '请输入用户名密码', trigger: 'blur'}
                   ]
                 },
-                form2: {
+                form_other: {
                     portalUrl:'',
                     duration:'',
                     multiDevOL:'',
                     clientTimeout:'',
                 },
-                rules2: {
+                rules_other: {
                     portalUrl: [
                         {required: true, message: '请输入跳转页面', trigger: 'blur'},
                         {validator: this.validateUrl, trigger: 'blur'}
@@ -289,7 +266,7 @@
                         {required: true, message: '选择客户超时认证时间', trigger: 'change'}
                     ],
                 },
-                form3:{
+                form_dx:{
 
                 },
                 formAli:{
@@ -352,10 +329,10 @@
                         self.params = {
                             user_account:localStorage.getItem('ms_username'),
                             weixin:{
-                                appId:self.form0.appId,
-                                shopId:self.form0.shopId,
-                                secretKey:self.form0.secretKey,
-                                enable:self.form0.enable,
+                                appId:self.form_wx.appId,
+                                shopId:self.form_wx.shopId,
+                                secretKey:self.form_wx.secretKey,
+                                enable:self.form_wx.enable,
                             }
                         };
                         self.active = 1;
@@ -367,14 +344,12 @@
                 });
 
             },
-            onWificoinSubmit: function(formName) {
+            onOnekeySubmit:function (formName) {
                 var self = this;
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
-                        self.params.wificoin = {
-                            toAddress:self.form1.toAddress,
-                            toAmount:self.form1.toAmount,
-                            enable:self.form1.enable,
+                        self.params.onekey = {
+                            enable:self.form_onekey.enable,
                         };
                         self.active = 2;
                         self.task_type = '3';
@@ -390,9 +365,9 @@
                 self.$refs[formName].validate(function (valid) {
                     if (valid) {
                         self.params.user = {
-                            user:self.form4.usernmae,
-                            password:self.form4.password,
-                            enable:self.form4.enable,
+                            user:self.form_user.usernmae,
+                            password:self.form_user.password,
+                            enable:self.form_user.enable,
                         };
                         self.active = 3;
                         self.task_type = '4';
@@ -437,98 +412,84 @@
             },
             onLastSubmit: function(formName){
                 var self = this;
-                self.$refs['form0'].validate(function (valid) {
+                self.$refs['form_wx'].validate(function (valid) {
                     if(valid){
+                        self.$refs[formName].validate(function (valid) {
+                            if (valid) {
+                                self.params.user_account = localStorage.getItem('ms_username');
+                                self.params.weixin = {
+                                    appId:self.form_wx.appId,
+                                    shopId:self.form_wx.shopId,
+                                    secretKey:self.form_wx.secretKey,
+                                    enable:self.form_wx.enable,
+                                };
 
-                        self.$refs['form1'].validate(function (valid) {
-                            if(valid){
+                                self.params.onekey = {
+                                    enable:self.form_onekey.enable,
+                                };
 
-                                self.$refs[formName].validate(function (valid) {
-                                    if (valid) {
-                                        self.params.user_account = localStorage.getItem('ms_username');
-                                        self.params.weixin = {
-                                            appId:self.form0.appId,
-                                            shopId:self.form0.shopId,
-                                            secretKey:self.form0.secretKey,
-                                            // ssid:self.form0.ssid,
-                                            enable:self.form0.enable,
-                                        };
-                                        self.params.wificoin = {
-                                            toAddress:self.form1.toAddress,
-                                            toAmount:self.form1.toAmount,
-                                            enable:self.form1.enable,
-                                        };
-					
-					                    self.params.user = {
-						                    user:self.form4.username,
-						                    password:self.form4.password,
-                                            enable:self.form4.enable,
-					                    };
+                                self.params.user = {
+                                    user:self.form_user.username,
+                                    password:self.form_user.password,
+                                    enable:self.form_user.enable,
+                                };
 
-                                        self.params.portalUrl = self.form2.portalUrl;
-                                        self.params.duration = self.form2.duration;
-                                        self.params.multiDevOL = self.form2.multiDevOL;
-                                        self.params.clientTimeout = self.form2.clientTimeout;
-                                        if (self.fileList.length > 0) {
-                                            self.params.backgroundUrl = self.fileList[0].response;
-                                            self.fileList.pop();
-                                        } else {
-                                            self.params.backgroundUrl = '/static/img/lg_pic.png';
-                                        }
-                                        
-                                        if(self.dxchoose == 'ali'){
-                                            self.params.sms = {
-                                                selected:self.dxchoose,
-                                                appId:self.formAli.appId,
-                                                appSecret:self.formAli.appSecret,
-                                                smsSignName:self.formAli.smsSignName,
-                                                smsTemplateCode:self.formAli.smsTemplateCode,
-                                                enable:self.formAli.enable,
-                                            }
-                                        }else{
-                                            self.params.sms = {
-                                                selected:self.dxchoose,
-                                                wyAppId:self.formWy.wyAppId,
-                                                wyAppSecret:self.formWy.wyAppSecret,
-                                                wyTemplateId:self.formWy.wyTemplateId,
-                                                enable:self.formWy.enable,
-                                            }
-                                        }
-
-                                        self.loading = true;
-                                        self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
-                                            self.loading = false;
-                                            self.active = 4;
-                                            if(res.data.ret_code == '1001'){
-                                                self.$message({message:res.data.extra,type:'warning'});
-                                                setTimeout(function(){
-                                                    self.$router.replace('login');
-                                                },2000)
-                                            }
-                                            if(res.data.ret_code == 0){
-                                                self.$message({message:res.data.extra,type:'success'});
-
-                                            }else{
-                                                self.$message.error(res.data.extra)
-                                            }
-                                        })
-
-                                    } else {
-                                        return false;
-                                        console.log('验证失败');
+                                self.params.portalUrl = self.form_other.portalUrl;
+                                self.params.duration = self.form_other.duration;
+                                self.params.multiDevOL = self.form_other.multiDevOL;
+                                self.params.clientTimeout = self.form_other.clientTimeout;
+                                if (self.fileList.length > 0) {
+                                    self.params.backgroundUrl = self.fileList[0].response;
+                                    self.fileList.pop();
+                                } else {
+                                    self.params.backgroundUrl = '/static/img/lg_pic.png';
+                                }
+                                
+                                if(self.dxchoose == 'ali'){
+                                    self.params.sms = {
+                                        selected:self.dxchoose,
+                                        appId:self.formAli.appId,
+                                        appSecret:self.formAli.appSecret,
+                                        smsSignName:self.formAli.smsSignName,
+                                        smsTemplateCode:self.formAli.smsTemplateCode,
+                                        enable:self.formAli.enable,
                                     }
-                                });
+                                }else{
+                                    self.params.sms = {
+                                        selected:self.dxchoose,
+                                        wyAppId:self.formWy.wyAppId,
+                                        wyAppSecret:self.formWy.wyAppSecret,
+                                        wyTemplateId:self.formWy.wyTemplateId,
+                                        enable:self.formWy.enable,
+                                    }
+                                }
 
-                            }else{
-                                self.task_type = '2';
+                                self.loading = true;
+                                self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
+                                    self.loading = false;
+                                    self.active = 4;
+                                    if(res.data.ret_code == '1001'){
+                                        self.$message({message:res.data.extra,type:'warning'});
+                                        setTimeout(function(){
+                                            self.$router.replace('login');
+                                        },2000)
+                                    }
+                                    if(res.data.ret_code == 0){
+                                        self.$message({message:res.data.extra,type:'success'});
+
+                                    }else{
+                                        self.$message.error(res.data.extra)
+                                    }
+                                })
+                            } else {
                                 return false;
+                                console.log('验证失败');
                             }
                         });
-
                     }else{
                         self.task_type = '1';
                         return false;
-                    }
+                    });
                 });
             },
             getData: function(){//获取数据
@@ -545,23 +506,23 @@
                     }
                     if(res.data.ret_code == 0){
                         var requestData = res.data.extra;
-                        self.form0.appId = requestData.appId;
-                        self.form0.shopId = requestData.shopId;
-                        self.form0.secretKey = requestData.secretKey;
-                        self.form0.ssid = requestData.ssid;
-                        self.form0.enable = requestData.wxEnable;
-                        self.form2.portalUrl = requestData.portalUrl;
-                        self.form2.duration = String(requestData.duration);
-                        self.form2.multiDevOL = requestData.multiDevOL;
-                        self.form2.clientTimeout = requestData.clientTimeout;
+                        self.form_wx.appId = requestData.appId;
+                        self.form_wx.shopId = requestData.shopId;
+                        self.form_wx.secretKey = requestData.secretKey;
+                        self.form_wx.ssid = requestData.ssid;
+                        self.form_wx.enable = requestData.wxEnable;
                         
-                        self.form1.toAddress = requestData.toAddress;
-                        self.form1.toAmount = String(requestData.toAmount);
-                        self.form1.enable = requestData.wfcEnable;
+                        self.form_other.portalUrl = requestData.portalUrl;
+                        self.form_other.duration = String(requestData.duration);
+                        self.form_other.multiDevOL = requestData.multiDevOL;
+                        self.form_other.clientTimeout = requestData.clientTimeout;
+                        
 
-                        self.form4.username = requestData.user;
-                        self.form4.password = requestData.password;
-                        self.form4.enable = requestData.userEnable;
+                        self.form_user.username = requestData.user;
+                        self.form_user.password = requestData.password;
+                        self.form_user.enable = requestData.userEnable;
+
+                        self.form_onekey.enable = requestData.onekeyEnable;
                         
                         self.formAli.appId = requestData.smsAppId;
                         self.formAli.appSecret = requestData.smsAppSecret;
@@ -587,15 +548,15 @@
             },
             changeDuration: function(value){
                 var self = this;
-                self.form2.duration = String(value);
+                self.form_other.duration = String(value);
             },
             changeMultiDevOL: function(value) {
                 var self = this;
-                self.form2.multiDevOL = String(value);
+                self.form_other.multiDevOL = String(value);
             },
             changeClientTimeout: function(value) {
                 var self = this;
-                self.form2.clientTimeout = String(value);
+                self.form_other.clientTimeout = String(value);
             },
             validateUrl: function (rule, value, callback) {
                 var self = this;

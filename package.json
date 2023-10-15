@@ -1,7 +1,7 @@
 {
   "name": "wwas-admin",
   "version": "1.0.0",
-  "description": "wificoin wifidog auth server admin ui",
+  "description": "apfree wifidog auth server admin ui",
   "author": "lin-xin <2981207131@qq.com>",
   "private": true,
   "scripts": {
