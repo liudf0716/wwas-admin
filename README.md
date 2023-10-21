@@ -19,6 +19,10 @@ wwas-admin是WWAS的管理配置前端，其主要功能包括：
 
 > 一键免认证配置
 
+> 用户密码认证
+
+> portal页面自定义设置
+
 # 项目运行
 
 ```
@@ -59,24 +63,9 @@ cp -r dist/* ../wwas/public/
 ```
 
 
-如果只做前端开发，请忽略这段话。
-
-# 说明
-
->  如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！ ^_^
-
->  如有问题请直接在 [Issues](https://github.com/liudf0716/wwas-admin/issues/new) 中提，或者您发现问题并有非常好的解决方案，欢迎 PR 👍
-
->  项目交流群：331230369(QQ) 424031785(QQ)
-
-
-# 部分截图
+# 部分功能截图
 
 ### 登录
-
-<img src="https://github.com/liudf0716/wwas-admin/blob/master/login.png"/>
-
-### 渠道管理
 
 ![image](https://github.com/liudf0716/wwas-admin/assets/1182593/43f2cc31-481b-4ee6-a1f9-26702aec7b2f)
 
@@ -85,6 +74,12 @@ cp -r dist/* ../wwas/public/
 
 <img src="https://github.com/liudf0716/wwas-admin/blob/master/device.png"/>
 
+### 导入路由
+
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/29fe9f7b-295f-4331-afa7-e2818ec1db41)
+
+
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/1713bc42-2342-4b9b-84d5-51706f9a957c)
 
 ### 微信认证配置
 
@@ -109,4 +104,11 @@ cp -r dist/* ../wwas/public/
 ![image](https://github.com/liudf0716/wwas-admin/assets/1182593/c705997a-7064-4102-8c84-d882e397177d)
 
 
+# 说明
+
+>  如果对您有帮助，您可以点右上角 "Star" 支持一下 谢谢！ ^_^
+
+>  如有问题请直接在 [Issues](https://github.com/liudf0716/wwas-admin/issues/new) 中提，或者您发现问题并有非常好的解决方案，欢迎 PR 👍
+
+>  项目交流群：331230369(QQ) 424031785(QQ)
 
