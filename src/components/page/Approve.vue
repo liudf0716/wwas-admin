@@ -47,7 +47,7 @@
                                 <el-switch v-model="form_onekey.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onLastSubmit('form_onekey')">下一步</el-button>
+                                <el-button type="primary" @click="onOnekeySubmit('form_onekey')">下一步</el-button>
                             </el-form-item>
                         </el-form>
                 </el-tab-pane>
@@ -180,11 +180,11 @@
                                     :file-list="fileList"
                                     :auto-upload="true">
                                     <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-                                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过1M</div>
+                                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件,且不超过1M</div>
                                 </el-upload>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onLastSubmit('form2')">保存</el-button>
+                                <el-button type="primary" @click="onLastSubmit('form_other')">保存</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -199,7 +199,6 @@
 
 <script>
     import global_ from 'components/common/Global';
-    var crypto = require('crypto');
     export default {
         data: function () {
             return {
@@ -489,7 +488,7 @@
                     }else{
                         self.task_type = '1';
                         return false;
-                    });
+                    }
                 });
             },
             getData: function(){//获取数据
