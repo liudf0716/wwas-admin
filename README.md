@@ -78,22 +78,35 @@ cp -r dist/* ../wwas/public/
 
 ### 渠道管理
 
-<img src="https://github.com/liudf0716/wwas-admin/blob/master/qudao.png"/>
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/43f2cc31-481b-4ee6-a1f9-26702aec7b2f)
+
 
 ### 设备管理
 
 <img src="https://github.com/liudf0716/wwas-admin/blob/master/device.png"/>
 
+
 ### 微信认证配置
 
-<img src="https://github.com/liudf0716/wwas-admin/blob/master/weixin_auth.png"/>
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/5270faa1-03d6-47f9-9fba-8acaf169e3a1)
+
 
 ### 短信认证配置
 
-<img src="https://github.com/liudf0716/wwas-admin/blob/master/sms-auth.png"/>
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/ecf7c160-9b48-4425-aa9f-48726575a283)
+
+### 一键免认证配置
+
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/b6542bc9-ae79-4a2c-897f-1a34df71549c)
+
+### 用户密码认证配置
+
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/2653fc32-04a2-4e84-a68f-4ce7026ff503)
+
 
 ### 其他认证配置
 
-<img src="https://github.com/liudf0716/wwas-admin/blob/master/other_auth.png"/>
+![image](https://github.com/liudf0716/wwas-admin/assets/1182593/c705997a-7064-4102-8c84-d882e397177d)
+
 
 
