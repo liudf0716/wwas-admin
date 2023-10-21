@@ -42,11 +42,21 @@ npm run dev
 
 2.cd wwas-admin
 
-3.npm install
+3. 修改config/index.js文件
 
-4.npm run build
+```
+ webServer: 'http://yourip:8001'
+```
 
-5.把生成的dist文件夹整个复制到wwas的public目录下即可。
+4.npm install
+
+5.npm run build
+
+6.把生成的dist文件夹整个复制到wwas的public目录下即可。
+
+```
+cp -r dist/* ../wwas/public/
+```
 
 
 如果只做前端开发，请忽略这段话。
