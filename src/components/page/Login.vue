@@ -18,12 +18,11 @@
                         <!--<el-button type="defult">用户注册</el-button>-->
                     <!--</a>-->
                 </div>
-                <p style="font-size:12px;line-height:30px;color:#aaa;">用户注册请先加群联系相关人员</p>
             </el-form>
         </div>
         <div class="footer">
             <div class="p" id="communityFooter">
-                Community&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)</a>
+                技术支持&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)群主</a>
                 <!--&nbsp;&nbsp;|&nbsp;&nbsp;-->
                 <!--<iframe src="http://ghbtns.com/github-btn.html?user=liudf0716&amp;repo=node-open-mining-portal&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="140" height="20"></iframe>-->
             </div>

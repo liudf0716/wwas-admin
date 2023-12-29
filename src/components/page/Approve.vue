@@ -79,6 +79,7 @@
                                 <el-select v-model="dxchoose" placeholder="请选择短信服务商" @change="changeDxchoose">
                                     <el-option label="阿里云" value="ali"></el-option>
                                     <el-option label="网易云信" value="wy"></el-option>
+                                    <el-option label="无短信认证" value="none"></el-option>
                                 </el-select>
                             </el-form-item>
                             <el-form ref="formAli" :model="formAli" :rules="rulesAli" label-width="150px" v-show="dxchoose == 'ali'">
@@ -118,7 +119,11 @@
                                     <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
                                 </el-form-item>
                             </el-form>
-
+                            <el-form ref="formNone" :model="formNone" label-width="150px" v-show="dxchoose == 'none'">
+                                <el-form-item>
+                                    <el-button type="primary" @click="onDuanxinSubmit('formNone')">下一步</el-button>
+                                </el-form-item>
+                            </el-form>
 
                         </el-form>
                     </el-form>
@@ -308,7 +313,10 @@
                     ]
 
                 },
-                dxchoose:'ali',
+                formNone:{
+                    enable:false,
+                },
+                dxchoose:'none',
                 actionUrl: global_.baseUrl + '/setting/uploadBgImage',
                 fileList: [],
                 loading:false
@@ -390,13 +398,18 @@
                                 smsTemplateCode:self.formAli.smsTemplateCode,
                                 enable:self.formAli.enable,
                             };
-                        }else{
+                        }else if(formName == 'formWy'){
                             self.params.sms = {
                                 selected:self.dxchoose,
                                 wyAppId:self.formWy.wyAppId,
                                 wyAppSecret:self.formWy.wyAppSecret,
                                 wyTemplateId:self.formWy.wyTemplateId,
                                 enable:self.formWy.enable,
+                            };
+                        } else {
+                            self.params.sms = {
+                                selected:'none',
+                                enable:false,
                             };
                         }
 
@@ -453,13 +466,18 @@
                                         smsTemplateCode:self.formAli.smsTemplateCode,
                                         enable:self.formAli.enable,
                                     }
-                                }else{
+                                } else if (self.dxchoose == 'wy'){
                                     self.params.sms = {
                                         selected:self.dxchoose,
                                         wyAppId:self.formWy.wyAppId,
                                         wyAppSecret:self.formWy.wyAppSecret,
                                         wyTemplateId:self.formWy.wyTemplateId,
                                         enable:self.formWy.enable,
+                                    }
+                                } else {
+                                    self.params.sms = {
+                                        selected:self.dxchoose,
+                                        enable: self.formNone.enable,
                                     }
                                 }
 

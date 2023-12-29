@@ -3,16 +3,16 @@
         <div class="ms-title">用户注册</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
-                <el-form-item label="账号" prop="account">
-                    <el-input v-model="ruleForm.account" placeholder="请输入电话号码或邮箱"></el-input>
+                <el-form-item label="手机号" prop="account">
+                    <el-input v-model="ruleForm.account" placeholder="请输入手机号码"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password">
                     <el-input type="password" placeholder="密码" v-model="ruleForm.password" @keyup.enter.native="submitForm('ruleForm')"></el-input>
                 </el-form-item>
-                <el-form-item label="用户名" prop="name">
+                <el-form-item label="用户名" prop="name" style="display: none;">
                     <el-input v-model="ruleForm.name" placeholder="用户名"></el-input>
                 </el-form-item>
-                <el-form-item label="联系方式" prop="phone">
+                <el-form-item label="联系方式" prop="phone" style="display: none;">
                     <el-input v-model="ruleForm.phone" placeholder="电话号码"></el-input>
                 </el-form-item>
                 <el-form-item label="所在城市" prop="city" style="display: none;">
@@ -71,7 +71,7 @@
                 citys: [],
                 rules: {
                     account: [
-                        { required: true, message: '请输入电话号码或邮箱', trigger: 'blur' }
+                        { required: true, message: '请输入手机号码', trigger: 'blur' }
                     ],
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' },
@@ -83,12 +83,6 @@
                                 callback();
                             }
                         }}
-                    ],
-                    name: [
-                        { required: true, message: '请输入用户名', trigger: 'blur' }
-                    ],
-                    phone: [
-                        { required: true, message: '请输入联系方式', trigger: 'blur' }
                     ],
                 }
             }
@@ -104,8 +98,8 @@
                         var params = {
                             user_account: self.ruleForm.account,
                             user_password: md5(self.ruleForm.password),
-                            user_name: self.ruleForm.name,
-                            user_phone:self.ruleForm.phone,
+                            user_name: self.ruleForm.account,
+                            user_phone:self.ruleForm.account,
                             user_city:self.ruleForm.selectProv + self.ruleForm.selectCity
 
                         };
