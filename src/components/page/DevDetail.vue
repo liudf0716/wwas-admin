@@ -22,7 +22,8 @@
                 </el-table-column>
                 <el-table-column prop="sysLoad" label="系统负载"></el-table-column>
                 <el-table-column prop="cpuUsage" label="cpu利用率"></el-table-column>
-                <el-table-column prop="version" label="版本"></el-table-column>
+                <el-table-column prop="aw_version" label="apfree-wifidog版本"></el-table-column>
+                <el-table-column prop="fm_version" label="固件版本"></el-table-column>
                 <el-table-column prop="type" label="设备类型"></el-table-column>
                 <el-table-column prop="name" label="设备名称"></el-table-column>
             </el-table>
