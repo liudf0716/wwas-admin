@@ -20,7 +20,7 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        webServer: 'http://127.0.0.1:8001'
+        webServer: process.env.AUTH_DOMAIN || 'http://wifidogx.online:8001'
     },
     dev: {
         env: require('./dev.env'),
@@ -30,6 +30,7 @@ module.exports = {
         assetsPublicPath: '/',
         proxyTable: {
             '/api':{
+                //target:'http://172.21.169.223:8001',
                 target:'http://127.0.0.1:8001',
                 changeOrigin:true,
                 pathRewrite:{
