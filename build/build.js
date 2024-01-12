@@ -37,4 +37,6 @@ webpack(webpackConfig, function (err, stats) {
     '  Tip: built files are meant to be served over an HTTP server.\n' +
     '  Opening index.html over file:// won\'t work.\n'
   ))
+  // exit the process when the build is finished
+  process.exit()
 })
