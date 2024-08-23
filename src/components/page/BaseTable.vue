@@ -69,22 +69,61 @@
         </div>
         <div v-if="isSuper == '0'?false:true">
             <div class="crumbs">
-                <el-breadcrumb separator="/">
-                    <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
-                    <!--<el-breadcrumb-item>渠道信息</el-breadcrumb-item>-->
-                </el-breadcrumb>
+            <el-breadcrumb separator="/">
+            <el-breadcrumb-item><i class="el-icon-menu"></i> 设备管理</el-breadcrumb-item>
+            <!--<el-breadcrumb-item>渠道信息</el-breadcrumb-item>-->
+            </el-breadcrumb>
             </div>
-            <el-table :data="noSuperData" border style="width: 100%" ref="multipleTable">
-                <el-table-column prop="user_account" label="账 号"></el-table-column>
-                <el-table-column label="操作">
-                    <template slot-scope="scope">
-                        <el-button class="btn1" size="small" type="success" @click="toRouter(scope.row.user_account)">导入路由</el-button>
-                        <el-button class="btn1" size="small" type="warning" @click="outRouter(scope.row.user_account)">导出路由</el-button>
-                        <el-button class="btn1" size="small" type="success" @click="outClient(scope.row.user_account)">导出用户</el-button>
-                    </template>
-                </el-table-column>
+            <el-form :inline="true" class="handle-box">
+            <el-form-item>
+            <el-button type="primary" icon="plus" class="handle-del mr10" @click="addGateway">添加认证网关设备</el-button>
+            </el-form-item>
+            </el-form>
+            <div v-if="noSuperData.length === 0" class="no-device">no device available</div>
+            <el-table v-else :data="noSuperData" border style="width: 100%" ref="multipleTable">
+            <el-table-column prop="gateway_channel" label="渠道"></el-table-column>
+            <el-table-column prop="device_id" label="设备ID"></el-table-column>
+            <el-table-column prop="gateway_id" label="网关ID"></el-table-column>
+            <el-table-column prop="gateway_id_once_auth" label="单次认证网关ID">
+            <template slot-scope="scope">
+            <el-switch v-model="scope.row.gateway_id_once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            </template>
+            </el-table-column>
+            <el-table-column prop="next_auth_time" label="单次认证免认证时长"></el-table-column>
+            <el-table-column label="操作">
+            <template slot-scope="scope">
+            <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.user_account)">删除网关</el-button>
+            <el-button class="btn1" size="small" type="primary" @click="updateGateway(scope.row.user_account)">更新网关</el-button>
+            </template>
+            </el-table-column>
             </el-table>
         </div>
+        <el-dialog title="添加网关" :visible.sync="showDialogAddGateway" class="digcont">
+            <el-form :model="formAddGateway" ref="formAddGateway">
+            <el-form-item label="设备ID" prop="device_id" :label-width="formLabelWidth" class="form-item-center">
+                <el-tooltip effect="dark" content="设备ID用于标识整个设备，一个设备下有多个认证网关" placement="top">
+                    <el-input v-model="formAddGateway.device_id" maxlength="10" style="width: 150px;"></el-input>
+                </el-tooltip>
+            </el-form-item>
+            <el-form-item label="网关ID" prop="gateway_id" :label-width="formLabelWidth" class="form-item-center">
+                <el-tooltip effect="dark" content="认证网关ID，一般为每个桥接口的MAC地址" placement="top">
+                    <el-input v-model="formAddGateway.gateway_id" maxlength="10" style="width: 150px;"></el-input>
+                </el-tooltip>
+            </el-form-item>
+            <el-form-item label="开启单次认证" prop="once_auth" :label-width="formLabelWidth" class="form-item-center">
+                <el-switch v-model="formAddGateway.gateway_id_once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            </el-form-item>
+            <el-form-item v-if="formAddGateway.gateway_id_once_auth" label="免认证时长" prop="next_auth_time" :label-width="formLabelWidth" class="form-item-center">
+                <el-tooltip effect="dark" content="免认证时长单位为天，当有一个用户通过认证后，后续免认证时长内该网关不再需要认证" placement="top">
+                    <el-input v-model="formAddGateway.next_auth_time" maxlength="10" style="width: 150px;"></el-input>
+                </el-tooltip>
+            </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+            <el-button @click="showDialogAddGateway = false">取消</el-button>
+            <el-button type="primary" @click="addGatewayConfirm">确认</el-button>
+            </div>
+        </el-dialog>
         <el-dialog title="修改密码" :visible.sync="showDialogPwd" class="digcont">
             <el-form :model="formP" ref="formP" :rules="rulesP">
                 <el-form-item label="密码" prop="user_password" :label-width="formLabelWidth">
@@ -301,6 +340,7 @@
                 citys: [],
                 showRouterDialog:false,
                 showDelRouterDialog:false,
+                showDialogAddGateway:false,
                 radiotoRout:'文件上传',
                 fileList:[],
                 search_word:'',
@@ -317,6 +357,14 @@
                     user_password:'',
                     user_new_password:'',
                     user_validate_password:''
+                },
+                formAddGateway:{
+                    user_account:localStorage.getItem('ms_username'),
+                    gateway_channel: localStorage.getItem('ms_username'),
+                    device_id:'',
+                    gateway_id:'',
+                    gateway_id_once_auth:false,
+                    next_auth_time:''
                 },
                 rulesP: {
                     user_password:[
@@ -372,9 +420,7 @@
                     }
                     if(res.data.ret_code == '1010'){//权限不足
                         // self.emptyMsg = res.data.extra;
-                        self.noSuperData = [{
-                            user_account:self.formP.user_account
-                        }]
+                        
                     }
                     if(res.data.ret_code == 0){
                         self.pageTotal = res.data.extra.count || self.pageTotal;
@@ -950,6 +996,10 @@
                 // else{
                 //     return extension || extension2 || extension3 || extension4 && isLt2M;
                 // }
+            },
+            addGateway: function(){
+                var self = this;
+                self.showDialogAddGateway = true;
             },
             handleSuccess: function(response,file,fileList){
                 if(response.ret_code == '1017'){
