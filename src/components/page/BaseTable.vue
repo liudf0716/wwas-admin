@@ -190,14 +190,31 @@
                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="手动导入" name="2">
-                    <div style="margin-bottom:16px;">*批量添加功能MAC之间以换行分割，每行一个MAC；MAC格式为12位字母或数字组合，不区分大小写:</div>
                     <el-form :model="formRouter2" ref="formRouter2" :rules="rulesRouter2">
-                        <el-form-item prop="route_mac">
+                        <el-form-item label="设备ID" prop="device_id">
+                            <el-input v-model="formRouter2.device_id" class="diainp"></el-input>
+                        </el-form-item>
+                        <el-form-item label="启用认证网关设备" prop="route_mac">
                             <el-input
                                 type="textarea"
-                                :rows="5"
-                                placeholder="请输入内容"
+                                :rows="2"
+                                placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
                                 v-model="formRouter2.route_mac">
+                            </el-input> 
+                        </el-form-item>
+                        <el-form-item label="启用单次认证网关设备" prop="route_mac_once_auth">
+                            <el-input
+                                type="textarea"
+                                :rows="2"
+                                placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
+                                v-model="formRouter2.route_mac_once_auth">
+                            </el-input> 
+                        </el-form-item>
+                        <el-form-item label="单次认证免认证时长" prop="next_auth_time">
+                            <el-input 
+                            v-model="formRouter2.next_auth_time" 
+                            placeholder="请输入免认证时长"
+                            class="diainp">
                             </el-input>
                         </el-form-item>
                     </el-form>
@@ -716,8 +733,11 @@
                 self.$refs[formName].validate(function(valid){
                     if(valid){
                         var params = {
-                            user_name: self.curAccount2,
-                            route_mac:self.formRouter2.route_mac
+                            user_name:  self.curAccount2,
+                            device_id:  self.formRouter2.device_id,
+                            route_mac:  self.formRouter2.route_mac,
+                            route_mac_once_auth:  self.formRouter2.route_mac_once_auth,
+                            next_auth_time:  self.formRouter2.next_auth_time
                         };
                         self.loading2  = true;
                         self.$axios.post(global_.baseUrl+'/device/import',params).then(function(res){

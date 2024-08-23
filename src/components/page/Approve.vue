@@ -46,6 +46,9 @@
                             <el-form-item label="启用">
                                 <el-switch v-model="form_onekey.enable" class="diainp"></el-switch>
                             </el-form-item>
+                            <el-form-item label="服务端放行">
+                                <el-switch v-model="form_onekey.from_server" class="diainp"></el-switch>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onOnekeySubmit('form_onekey')">下一步</el-button>
                             </el-form-item>
@@ -63,6 +66,9 @@
                             </el-form-item>
                             <el-form-item label="启用">
                                 <el-switch v-model="form_user.enable" class="diainp"></el-switch>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-switch v-model="form_user.from_server" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onPasswordSubmit('form_user')">下一步</el-button>
@@ -99,6 +105,9 @@
                                     <el-switch v-model="formAli.enable" class="diainp"></el-switch>
                                 </el-form-item>
                                 <el-form-item>
+                                    <el-switch v-model="formAli.from_server" class="diainp"></el-switch>
+                                </el-form-item>
+                                <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formAli')">下一步</el-button>
                                 </el-form-item>
                             </el-form>
@@ -114,6 +123,9 @@
                                 </el-form-item>
                                 <el-form-item label="启用">
                                     <el-switch v-model="formWy.enable" class="diainp"></el-switch>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-switch v-model="formWy.from_server" class="diainp"></el-switch>
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
@@ -217,6 +229,7 @@
                     ssid:'',
                     secretKey: '',
                     enable: false,
+                    from_server: true,
                 },
                 durations:[1,2,3,4,5,6,7,8,9,10,11,12],
                 multiDevOLs:[1,2,3,4,5,6],
@@ -235,11 +248,13 @@
                 },
                 form_onekey: {
                     enable: true,
+                    from_server: true,
                 },
                 form_user: {
                   username:'',
                   password:'',
                   enable: true,
+                  from_server: true,
                 },
                 rules_user: {
                   username:[
@@ -279,6 +294,7 @@
                     smsSignName:'',
                     smsTemplateCode:'',
                     enable:true,
+                    from_server: true,
                 },
                 rulesAli: {
                     appId: [
@@ -300,6 +316,7 @@
                     wyAppSecret:'',
                     wyTemplateId:'',
                     enable: true,
+                    from_server: true,
                 },
                 rulesWy: {
                     wyAppId: [
@@ -357,12 +374,14 @@
                     if (valid) {
                         self.params.onekey = {
                             enable:self.form_onekey.enable,
+                            fromServer:self.form_onekey.from_server,
                         };
+                    
                         self.active = 2;
                         self.task_type = '3';
                     } else {
-                        return false;
                         console.log('验证失败');
+                        return false;
                     }
                 });
 
@@ -434,16 +453,19 @@
                                     shopId:self.form_wx.shopId,
                                     secretKey:self.form_wx.secretKey,
                                     enable:self.form_wx.enable,
+                                    fromServer:self.form_wx.from_server,
                                 };
 
                                 self.params.onekey = {
                                     enable:self.form_onekey.enable,
+                                    fromServer:self.form_onekey.from_server,
                                 };
 
                                 self.params.user = {
                                     user:self.form_user.username,
                                     password:self.form_user.password,
                                     enable:self.form_user.enable,
+                                    fromServer:self.form_user.from_server,
                                 };
 
                                 self.params.portalUrl = self.form_other.portalUrl;
@@ -465,6 +487,7 @@
                                         smsSignName:self.formAli.smsSignName,
                                         smsTemplateCode:self.formAli.smsTemplateCode,
                                         enable:self.formAli.enable,
+                                        fromServer:self.formAli.from_server,
                                     }
                                 } else if (self.dxchoose == 'wy'){
                                     self.params.sms = {
@@ -473,6 +496,7 @@
                                         wyAppSecret:self.formWy.wyAppSecret,
                                         wyTemplateId:self.formWy.wyTemplateId,
                                         enable:self.formWy.enable,
+                                        fromServer:self.formWy.from_server,
                                     }
                                 } else {
                                     self.params.sms = {
@@ -539,7 +563,17 @@
                         self.form_user.password = requestData.password;
                         self.form_user.enable = requestData.userEnable;
 
-                        self.form_onekey.enable = requestData.onekeyEnable;
+                        if (requestData.onekeyEnable || requestData.onekeyFromServerEnable) {
+                            self.form_onekey.enable = true;
+                            self.form_onekey.from_server = requestData.onekeyFromServerEnable;
+                            self.form_onekey.once_auth = requestData.onekeyFromServerOnceAuth;
+                            self.form_onekey.auth_duration = requestData.onekeyFromServerNextAuthTime;
+                        } else {
+                            self.form_onekey.enable = false;
+                            self.form_onekey.from_server = false;
+                            self.form_onekey.once_auth = 0;
+                            self.form_onekey.auth_duration = 0;
+                        }
                         
                         self.formAli.appId = requestData.smsAppId;
                         self.formAli.appSecret = requestData.smsAppSecret;
