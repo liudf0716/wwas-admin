@@ -1,6 +1,6 @@
 <template>
     <div class="table" v-loading="loading2">
-        <div v-if="isSuper =='0'?true:false">
+        <div v-if="isUser =='1'?false:true">
             <div class="crumbs">
                 <el-breadcrumb separator="/">
                     <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
@@ -9,16 +9,16 @@
             </div>
             <el-form :inline="true" class="handle-box">
                 <el-form-item>
-                    <el-button type="primary" icon="plus" :disabled="isSuper=='0'?false:true" class="handle-del mr10" @click="dialogFormVisible=true">新建子渠道</el-button>
+                    <el-button type="primary" icon="plus"  class="handle-del mr10" @click="dialogFormVisible=true">新建子渠道</el-button>
                 </el-form-item>
                 <el-form-item label="">
                     <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" icon="search" :disabled="isSuper=='0'?false:true" @click="search">查询</el-button>
+                    <el-button type="primary" icon="search" @click="search">查询</el-button>
                 </el-form-item>
             </el-form>
-            <div class='rad-group' v-if="isSuper =='0'?true:false">
+            <div class='rad-group'>
                 <el-radio-group v-model="radio3" @change="changeTab">
                     <el-radio-button label="all">全部</el-radio-button>
                     <el-radio-button label="0">未冻结</el-radio-button>
@@ -26,35 +26,31 @@
                 </el-radio-group>
             </div>
             <el-table :data="userData" border style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
-                <el-table-column prop="user_account" label="账 号" width="150"></el-table-column>
-                <el-table-column prop="user_name" label="渠道名称"></el-table-column>
-                <el-table-column prop="user_phone" label="联系电话" width="130"></el-table-column>
-                <el-table-column prop="user_status" label="冻结状态" width="120">
+                <el-table-column prop="userAccount" label="账 号" width="150"></el-table-column>
+                <el-table-column prop="userName" label="渠道名称"></el-table-column>
+                <el-table-column prop="userPhone" label="联系电话" width="130"></el-table-column>
+                <el-table-column prop="userStatus" label="冻结状态" width="120">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.user_status == '1' ? 'warning' : 'success'" close-transition>{{scope.row.user_status=='1'?'已冻结':'未冻结'}}</el-tag>
+                        <el-tag :type="scope.row.userStatus == '1' ? 'warning' : 'success'" close-transition>{{scope.row.userStatus=='1'?'已冻结':'未冻结'}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="渠道类型" width="120">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.user_type == '0' ? 'danger' : 'info'" close-transition>{{scope.row.user_type == '0'?'超级管理员':'管理员'}}</el-tag>
+                        <el-tag :type="scope.row.userType == '0' ? 'danger' : 'info'" close-transition>{{scope.row.userType == '0'?'超级管理员':'管理员'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="user_create_time" label="创建时间" width="150"></el-table-column>
+                <el-table-column prop="userCreateTime" label="创建时间" width="150"></el-table-column>
                 <el-table-column label="在线设备" width="100">
                     <template slot-scope="scope">
-                        <el-tag type="warning">{{scope.row.user_online_count + '/ ' + scope.row.user_device_count}}</el-tag>
+                        <el-tag type="warning">{{scope.row.userOnlineCount + '/ ' + scope.row.userDeviceCount}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="380">
                     <template slot-scope="scope">
-                        <!--<el-button class="btn1" size="small" type="text" @click="resetPwd(scope.row.user_account)">修改密码</el-button>-->
-                        <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.user_account)">重置密码</el-button>
-                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="toRouter(scope.row.user_account)">导入路由</el-button>
-                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="outRouter(scope.row.user_account)">导出路由</el-button>
-                        <!--<el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="text" @click="delRouter(scope.row.user_account)">删除路由</el-button>-->
-                        <el-button class="btn1" size="small" v-if="scope.row.user_status =='0' && scope.row.user_type =='1'" @click="revoke(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">冻结账户</el-button>
-                        <el-button class="btn1" size="small" v-else-if="scope.row.user_status =='1' && scope.row.user_type =='1'" @click="restore(scope.row.user_account)" :type="scope.row.user_status == '1' ? 'warning' : 'danger'">解冻账户</el-button>
-                        <el-button class="btn1" size="small" v-if="scope.row.user_type =='1'?true:false" type="success" @click="toEnter(scope.row.user_account)">点击进入</el-button>
+                        <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.userAccount)">重置密码</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.userStatus =='0' && scope.row.userType =='1'" @click="revoke(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">冻结账户</el-button>
+                        <el-button class="btn1" size="small" v-else-if="scope.row.userStatus =='1' && scope.row.userType =='1'" @click="restore(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">解冻账户</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.userType =='1'?true:false" type="success" @click="toEnter(scope.row.userAccount)">点击进入</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -67,12 +63,12 @@
                 </el-pagination>
             </div>
         </div>
-        <div v-if="isSuper == '0'?false:true">
+        <div v-if="isUser == '1'?true:false">
             <div class="crumbs">
-            <el-breadcrumb separator="/">
-            <el-breadcrumb-item><i class="el-icon-menu"></i> 设备管理</el-breadcrumb-item>
-            <!--<el-breadcrumb-item>渠道信息</el-breadcrumb-item>-->
-            </el-breadcrumb>
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道设备</el-breadcrumb-item>
+                    <el-breadcrumb-item>认证设备</el-breadcrumb-item>
+                </el-breadcrumb>
             </div>
             <el-form :inline="true" class="handle-box">
             <el-form-item>
@@ -81,47 +77,51 @@
             </el-form>
             <div v-if="noSuperData.length === 0" class="no-device">no device available</div>
             <el-table v-else :data="noSuperData" border style="width: 100%" ref="multipleTable">
-            <el-table-column prop="gateway_channel" label="渠道"></el-table-column>
-            <el-table-column prop="device_id" label="设备ID"></el-table-column>
-            <el-table-column prop="gateway_id" label="网关ID"></el-table-column>
-            <el-table-column prop="gateway_id_once_auth" label="单次认证网关ID">
+            <el-table-column prop="gwChannel" label="渠道"></el-table-column>
+            <el-table-column prop="deviceID" label="设备ID"></el-table-column>
+            <el-table-column prop="gwID" label="网关ID"></el-table-column>
+            <el-table-column prop="onceAuth" label="单次认证网关ID">
             <template slot-scope="scope">
-            <el-switch v-model="scope.row.gateway_id_once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+            <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
             </template>
             </el-table-column>
-            <el-table-column prop="next_auth_time" label="单次认证免认证时长"></el-table-column>
+            <el-table-column prop="nextAuthTime" label="单次认证免认证时长"></el-table-column>
             <el-table-column label="操作">
             <template slot-scope="scope">
-            <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.user_account)">删除网关</el-button>
-            <el-button class="btn1" size="small" type="primary" @click="updateGateway(scope.row.user_account)">更新网关</el-button>
+            <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.deviceID, scope.row.gwID)">
+                删除网关
+            </el-button>
+            <el-button class="btn1" size="small" type="primary" @click="updateGateway(scope.row.deviceID, scope.row.gwID, scope.row.onceAuth, scope.row.nextAuthTime)">
+                更新网关
+            </el-button>
             </template>
             </el-table-column>
             </el-table>
         </div>
-        <el-dialog title="添加网关" :visible.sync="showDialogAddGateway" class="digcont">
-            <el-form :model="formAddGateway" ref="formAddGateway">
-            <el-form-item label="设备ID" prop="device_id" :label-width="formLabelWidth" class="form-item-center">
-                <el-tooltip effect="dark" content="设备ID用于标识整个设备，一个设备下有多个认证网关" placement="top">
-                    <el-input v-model="formAddGateway.device_id" maxlength="10" style="width: 150px;"></el-input>
-                </el-tooltip>
-            </el-form-item>
-            <el-form-item label="网关ID" prop="gateway_id" :label-width="formLabelWidth" class="form-item-center">
-                <el-tooltip effect="dark" content="认证网关ID，一般为每个桥接口的MAC地址" placement="top">
-                    <el-input v-model="formAddGateway.gateway_id" maxlength="10" style="width: 150px;"></el-input>
-                </el-tooltip>
-            </el-form-item>
-            <el-form-item label="开启单次认证" prop="once_auth" :label-width="formLabelWidth" class="form-item-center">
-                <el-switch v-model="formAddGateway.gateway_id_once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </el-form-item>
-            <el-form-item v-if="formAddGateway.gateway_id_once_auth" label="免认证时长" prop="next_auth_time" :label-width="formLabelWidth" class="form-item-center">
-                <el-tooltip effect="dark" content="免认证时长单位为天，当有一个用户通过认证后，后续免认证时长内该网关不再需要认证" placement="top">
-                    <el-input v-model="formAddGateway.next_auth_time" maxlength="10" style="width: 150px;"></el-input>
-                </el-tooltip>
-            </el-form-item>
+        <el-dialog :title="dialogTitle" :visible.sync="showDialogAddUpdateGateway" class="digcont">
+            <el-form :model="formAddUpdateGateway" ref="formAddUpdateGateway">
+                <el-form-item label="设备ID" prop="device_id" :label-width="formLabelWidth" class="form-item-center">
+                    <el-tooltip effect="dark" content="设备ID用于标识整个设备，一个设备下有多个认证网关" placement="top">
+                        <el-input v-model="formAddUpdateGateway.device_id" maxlength="12" style="width: 150px;" :disabled="isUpdate"></el-input>
+                    </el-tooltip>
+                </el-form-item>
+                <el-form-item label="网关ID" prop="gw_id" :label-width="formLabelWidth" class="form-item-center">
+                    <el-tooltip effect="dark" content="认证网关ID，一般为每个桥接口的MAC地址，长度不超过12个字符" placement="top">
+                        <el-input v-model="formAddUpdateGateway.gw_id" maxlength="12" style="width: 150px;" :disabled="isUpdate"></el-input>
+                    </el-tooltip>
+                </el-form-item>
+                <el-form-item label="开启单次认证" prop="once_auth" :label-width="formLabelWidth" class="form-item-center">
+                    <el-switch v-model="formAddUpdateGateway.once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+                </el-form-item>
+                <el-form-item v-if="formAddUpdateGateway.once_auth" label="免认证时长" prop="next_auth_time" :label-width="formLabelWidth" class="form-item-center">
+                    <el-tooltip effect="dark" content="免认证时长单位为天，当有一个用户通过认证后，后续免认证时长内该网关不再需要认证" placement="top">
+                        <el-input v-model="formAddUpdateGateway.next_auth_time" maxlength="12" style="width: 150px;"></el-input>
+                    </el-tooltip>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-            <el-button @click="showDialogAddGateway = false">取消</el-button>
-            <el-button type="primary" @click="addGatewayConfirm">确认</el-button>
+                <el-button @click="showDialogAddUpdateGateway = false">取消</el-button>
+                <el-button type="primary" @click="addUpdateGatewayConfirm('formAddUpdateGateway')">{{ isUpdate ? '修改' : '添加' }}</el-button>
             </div>
         </el-dialog>
         <el-dialog title="修改密码" :visible.sync="showDialogPwd" class="digcont">
@@ -288,13 +288,13 @@
 <script>
     import  md5 from 'js-md5';
     import global_ from 'components/common/Global';
-    var crypto = require('crypto');
+    const crypto = require('crypto');
     export default {
         data: function() {
             return {
                 uploadUrl:global_.baseUrl+'/device/import/excel',
                 radio3:'online',
-                isSuper:localStorage.getItem('userMsg'),
+                isUser:localStorage.getItem('userType'),
                 loading2:false,
                 dialogFormVisible: false,
                 noSuperData:[],
@@ -340,7 +340,8 @@
                 citys: [],
                 showRouterDialog:false,
                 showDelRouterDialog:false,
-                showDialogAddGateway:false,
+                showDialogAddUpdateGateway:false,
+                isUpdate:false,
                 radiotoRout:'文件上传',
                 fileList:[],
                 search_word:'',
@@ -358,12 +359,12 @@
                     user_new_password:'',
                     user_validate_password:''
                 },
-                formAddGateway:{
+                formAddUpdateGateway:{
                     user_account:localStorage.getItem('ms_username'),
-                    gateway_channel: localStorage.getItem('ms_username'),
+                    gw_channel: localStorage.getItem('ms_username'),
                     device_id:'',
-                    gateway_id:'',
-                    gateway_id_once_auth:false,
+                    gw_id:'',
+                    once_auth:false,
                     next_auth_time:''
                 },
                 rulesP: {
@@ -403,14 +404,27 @@
                 }
             }
         },
-        created: function(){
-            this.getUsers({},'all');
+
+        computed: {
+            dialogTitle: function(){
+                return this.isUpdate ? '修改认证网关' : '添加认证网关';
+            }
         },
+
+        created: function() {
+            let isUser = localStorage.getItem('userType');
+            if (isUser == '1') {
+                this.getDeviceByChannel(localStorage.getItem('ms_username'));
+            } else {
+                this.getUsers({},'all');
+            }
+        },
+
         methods: {
             getUsers: function(params,url){//获取渠道列表
                 var self = this;
                 self.loading = true;
-                self.$axios.post(global_.baseUrl+'/admin/'+url,params).then(function(res){
+                self.$axios.post(global_.baseUrl+'/admin/'+url, params).then(function(res){
                     self.loading = false;
                     if(res.data.ret_code == '1001'){//未登录状态
                         self.$message({message:res.data.extra,type:'warning'});
@@ -434,6 +448,27 @@
                     }
                 })
             },
+
+            getDeviceByChannel: function(gw_channel) {
+                var self = this;
+                var params = {
+                    gw_channel: gw_channel
+                };
+                self.loading2 = true;
+                self.$axios.post(global_.baseUrl+'/device/queryGateway',params).then(function(res){
+                    self.loading2 = false;
+                    if(res.data.ret_code == '1001'){
+                        self.$message({message:res.data.extra,type:'warning'});
+                        setTimeout(function(){
+                            self.$router.replace('login');
+                        },2000)
+                    }
+                    if(res.data.ret_code == 0){
+                        self.noSuperData = res.data.extra;
+                    }
+                })
+            },
+
             changeTab: function(){
                 var self = this;
                 var params = {};
@@ -445,6 +480,7 @@
                     self.getUsers({user_status:self.radio3},'status');
                 }
             },
+
             revoke: function(account){//冻结操作
                 var self = this;
                 var params = {
@@ -478,6 +514,7 @@
                 })
 
             },
+
             restore: function(account){//解冻操作
                 var self = this;
                 var params = {
@@ -509,11 +546,13 @@
                 })
 
             },
+
             getUser: function(){
                 var self = this;
                 self.$axios.post(global_.baseUrl+'/admin/info').then(function(res){
                     if(res.data.ret_code == 0){
-                        localStorage.setItem('userMsg',res.data.ret_msg);
+                        const user = res.data.extra;
+                        localStorage.setItem('userType', res.data.userType);
                         if(res.data.ret_msg == '1'){//普通管理员
 
                         }
@@ -525,6 +564,7 @@
                     }
                 })
             },
+
             toEnter: function(user){
                 var self = this;
                 self.loading = true;
@@ -545,13 +585,14 @@
                     if(res.data.ret_code == 0){
                         self.$message({message:res.data.extra,type:'success'});
                         localStorage.setItem('ms_username',user);
-                        localStorage.setItem('userMsg','1');
+                        localStorage.setItem('userType','1');
                         window.location.reload();
                     }else{
                         self.$message.error(res.data.extra);
                     }
                 })
             },
+
             saveCreate: function(formName){
                 let self = this;
                 self.$refs[formName].validate(function(valid){
@@ -595,6 +636,7 @@
                 });
 
             },
+
             search: function(){
                 var self = this;
                 if(self.search_word == ''){
@@ -627,11 +669,13 @@
                 })
 
             },
+
             resetPwd: function(account){
                 var self = this;
                 self.showDialogPwd = true;
                 self.curAccount = account;
             },
+
             resetPassword:function(account){
                 var self = this;
                 var params = {
@@ -658,6 +702,7 @@
                 })
 
             },
+
             savePwdChange: function(formName){
                 var self = this;
                 self.$refs[formName].validate(function(valid){
@@ -694,18 +739,21 @@
 
 
             },
+
             toRouter: function(account){
                 var self = this;
                 self.showRouterDialog = true;
                 self.curAccount2 = account;
                 self.formMacfile.user_name = account;
             },
+
             delRouter: function(account){
                 var self = this;
                 self.showDelRouterDialog = true;
                 self.curAccount3 = account;
                 self.formMacfile.user_name3 = account;
             },
+
             outRouter: function(account){
                 var self = this;
                 var params = {
@@ -740,6 +788,7 @@
                     self.$message.error(err);
                 })
             },
+
             outClient: function(account) {
                 var self = this;
                 var params = {
@@ -774,6 +823,7 @@
                     self.$message.error(err);
                 })
             },
+
             saveToRouterChange: function(formName){
                 var self = this;
                 self.$refs[formName].validate(function(valid){
@@ -827,6 +877,7 @@
                     }
                 })
             },
+
             saveDelRouterChange: function(formName){
                 var self = this;
                 self.$refs[formName].validate(function(valid){
@@ -878,6 +929,7 @@
                     }
                 })
             },
+
             validateRepwd: function(rule,value,callback){
                 if(value !== this.formP.user_new_password){
                     callback(new Error('两次输入密码不一致'));
@@ -885,6 +937,7 @@
                     callback();
                 }
             },
+
             validateUser: function(rule,value,callback){
                 if(value === ''){
                     callback(new Error('请输入账号'))
@@ -892,6 +945,7 @@
                     callback();
                 }
             },
+
             validatePwd: function(rule,value,callback){
                 if(value === ''){
                     callback(new Error('请输入密码'))
@@ -899,6 +953,7 @@
                     callback();
                 }
             },
+
             validateTel:function(rule,value,callback){
                 var regTel3 = /(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value);
                 if(!regTel3){
@@ -907,6 +962,7 @@
                     callback();
                 }
             },
+
             validateMac: function (rule, value, callback) {
                 var self = this;
                 var reg_name = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
@@ -920,6 +976,7 @@
                     }
                 }
             },
+
             validateSpace: function (rule, value, callback) {
                 var self = this;
                 if(value.indexOf(' ')>=0){
@@ -928,6 +985,7 @@
                     callback();
                 }
             },
+
             //按逗号和回车分隔字符串
             splitStr: function (str) {
                 var temp = str.split(/[\n,]/g);
@@ -940,9 +998,11 @@
                 }
                 return temp;
             },
+
             handleClick:function(tab,event){
 
             },
+
             getProv: function(prov){
                 let tempCity=[];
                 this.citys=[];
@@ -956,10 +1016,12 @@
                 }
                 this.citys = tempCity;
             },
+
             getCity: function (city) {
                 console.log(city);
                 console.log(this.selectCity)
             },
+
             handleCurrentChange:function(val){
                 this.currentPage = val;
                 var url = this.radio3=='all'?'all':'status';
@@ -971,13 +1033,16 @@
                 }
                 this.getUsers(params,url);
             },
+
             filterTag:function(value, row) {
                 return row.user_status == value;
             },
+
             fileAdd: function(formName){
                 var self = this;
                 self.$refs.upload.submit();
             },
+
             beforeUpload: function(file){
                 var testmsg=file.name.substring(file.name.lastIndexOf('.')+1);
                 const extension = testmsg === 'xls';
@@ -993,14 +1058,96 @@
                     this.$message({message:'上传模板大小不能超过 10MB!',type:'warning'});
                     return false;
                 }
-                // else{
-                //     return extension || extension2 || extension3 || extension4 && isLt2M;
-                // }
             },
+
+            addUpdateGatewayConfirm: function(formName){
+                let self = this;
+                self.$refs[formName].validate(function(valid){
+                    if(valid){
+                        console.log('验证成功')
+                    }else{
+                        return false;
+                        console.log('验证失败');
+                    }
+                    const params = {
+                        gw_channel:self.formAddUpdateGateway.gw_channel,
+                        device_id:self.formAddUpdateGateway.device_id,
+                        gw_id:self.formAddUpdateGateway.gw_id,
+                        once_auth:self.formAddUpdateGateway.once_auth,
+                        next_auth_time:self.formAddUpdateGateway.next_auth_time
+                    };
+                    
+                    self.$axios.post(global_.baseUrl+'/device/updateGateway', params).then(function(res){
+                        if(res.data.ret_code == '1001'){
+                            self.$message({message:res.data.extra,type:'warning'});
+                            setTimeout(function(){
+                                self.$router.replace('login');
+                            },2000)
+                        }
+                        if(res.data.ret_code == 0){
+                            self.$message({message:'创建成功',type:'success'});
+                            self.getDeviceByChannel(self.formAddUpdateGateway.gw_channel);
+                        }else{
+                            self.$message.error(res.data.extra);
+                        }
+                        self.showDialogAddUpdateGateway = false;
+                    })
+
+                });
+            },
+
             addGateway: function(){
-                var self = this;
-                self.showDialogAddGateway = true;
+                let self = this;
+                self.showDialogAddUpdateGateway = true;
+                self.isUpdate = false;
+                self.formAddUpdateGateway.device_id = '';
+                self.formAddUpdateGateway.gw_id = '';
+                self.formAddUpdateGateway.once_auth = false;
             },
+
+            updateGateway: function(device_id, gw_id, once_auth, next_auth_time){
+                let self = this;
+                self.showDialogAddUpdateGateway = true;
+                self.isUpdate = true;
+                self.formAddUpdateGateway.device_id = device_id;
+                self.formAddUpdateGateway.gw_id = gw_id;
+                self.formAddUpdateGateway.once_auth = once_auth;
+                self.formAddUpdateGateway.next_auth_time = next_auth_time;
+            },
+
+            delGateway: function(device_id, gw_id){
+                let self = this;
+                self.$confirm('此操作将删除该网关, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    const params = {
+                        device_id: device_id,
+                        gw_id: gw_id
+                    };
+                    self.$axios.post(global_.baseUrl+'/device/deleteGateway', params).then(function(res){
+                        if(res.data.ret_code == '1001'){
+                            self.$message({message:res.data.extra,type:'warning'});
+                            setTimeout(function(){
+                                self.$router.replace('login');
+                            },2000)
+                        }
+                        if(res.data.ret_code == 0){
+                            self.$message({message:'删除成功',type:'success'});
+                            self.getDeviceByChannel(localStorage.getItem('ms_username'));
+                        }else{
+                            self.$message.error(res.data.extra);
+                        }
+                    })
+                }).catch(() => {
+                    self.$message({
+                        type: 'info',
+                        message: '已取消删除'
+                    });
+                });
+            },
+
             handleSuccess: function(response,file,fileList){
                 if(response.ret_code == '1017'){
                     this.showRouterDialog = false;
@@ -1026,11 +1173,13 @@
                 }
                 this.showRouterDialog = false;
             },
+
             handleError: function(response,file,fileList){
                 this.$message.error('操作失败');
             },
+
             handleChange:function(file) {
-                var self = this;
+                
             },
         }
     }

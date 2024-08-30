@@ -111,7 +111,7 @@
                                     if(res.data.ret_code == 0){
                                         // self.$message({message:res.data.extra,type:'success'});
                                         localStorage.removeItem('ms_username');
-                                        localStorage.removeItem('userMsg');
+                                        localStorage.removeItem('userType');
                                         self.$router.push('/login');
                                     }else{
                                         self.$message.error(res.data.extra);
@@ -166,7 +166,7 @@
                         if(res.data.ret_code == 0){
                             self.$message({message:res.data.extra,type:'success'});
                             localStorage.removeItem('ms_username');
-                            localStorage.removeItem('userMsg');
+                            localStorage.removeItem('userType');
                             self.$router.push('/login');
                         }else{
                             self.$message.error(res.data.extra);

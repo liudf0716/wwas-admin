@@ -12,21 +12,12 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
                 </div>
-                <div class="login-btn login-btn-a-cont">
-                    <el-button class="login-btn-btn" type="text" @click="register">用户注册</el-button>
-                    <!--<a class="login-btn-a" href="https://jq.qq.com/?_wv=1027&k=5StVwau" target="_blank">-->
-                        <!--<el-button type="defult">用户注册</el-button>-->
-                    <!--</a>-->
-                </div>
             </el-form>
         </div>
         <div class="footer">
             <div class="p" id="communityFooter">
                 技术支持&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)群主</a>
-                <!--&nbsp;&nbsp;|&nbsp;&nbsp;-->
-                <!--<iframe src="http://ghbtns.com/github-btn.html?user=liudf0716&amp;repo=node-open-mining-portal&amp;type=watch&amp;count=true" allowtransparency="true" frameborder="0" scrolling="0" width="140" height="20"></iframe>-->
             </div>
-
         </div>
     </div>
 </template>
@@ -70,10 +61,8 @@
                 var self = this;
                 self.$axios.post(global_.baseUrl+'/admin/info').then(function(res){
                     if(res.data.ret_code == 0){
-                        localStorage.setItem('userMsg',res.data.ret_msg);
-                        if(res.data.ret_msg == '1'){//普通管理员
-
-                        }
+                        const user = res.data.extra;
+                        localStorage.setItem('userType', user.userType);
                         self.$router.push('/basetable')
                     }
                 })

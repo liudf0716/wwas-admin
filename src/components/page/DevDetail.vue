@@ -223,7 +223,7 @@
                 var params = {
                     filter:{"gwId":self.curGwid}
                 };
-                if(localStorage.getItem('userMsg') == 1){//非超级管理员
+                if(localStorage.getItem('userType') == 1){//非超级管理员
                     params.filter.channelPath = localStorage.getItem('ms_username');
                 }
                 self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
