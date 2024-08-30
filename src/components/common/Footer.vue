@@ -25,25 +25,5 @@
     }
 </script>
 <style scoped>
-    .footer{
-        position: relative;
-        box-sizing: border-box;
-        width: 100%;
-        color: #aaa;
-        text-align: center;
-        font-size:14px;
-        margin-top:30px;
-        border-top:1px solid #eee;
-        padding-top:30px;
-    }
-    .footer .p{
-        height:30px;
-        line-height:30px;
-    }
-    .footer a{
-        font-size:15px;
-        color:#4db3ff;
-    }
-
-    .diainp{width:217px;}
+    @import '../../assets/css/theme.css';
 </style>

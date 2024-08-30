@@ -133,44 +133,5 @@
 </script>
 
 <style scoped>
-    .login-wrap{
-        position: relative;
-        width:100%;
-        height:100%;
-    }
-    .ms-title{
-        position: absolute;
-        top:46%;
-        width:100%;
-        margin-top: -230px;
-        text-align: center;
-        font-size:30px;
-        color: #fff;
-
-    }
-    .ms-login{
-        position: absolute;
-        left:50%;
-        top:46%;
-        width:300px;
-        /*height:160px;*/
-        margin:-150px 0 0 -190px;
-        padding:40px;
-        border-radius: 5px;
-        background: #fff;
-    }
-    .login-btn{
-        text-align: center;
-    }
-    .login-btn button{
-        width:100%;
-        height:36px;
-    }
-    .login-btn-btn{
-        color:#4db3ff;
-        margin:15px 0 0 0;
-        background-color:#fff;
-        border:1px solid #4db3ff;
-        border-radius: 3px;
-    }
+    @import '../../assets/css/theme.css';
 </style>

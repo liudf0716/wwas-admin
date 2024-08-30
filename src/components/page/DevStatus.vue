@@ -430,8 +430,6 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        // self.pageTotal = res.data.extra.length;
-                        // self.listData = res.data.extra.slice(0,10);
                         self.pageTotal = res.data.extra.count;
                         self.listData = res.data.extra.query;
                     }

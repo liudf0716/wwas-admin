@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="wrap">
         <v-head></v-head>
         <div class="coll-cont" :class="[isCollapse?'iscoll':'nocoll']" @click="clickCollapse">
             <i class="el-icon-my-arrow" :class="[isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left']"></i>
@@ -17,7 +17,6 @@
                         <el-menu-item :index="item.index"><i :class="item.icon"></i><span slot="title">{{ item.title }}</span></el-menu-item>
                     </template>
                 </template>
-            </el-menu>
             </el-menu>
             <div class="content">
                 <div class="main-cont">
@@ -139,66 +138,6 @@
         }
     }
 </script>
-<style>
-    .main-cont {
-        min-height: 500px;
-    }
-    .el-menu-vertical-demo {
-        float: left;
-    }
-    .el-menu-vertical-demo:not(.el-menu--collapse) {
-        width: 250px;
-        /*min-height: 400px;*/
-    }
-    .sidebar2{
-        overflow: hidden;
-    }
-</style>
 <style scoped>
-    .sidebar{
-        width:100%;
-        height:100%;
-        /*display: block;*/
-        position: absolute;
-        /*width: 250px;*/
-        left: 0;
-        top: 110px;
-        bottom:0;
-        background: #324157;
-    }
-    .sidebar > ul {
-        height:100%;
-    }
-    .content{
-        position: relative;
-        top:-110px;
-        padding:110px 40px 40px 40px;
-        height:100%;
-    }
-    .coll-cont{
-        font-size:14px;
-        background-color:#324157;
-        display:inline-block;
-        height:40px;
-        color: #bfcbd9;
-        padding:10px 20px;
-        box-sizing: border-box;
-        cursor: pointer;
-        transition: transform .3s;
-    }
-    .iscoll{
-        width:64px;
-        /*text-align: center;*/
-        transition:width 0.3s ease-in-out;
-        /*transition:transform .3s;*/
-    }
-    .nocoll{
-        width:250px;
-        text-align: left;
-        transition:width 0.3s ease-in-out;
-        /*transition:transform .3s*/
-    }
-    .el-icon-my-arrow{
-        padding:0 5px;
-    }
+    @import '../../assets/css/theme.css';
 </style>

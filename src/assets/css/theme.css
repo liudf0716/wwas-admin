@@ -1,0 +1,223 @@
+/* src/assets/css/theme.css */
+:root {
+    --primary-color: #324157;
+    --secondary-color: #4facfe;
+    --accent-color: #00f2fe;
+    --text-color: #bfcbd9;
+    --background-color: #f5f5f5;
+    --font-family: 'Arial', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 110px;
+    bottom: 0;
+    background: var(--primary-color);
+}
+
+.sidebar > ul {
+    height: 100%;
+}
+
+.sidebar2 {
+    overflow: hidden;
+}
+
+.el-menu-vertical-demo {
+    float: left;
+}
+
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 250px;
+}
+
+/* Content Styles */
+.content {
+    position: relative;
+    top: -110px;
+    padding: 110px 40px 40px 40px;
+    height: 100%;
+}
+
+.main-cont {
+    min-height: 500px;
+}
+
+/* Collapsible Container Styles */
+.coll-cont {
+    font-size: 14px;
+    background-color: var(--primary-color);
+    display: inline-block;
+    height: 40px;
+    color: var(--text-color);
+    padding: 10px 20px;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.iscoll {
+    width: 64px;
+    transition: width 0.3s ease-in-out;
+}
+
+.nocoll {
+    width: 250px;
+    text-align: left;
+    transition: width 0.3s ease-in-out;
+}
+
+.el-icon-my-arrow {
+    padding: 0 5px;
+}
+
+/* Login Page Styles */
+.login-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.ms-title {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+    text-align: center;
+    font-size: 36px;
+    color: #fff;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.ms-login {
+    width: 400px;
+    padding: 40px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.el-form-item {
+    margin-bottom: 20px;
+}
+
+.el-input {
+    width: 100%;
+}
+
+.login-btn {
+    text-align: center;
+}
+
+.login-btn .el-button {
+    width: 100%;
+    height: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.login-btn .el-button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* Footer Styles */
+.footer {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #ffeb3b;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Header Styles */
+.header {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 70px;
+    color: #fff;
+    background-color: var(--primary-color);
+}
+
+.header .logo {
+    float: left;
+    width: 250px;
+    text-align: center;
+    font-size: 22px;
+    line-height: 70px;
+}
+
+.user-info {
+    float: right;
+    padding-right: 50px;
+    font-size: 16px;
+    color: #fff;
+    line-height: 70px;
+}
+
+.user-info .el-dropdown-link {
+    position: relative;
+    display: inline-block;
+    padding-left: 50px;
+    color: #fff;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.user-info .user-logo {
+    position: absolute;
+    left: 0;
+    top: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.el-dropdown-menu__item {
+    text-align: center;
+}
+
+.diainp {
+    width: 217px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
