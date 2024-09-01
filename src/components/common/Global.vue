@@ -1,30 +1,10 @@
 <script>
-    var config = require('../../../config');
-    var uniUrl = 'https://wifi.kunteng.org';
-    var baseUrl = config.build.webServer;
-    // var baseUrl = '/api';
-    //时间转换
-    function timeStamp( second_time ){
-        var time = parseInt(second_time) + "秒";
-        if( parseInt(second_time )> 60){
-            var second = parseInt(second_time) % 60;
-            var min = parseInt(second_time / 60);
-            time = min + "分" + second + "秒";
-            if( min > 60 ){
-                min = parseInt(second_time / 60) % 60;
-                var hour = parseInt( parseInt(second_time / 60) /60 );
-                time = hour + "小时" + min + "分" + second + "秒";
-                if( hour > 24 ){
-                    hour = parseInt( parseInt(second_time / 60) /60 ) % 24;
-                    var day = parseInt( parseInt( parseInt(second_time / 60) /60 ) / 24 );
-                    time = day + "天" + hour + "小时" + min + "分" + second + "秒";
-                }
-            }
-        }
-        return time;
-    };
+    const config = require('../../../config');
+    const uniUrl = 'http://wifidogx.online';
+    const baseUrl = config.build.webServer;
+    // var baseUrl = '/api';  
 
-    var provs = [
+    const provs = [
             {label:"北京市",value:"北京市"},
             {label:"天津市",value:"天津市"},
             {label:"河北省",value:"河北省"},
@@ -59,7 +39,7 @@
             {label:"台湾省",value:"台湾省"},
             {label:"香港特别行政区",value:"香港特别行政区"},
             {label:"澳门特别行政区",value:"澳门特别行政区"}];
-    var allCity=[
+    const allCity=[
         {
             prov: "北京市",
             label: "北京市"
@@ -1199,10 +1179,10 @@
             label: "无堂区划分区域"
         }
     ];
+
     export default {
         uniUrl,
         baseUrl,
-        timeStamp,
         provs,
         allCity
     }

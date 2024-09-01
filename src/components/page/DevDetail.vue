@@ -41,13 +41,6 @@
                         <el-tag :type="scope.row.clients.telNumber == '' ? 'info' : 'success'" close-transition>{{displayClientPhone(scope.row.clients)}}</el-tag>
                     </template>
                 </el-table-column>
-                <!--
-                <el-table-column prop="clients.wired" label="有线设备" width="50">
-                    <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.wired == '1' ? 'success' : 'danger'" close-transition>{{scope.row.clients.wired == '1'?'是': '否'}}</el-tag>
-                    </template>
-                </el-table-column>
-                -->
                 <el-table-column prop="clients.name" label="终端名称" width="220"></el-table-column>
                 <el-table-column prop="clients.incoming" label="下行流量" width="120">
                     <template slot-scope="scope">
@@ -71,11 +64,6 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <!--<el-table-column prop="pubsub_status" label="升级状态">-->
-                    <!--<template slot-scope="scope">-->
-                        <!--<el-tag :type="scope.row.pubsub_status == 'response_ok' ? 'success' : (scope.row.pubsub_status == 'response_fail'?'danger':'warning')" close-transition>{{scope.row.pubsub_status == 'response_ok'?'成功': (scope.row.pubsub_status == 'response_fail'?'失败':'执行中')}}</el-tag>-->
-                    <!--</template>-->
-                <!--</el-table-column>-->
                 <el-table-column label="操作" width=200>
                     <template slot-scope="scope">
                         <el-button class="btn1" type="warning" size="small" v-if="!scope.row.clients.kickoff" @click="handleCltOffline(scope.row.clients.mac)">下线</el-button>
@@ -96,7 +84,9 @@
 </template>
 
 <script>
-    import global_ from 'components/common/Global';
+    import {baseUrl} from 'components/common/Global';
+    import {timeStamp, dateForm, isOffline, bandwidthLabel} from 'components/common/Helpers.js';
+
     export default {
         data: function(){
             const self = this;
@@ -115,6 +105,11 @@
             this.getParams();
         },
         methods: {
+            timeStamp: timeStamp,
+            dateForm: dateForm,
+            isOffline: isOffline,
+            bandwidthLabel: bandwidthLabel,
+
             getParams: function(){
                 var self = this;
                 self.curGwid = self.$route.query.gwId;
@@ -122,80 +117,7 @@
                 self.getDetailData({});
                 self.getDevMsg();
             },
-            getFirmwareData: function(params){
-                var self = this;
-                params.uuid = self.curId;
-                self.$axios.post(global_.baseUrl+'/task/list/detail',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        // self.firmwareData = res.data.extra;
-                        self.firmwareData1 = res.data.extra.resultList.slice(0,1);
-                        self.pageTotal = res.data.extra.count || self.pageTotal;
-                        if(!params.hasOwnProperty('current_page')){
-                            self.firmwareData = res.data.extra.resultList;
-                        }else{
-                            self.firmwareData = res.data.extra.resultList;
-                        }
-                    }else{
-                        self.$message.error(res.data.extra)
-                    }
-                },function(err){
-                    self.loading = false;
-                    console.log(err);
-                });
-            },
-            //时间转换
-            timeStamp: function( second_time ){
-                var time = parseInt(second_time) + "秒";
-                if( parseInt(second_time )> 60){
-                    var second = parseInt(second_time) % 60;
-                    var min = parseInt(second_time / 60);
-                    time = min + "分" + second + "秒";
-                    if( min > 60 ){
-                        min = parseInt(second_time / 60) % 60;
-                        var hour = parseInt( parseInt(second_time / 60) /60 );
-                        time = hour + "小时" + min + "分" + second + "秒";
-                        if( hour > 24 ){
-                            hour = parseInt( parseInt(second_time / 60) /60 ) % 24;
-                            var day = parseInt( parseInt( parseInt(second_time / 60) /60 ) / 24 );
-                            time = day + "天" + hour + "小时" + min + "分" + second + "秒";
-                        }
-                    }
-                }
-                return time;
-            },
-            isOffline:function(time){
-                var now             = new Date();
-                var nowTime	        = now.getTime();
-                if ((nowTime - time) > 60*2*1000)
-                    return true;
-                return false;
-            },
-            //毫秒数转为时间戳
-            dateForm:function(time){
-                var now             = new Date();
-                var nowTime	        = now.getTime();
-                if ((nowTime - time) > 60*2*1000)
-                    return "用户离线";
-                var date = new Date(time);
-                return date.toLocaleString();
-            },
-            //连接设备速率转换
-            bandwidthLabel: function(by){
-                var kby = (by / 1024).toFixed(2);
-                var uby = 'KB';
-                if (kby >= 1024) {
-                    uby = 'MB';
-                    kby = (kby / 1024).toFixed(2);
-                }
-                return kby + " " + uby;
-            },
+
             getDetailData: function(params){
                 var self = this;
                 params.gwId = self.curGwid;
@@ -218,6 +140,7 @@
                     console.log(err);
                 });
             },
+
             getDevMsg: function(){
                 var self = this;
                 var params = {
@@ -239,6 +162,7 @@
                     }
                 })
             },
+
             handleCurrentChange:function(val){
                 var self = this;
                 self.currentPage = val;
@@ -249,6 +173,7 @@
                 self.getDetailData(params);
 
             },
+
             handleCltOffline: function(mac){
                 var self = this;
                 var params = {
@@ -277,6 +202,7 @@
                     });
                 });
             },
+
             handleBlockClient: function(mac, isTelBlocked) {
                 var self = this;
                 var params = {
@@ -305,13 +231,16 @@
                     });
                 });
             },
+
             changePage:function(values) {
                 this.information.pagination.per_page = values.perpage;
                 this.information.data = this.information.data;
             },
+
             onSearch:function(searchQuery) {
                 this.query = searchQuery;
             },
+            
             displayClientPhone:function(client) {
                 if (client.authType != 1)
                     return '号码不展示';

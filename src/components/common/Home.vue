@@ -64,6 +64,10 @@
                             {
                                 index: 'devstatus',
                                 title: '设备状态'
+                            },
+                            {
+                                index: 'cltstatus',
+                                title: '认证用户'
                             }
                         ]
                     },
@@ -99,6 +103,10 @@
                             {
                                 index: 'devstatus',
                                 title: '设备状态'
+                            },
+                            {
+                                index: 'cltstatus',
+                                title: '认证用户'
                             }
                         ]
                     },
