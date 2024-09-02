@@ -9,7 +9,7 @@
         <div class='rad-group'>
             <el-form :inline="true" class="handle-box2">
                 <el-form-item label="">
-                    <el-input v-model="search_word" placeholder="请输入认证网关ID"></el-input>
+                    <el-input v-model="search_word" placeholder="请输入设备ID"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="search">搜索</el-button>
@@ -19,37 +19,35 @@
 
         <el-table :data="listData" border style="width: 100%" ref="multipleTable" v-loading="loading">
             <el-table-column prop="deviceID" label="设备ID" width="150"></el-table-column>
-            <el-table-column prop="gwId" label="认证网关ID" width="150"></el-table-column>
+            <el-table-column prop="gwID" label="认证网关ID" width="150"></el-table-column>
             <el-table-column prop="gwChannel" label="渠道" width="150"></el-table-column>
             <el-table-column prop="clients.mac" label="用户MAC" width="150"></el-table-column>
             <el-table-column prop="clients.ip" label="用户IP" width="150"></el-table-column>
-            <el-table-column prop="clients.name" label="用户名" width="150"></el-table-column>
-            <el-table-column prop="clients.incoming" label="下行流量" width="150"></el-table-column>
-            <el-table-column prop="clients.outgoing" label="上行流量" width="150"></el-table-column>
-            <el-table-column prop="clients.authType" label="认证方式" width="150"></el-table-column>
-            <el-table-column prop="clients.firstLogin" label="认证时间" width="150">
+            <el-table-column prop="clients.lastTime" label="最后在线时间" width="200">
                 <template slot-scope="scope">
-                    <span>{{dateForm(scope.row.clients.firstLogin)}}</span>
+                    {{dateForm(scope.row.clients.lastTime)}}
                 </template>
             </el-table-column>
-            <el-table-column prop="clients.onlineTime" label="在线时长" width="150">
+            <el-table-column label="操作" width="200">
                 <template slot-scope="scope">
-                    <span>{{timeStamp(scope.row.clients.onlineTime)}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column prop="clients.lastTime" label="最后在线时间" width="150">
-                <template slot-scope="scope">
-                    <span>{{dateForm(scope.row.clients.lastTime)}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="150">
-                <template slot-scope="scope">
-                    <el-tooltip class="item" effect="dark" content="查看详情" placement="top">
-                        <el-button type="text" icon="el-icon-search" @click="showDialog(scope.row)"></el-button>
-                    </el-tooltip>
+                    <el-button type="text" @click="showDetail(scope.row)">详情</el-button>
+                    <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.deviceID, scope.row.gwID)">用户下线</el-button>
                 </template>
             </el-table-column>
         </el-table>
+
+        <el-dialog :visible.sync="showClientDetailDialog" title="客户端详情" width="80%">
+            <el-form :model="detailForm" label-width="200px">
+                <el-table :data="selectedClient" border style="width: 50%">
+                    <el-table-column prop="key" label="描述" width="150"></el-table-column>
+                    <el-table-column prop="value" label="值" width="300"></el-table-column>
+                </el-table>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+            <el-button type="primary" @click="showClientDetailDialog = false">确定</el-button>
+            </span>
+        </el-dialog>
+        
         <div class="pagination">
             <el-pagination
                 @current-change ="handleCurrentChange"
@@ -78,6 +76,7 @@
                 curUser:'',
                 formLabelWidth:'120px',
                 fullscreenLoading: false,
+                showClientDetailDialog: false,
             }
         },
 
@@ -140,35 +139,25 @@
                 })
             },
 
-            del:function(iid,mac,username){
-                var self = this;
-                var params = {
-                    _id:iid,
-                    route_mac:mac,
-                    user_name:username
-                };
-                self.loading = true;
-                self.$axios.post(baseUrl+'/device/leave',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.$message({message:'已删除账号 "'+localStorage.getItem('ms_username')+'" 下的路由',type:'success'});
-                        var url = '';
-                        if(self.radio3 == 'all'){
-                            url = '';
-                        }else{
-                            url = '/'+self.radio3;
-                        }
-                        self.getData({page_size:10,current_page:self.currentPage},url);
-                    }else{
-                        self.$message.error(res.data.extra);
-                    }
-                })
+            showDetail: function(row){
+                const self = this;
+                self.showClientDetailDialog = true;
+                self.selectedClient = [
+                    {key:'用户MAC',value:row.clients.mac},
+                    {key:'用户IP',value:row.clients.ip},
+                    {key:'设备ID',value:row.deviceID},
+                    {key:'认证网关ID',value:row.gwID},
+                    {key:'渠道',value:row.gwChannel},
+                    {key:'用户名',value:row.clients.name},
+                    {key:'是否有线用户',value:row.clients.wired},
+                    {key:'下行流量',value:self.bandwidthLabel(row.clients.incoming)},
+                    {key:'上行流量',value:self.bandwidthLabel(row.clients.outgoing)},
+                    {key:'认证方式',value:row.clients.authType},
+                    {key:'认证时间',value:self.dateForm(row.clients.firstLogin)},
+                    {key:'在线时长',value:self.timeStamp(row.clients.onlineTime)},
+                    {key:'最后在线时间',value:self.dateForm(row.clients.lastTime)},
+                    {key:'认证令牌',value:row.clients.token},
+                ];
             },
 
             handleCurrentChange:function(val){
