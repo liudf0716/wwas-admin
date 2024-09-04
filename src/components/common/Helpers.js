@@ -65,8 +65,7 @@ export function cpuLabel(cpu) {
     return `${cpu}%`;
 }
 
-export function search(this){
-    const self = this;
+export function search(baseUrl, uri, self){
     if(self.search_word == ''){
         self.$message({message:'输入不能为空',type:'warning'});
         return false;
@@ -79,7 +78,7 @@ export function search(this){
     if(localStorage.getItem('userType') == 1){//非超级管理员
         params['gw_channel'] = localStorage.getItem('ms_username');
     }
-    self.$axios.post(baseUrl+'/device/list',params).then(function(res){
+    self.$axios.post(baseUrl + uri, params).then(function(res){
         self.loading = false;
         if(res.data.ret_code == '1001'){
             self.$message({message:res.data.extra,type:'warning'});

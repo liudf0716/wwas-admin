@@ -12,7 +12,7 @@
                     <el-input v-model="search_word" placeholder="请输入设备ID"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="search">搜索</el-button>
+                    <el-button type="primary" @click="queryClientsOfDevice">搜索</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -31,7 +31,9 @@
             <el-table-column label="操作" width="200">
                 <template slot-scope="scope">
                     <el-button type="text" @click="showDetail(scope.row)">详情</el-button>
-                    <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.deviceID, scope.row.gwID)">用户下线</el-button>
+                    <el-button class="btn1" size="small" type="danger" :disabled="!scope.row.isOnline" @click="kickOffline(scope.row)">
+                        强制下线
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -61,7 +63,7 @@
 
 <script>
     import { baseUrl } from 'components/common/Global';
-    import { timeStamp, dateForm, bandwidthLabel } from 'components/common/Helpers.js';
+    import { timeStamp, dateForm, bandwidthLabel, search } from 'components/common/Helpers.js';
 
     export default {
         data: function(){
@@ -88,6 +90,7 @@
             timeStamp: timeStamp,
             dateForm: dateForm,
             bandwidthLabel: bandwidthLabel,
+            search: search,
 
             getUser: function(){
                 var self = this;
@@ -127,11 +130,11 @@
                     }
 
                     if(res.data.ret_code == 0){
-                        self.pageTotal = res.data.extra.clients.length || self.pageTotal;
+                        self.pageTotal = res.data.extra.result.length || self.pageTotal;
                         if(!params.hasOwnProperty('current_page')){
-                            self.listData = res.data.extra.clients;
+                            self.listData = res.data.extra.result;
                         }else{
-                            self.listData = res.data.extra.clients;
+                            self.listData = res.data.extra.result;
                         }
                     } else {
                         self.$message({message:res.data.extra,type:'warning'});
@@ -160,40 +163,17 @@
                 ];
             },
 
-            handleCurrentChange:function(val){
-                this.currentPage = val;
-                var url = '';
-                if(this.radio3 == 'all'){
-                    url = '';
-                }else{
-                    url = '/'+this.radio3;
-                }
-                this.getData({page_size:10,current_page:this.currentPage},url);
+            queryClientsOfDevice: function() {
+                return this.search(baseUrl, '/client/list', this);
             },
 
-            search: function(){
-                var self = this;
-                var reg_name = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
-                var reg_name2 = /^[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}$/;
-                if(self.search_word == ''){
-                    self.$message({message:'输入不能为空',type:'warning'});
-                    return false;
-                }
-                if(!reg_name.test(self.search_word) && !reg_name2.test(self.search_word)){
-                    self.$message({message:'设备MAC输入有误',type:'warning'});
-                    return false;
-                }
-                self.loading = true;
-                var mac = self.search_word;
-                var str = (mac.indexOf(':')>=0?mac.replace(/:/g,''):mac).toUpperCase();
-                var params = {
-                    filter:{"gwId":str}
-                };
-                if(localStorage.getItem('userType') == 1){//非超级管理员
-                    params.filter.channelPath = localStorage.getItem('ms_username');
-                }
-                self.$axios.post(baseUrl+'/device/list',params).then(function(res){
-                    self.loading = false;
+            kickOffline: function(row){
+                const self = this;
+                const deviceID = row.deviceID;
+                const gwID = row.gwID;
+                const mac = row.clients.mac;
+                const ip = row.clients.ip;
+                self.$axios.post(baseUrl+'/client/kickoffClient', {device_id: deviceID, gw_id:gwID, mac:mac, ip:ip}).then(function(res){
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
@@ -201,16 +181,13 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        self.pageTotal = res.data.extra.count;
-                        self.listData = res.data.extra.query;
+                        self.$message({message:'用户下线成功',type:'success'});
+                        self.getData();
+                    } else {
+                        self.$message({message:res.data.extra,type:'warning'});
                     }
                 })
-
             },
-
-            filterTag:function(value, row) {
-                return row.status == value;
-            }
         }
     }
 </script>
