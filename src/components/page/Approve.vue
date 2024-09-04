@@ -394,6 +394,7 @@
                             user:self.form_user.usernmae,
                             password:self.form_user.password,
                             enable:self.form_user.enable,
+                            fromServer:self.form_user.from_server,
                         };
                         self.active = 3;
                         self.task_type = '4';
