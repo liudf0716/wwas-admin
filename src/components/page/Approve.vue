@@ -563,8 +563,9 @@
                         self.form_user.username = requestData.user;
                         self.form_user.password = requestData.password;
                         self.form_user.enable = requestData.userEnable;
+                        self.form_user.from_server = requestData.userFromServerEnable;
 
-                        if (requestData.onekeyEnable || requestData.onekeyFromServerEnable) {
+                        if (requestData.onekeyEnable) {
                             self.form_onekey.enable = true;
                             self.form_onekey.from_server = requestData.onekeyFromServerEnable;
                             self.form_onekey.once_auth = requestData.onekeyFromServerOnceAuth;

@@ -143,14 +143,11 @@
         </el-dialog>
         <el-dialog title="新建子渠道" :visible.sync="dialogFormVisible" class="digcont">
             <el-form :model="form" :rules="rules" ref="form">
-                <el-form-item label="账号" prop="user" :label-width="formLabelWidth">
+                <el-form-item label="账号/渠道名称" prop="user" :label-width="formLabelWidth">
                     <el-input v-model="form.user" class="diainp" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
                     <el-input v-model="form.password" type="password" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="渠道名称" prop="name" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" class="diainp" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="联系电话" prop="tel" :label-width="formLabelWidth">
                     <el-input v-model="form.tel" class="diainp" auto-complete="off"></el-input>
