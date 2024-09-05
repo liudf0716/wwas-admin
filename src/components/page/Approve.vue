@@ -67,9 +67,6 @@
                             <el-form-item label="启用">
                                 <el-switch v-model="form_user.enable" class="diainp"></el-switch>
                             </el-form-item>
-                            <el-form-item label="服务端放行">
-                                <el-switch v-model="form_user.from_server" class="diainp"></el-switch>
-                            </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="onPasswordSubmit('form_user')">下一步</el-button>
                             </el-form-item>
@@ -104,9 +101,6 @@
                                 <el-form-item label="启用">
                                     <el-switch v-model="formAli.enable" class="diainp"></el-switch>
                                 </el-form-item>
-                                <el-form-item label="服务端放行">
-                                    <el-switch v-model="formAli.from_server" class="diainp"></el-switch>
-                                </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formAli')">下一步</el-button>
                                 </el-form-item>
@@ -123,9 +117,6 @@
                                 </el-form-item>
                                 <el-form-item label="启用">
                                     <el-switch v-model="formWy.enable" class="diainp"></el-switch>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-switch v-model="formWy.from_server" class="diainp"></el-switch>
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
