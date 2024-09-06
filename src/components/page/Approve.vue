@@ -151,17 +151,6 @@
                                 </el-select>
                                 <span style="padding:5px 12px;">小时</span>
                             </el-form-item>
-                            <el-form-item label="单手机号能同时认证的设备数" prop="multiDevOL">
-                                <el-select v-model="form_other.multiDevOL" class="diainp" placeholder="请选择" @change="changeMultiDevOL">
-                                    <el-option
-                                        v-for="item in multiDevOLs"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                    </el-option>
-                                </el-select>
-                                <span style="padding:5px 12px;">台</span>
-                            </el-form-item>
                             <el-form-item label="客户超时认证时间" prop="clientTimeout">
                                 <el-select v-model="form_other.clientTimeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
                                     <el-option
