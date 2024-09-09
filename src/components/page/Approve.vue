@@ -273,7 +273,7 @@
                     appSecret:'',
                     smsSignName:'',
                     smsTemplateCode:'',
-                    enable:true,
+                    enable:false,
                     from_server: true,
                 },
                 rulesAli: {
@@ -295,7 +295,7 @@
                     wyAppId:'',
                     wyAppSecret:'',
                     wyTemplateId:'',
-                    enable: true,
+                    enable: false,
                     from_server: true,
                 },
                 rulesWy: {
