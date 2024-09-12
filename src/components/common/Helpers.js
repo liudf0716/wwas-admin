@@ -65,6 +65,87 @@ export function cpuLabel(cpu) {
     return `${cpu}%`;
 }
 
+export function validateUrl(rule, value, callback) {
+    const reg = /(http|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
+    console.log('value:', value);
+    if(!reg.test(value)){
+        callback(new  Error('请输入正确网址，如(https://baidu.com)'));
+    }else{
+        callback();
+    }
+}
+
+export function validateNum(rule, value, callback) {
+    const reg = /^\d+(\.\d+)?$/; //非负浮点数
+    if(!reg.test(value)){
+        callback(new  Error('输入必须是数字'));
+    }else{
+        callback();
+    }
+}
+
+export function validateTimeNum(rule, value, callback) {
+    const reg = /^\d+$/;
+    if(!reg.test(value)){
+        callback(new  Error('输入必须是数字'));
+    }else{
+        callback();
+    }
+}
+
+export function validateSpace(rule, value, callback) {
+    if(value.indexOf(' ') >= 0){
+        callback(new Error('输入有空格'));
+    } else {
+        callback();
+    }
+}
+
+export function validateMac(rule, value, callback) {
+    const reg_name = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
+    const reg_name2 = /^[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}$/;
+    const macarr = splitStr(value);
+    const len = macarr.length;
+    for (let i = 0; i < len; i++) {
+        if (!reg_name.test(macarr[i]) && !reg_name2.test(macarr[i])) {
+            callback(new Error('输入有误，以逗号或回车分隔'));
+        } else {
+            callback();
+        }
+    }
+}
+
+//按逗号和回车分隔字符串
+export function splitStr(str) {
+    const temp = str.split(/[\n,]/g);
+    for (let i = 0; i < temp.length; i++) {
+        if (temp[i] === "") {
+            temp.splice(i, 1);
+            //删除数组索引位置应保持不变
+            i--;
+        }
+    }
+    return temp;
+}
+
+export function validateAppId(rule, appId, callback) {
+    const reg = /^wx[A-Fa-f\d]{16}$/;
+    if (!reg.test(appId)) {
+        callback(new Error('请输入正确的AppId'));
+    } else {
+        callback();
+    }
+}
+
+export function formatMoney(value) {
+    // the value is in cents, convert it to CNY
+    return `${(value / 100).toFixed(2)}`;
+}
+
+export function convertMoney(value) {
+    return value * 100;
+}
+
 export function search(baseUrl, uri, self){
     if(self.search_word == ''){
         self.$message({message:'输入不能为空',type:'warning'});
@@ -95,5 +176,4 @@ export function search(baseUrl, uri, self){
             self.pageTotal = 0;
         }
     })
-
 }

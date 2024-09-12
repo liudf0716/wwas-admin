@@ -7,42 +7,82 @@
             </el-breadcrumb>
         </div>
         <div class='rad-group mb40'>
-            <el-tabs v-model="task_type" type="card" @tab-click="handleClick">
-                <el-tab-pane label="微信认证" name="1">
-                    <div class="txt" style="font-size:16px;color:#666;">
-                        <p>APP_ID：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>
-                        <!--<p>APP_SECRET：请从微信公众平台左侧最下方“开发－基本设置”获取。</p>-->
-                        <p>SHOP_ID及对应SSID和secretKey：</p>
-                        <p class="txt-small">
-                            <span>1 进入微信公众平台左侧“微信连Wi-Fi”中的“设备管理”。</span>
-                            <span>2 点击相应门店右侧的“查看详情”进入设备详情页面。</span>
-                            <span>3 点击中部“查看设备改造信息”按钮，在弹出框中获取。</span>
-                        </p>
-                    </div>
+            <el-tabs v-model="task_type" type="card" @tab-click="handleClick">   
+                <el-tab-pane label="微信支付上网" name="wxpay_setting">
                     <div class="form-box tab-cont form-box2">
-                        <el-form :model="form_wx" :rules="rules_wx" ref="form_wx" label-width="150px">
-                            <el-form-item label="APP_ID" prop="appId">
-                                <el-input v-model="form_wx.appId" class="diainp"></el-input>
+                        <el-form ref="form_wxpay" :model="form_wxpay" :rules="rules_wxpay" label-width="150px">
+                            <el-form-item label="商户号" prop="mch_id">
+                                <el-input v-model="form_wxpay.mch_id" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="secretKey" prop="secretKey">
-                                <el-input v-model="form_wx.secretKey" class="diainp"></el-input>
+                            <el-form-item label="商户API证书序列号" prop="mch_serial_no">
+                                <el-input v-model="form_wxpay.mch_serial_no" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="SHOP_ID" prop="shopId">
-                                <el-input v-model="form_wx.shopId" class="diainp"></el-input>
+                            <el-form-item label="商户私钥文件" prop="mch_priv_key">
+                                <el-upload
+                                    class="upload-demo"
+                                    :action="uploadKey"
+                                    ref="upload"
+                                    name="file_name"
+                                    with-credentials="true"
+                                    list-type="text"
+                                    :data="mch_priv_key"
+                                    :beforeUpload="beforeWxpayUpload"
+                                    :on-success="uploadSuccess"
+                                    :file-list="mch_priv_key_filelist"
+                                    :auto-upload="true"
+                                    :limit="1">
+                                    <el-button slot="trigger" size="small" type="primary">选取商户私钥</el-button>
+                                    <div slot="tip" class="el-upload__tip">上传商户私钥文件,大小不能超过128K</div>
+                                </el-upload>
+                            </el-form-item>
+                            <el-form-item label="微信支付平台证书" prop="wx_cert">
+                                <el-upload
+                                    class="upload-demo"
+                                    :action="uploadCert"
+                                    ref="upload"
+                                    name="file_name"
+                                    with-credentials="true"
+                                    list-type="text"
+                                    :data="mch_cert"
+                                    :beforeUpload="beforeWxpayUpload"
+                                    :on-success="uploadSuccess"
+                                    :file-list="wx_cert_filelist"
+                                    :auto-upload="true"
+                                    :limit="1"
+                                    accept=".crt,.pem,.cer">
+                                    <el-button slot="trigger" size="small" type="primary">选取微信支付平台证书</el-button>
+                                    <div slot="tip" class="el-upload__tip">上传微信支付平台证书文件, 大小不能超过128K</div>
+                                </el-upload>
+                            </el-form-item>
+                            <el-form-item label="公众号appid" prop="app_id">
+                                <el-input v-model="form_wxpay.app_id" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="公众号secret" prop="app_secret">
+                                <el-input v-model="form_wxpay.app_secret" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="支付金额" prop="amount">
+                                <el-input v-model="form_wxpay.amount" class="diainp"></el-input>
+                                <span style="padding:5px 12px;">元</span>
+                            </el-form-item>
+                            <el-form-item label="支付完成通知地址" prop="notify_url">
+                                <el-input v-model="form_wxpay.notify_url" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="描述" prop="desc">
+                                <el-input v-model="form_wxpay.desc" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="启用">
-                                <el-switch v-model="form_wx.enable" class="diainp"></el-switch>
+                                <el-switch v-model="form_wxpay.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onWeixinSubmit('form_wx')">下一步</el-button>
+                                <el-button type="primary" @click="onSaveSubmit('form_wxpay')">保存配置</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
                 </el-tab-pane>
 
-                <el-tab-pane label="一键免认证" name="2">
+                <el-tab-pane label="一键免认证" name="onekey_setting">
                     <div class="form-box tab-cont form-box2">
-                        <el-form ref="form_onekey" :model="form_onekey"  label-width="150px">
+                        <el-form ref="form_onekey" :model="form_onekey" label-width="150px">
                             <el-form-item label="启用">
                                 <el-switch v-model="form_onekey.enable" class="diainp"></el-switch>
                             </el-form-item>
@@ -50,12 +90,13 @@
                                 <el-switch v-model="form_onekey.from_server" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onOnekeySubmit('form_onekey')">下一步</el-button>
+                                <el-button type="primary"  @click="onSaveSubmit('form_onekey')">保存配置</el-button>
                             </el-form-item>
                         </el-form>
+                    </div>
                 </el-tab-pane>
 
-                <el-tab-pane label="用户密码认证" name="3">
+                <el-tab-pane label="用户密码认证" name="user_setting">
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form_user" :model="form_user" :rules="rules_user" label-width="150px">
                             <el-form-item label="用户名" prop="username">
@@ -68,14 +109,13 @@
                                 <el-switch v-model="form_user.enable" class="diainp"></el-switch>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="onPasswordSubmit('form_user')">下一步</el-button>
+                                <el-button type="primary"  @click="onSaveSubmit('form_user')">保存配置</el-button>
                             </el-form-item>
                         </el-form>
                     </div>
                 </el-tab-pane> 
                 
-                <el-tab-pane label="短信认证" name="4">
-
+                <el-tab-pane label="短信认证" name="sms_setting">
                     <el-form class="form-box tab-cont form-box2">
                         <el-form ref="form_dx" :model="form_dx" label-width="150px">
                             <el-form-item label="短信服务商" prop="dxchoose">
@@ -85,107 +125,113 @@
                                     <el-option label="无短信认证" value="none"></el-option>
                                 </el-select>
                             </el-form-item>
-                            <el-form ref="formAli" :model="formAli" :rules="rulesAli" label-width="150px" v-show="dxchoose == 'ali'">
-                                <el-form-item label="AccessKeyId" prop="appId">
-                                    <el-input v-model="formAli.appId" class="diainp"></el-input>
+                            <el-form ref="form_ali" :model="form_ali" :rules="rules_ali" label-width="150px" v-show="dxchoose == 'ali'">
+                                <el-form-item label="AccessKeyId" prop="app_id">
+                                    <el-input v-model="form_ali.app_id" class="diainp"></el-input>
                                 </el-form-item>
-                                <el-form-item label="AccessKeySecret" prop="appSecret">
-                                    <el-input v-model="formAli.appSecret" class="diainp"></el-input>
+                                <el-form-item label="AccessKeySecret" prop="app_secret">
+                                    <el-input v-model="form_ali.app_secret" class="diainp"></el-input>
                                 </el-form-item>
-                                <el-form-item label="SignName" prop="smsSignName">
-                                    <el-input v-model="formAli.smsSignName" class="diainp"></el-input>
+                                <el-form-item label="SignName" prop="sms_sign_name">
+                                    <el-input v-model="form_ali.sms_sign_name" class="diainp"></el-input>
                                 </el-form-item>
-                                <el-form-item label="TemplateCode" prop="smsTemplateCode">
-                                    <el-input v-model="formAli.smsTemplateCode" class="diainp"></el-input>
-                                </el-form-item>
-                                <el-form-item label="启用">
-                                    <el-switch v-model="formAli.enable" class="diainp"></el-switch>
-                                </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" @click="onDuanxinSubmit('formAli')">下一步</el-button>
-                                </el-form-item>
-                            </el-form>
-                            <el-form ref="formWy" :model="formWy" :rules="rulesWy" label-width="150px" v-show="dxchoose == 'wy'">
-                                <el-form-item label="AppKey" prop="wyAppId">
-                                    <el-input v-model="formWy.wyAppId" class="diainp"></el-input>
-                                </el-form-item>
-                                <el-form-item label="AppSecret" prop="wyAppSecret">
-                                    <el-input v-model="formWy.wyAppSecret" class="diainp"></el-input>
-                                </el-form-item>
-                                <el-form-item label="TemplateId" prop="wyTemplateId">
-                                    <el-input v-model="formWy.wyTemplateId" class="diainp"></el-input>
+                                <el-form-item label="TemplateCode" prop="sms_template_code">
+                                    <el-input v-model="form_ali.sms_template_code" class="diainp"></el-input>
                                 </el-form-item>
                                 <el-form-item label="启用">
-                                    <el-switch v-model="formWy.enable" class="diainp"></el-switch>
+                                    <el-switch v-model="form_ali.enable" class="diainp"></el-switch>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onDuanxinSubmit('formWy')">下一步</el-button>
+                                    <el-button type="primary"  @click="onSaveSubmit('form_ali')">保存配置</el-button>
                                 </el-form-item>
                             </el-form>
-                            <el-form ref="formNone" :model="formNone" label-width="150px" v-show="dxchoose == 'none'">
+                            <el-form ref="form_wy" :model="form_wy" :rules="rules_wy" label-width="150px" v-show="dxchoose == 'wy'">
+                                <el-form-item label="AppKey" prop="app_id">
+                                    <el-input v-model="form_wy.app_id" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="AppSecret" prop="app_secret">
+                                    <el-input v-model="form_wy.app_secret" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="TemplateId" prop="template_id">
+                                    <el-input v-model="form_wy.template_id" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="启用">
+                                    <el-switch v-model="form_wy.enable" class="diainp"></el-switch>
+                                </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary" @click="onDuanxinSubmit('formNone')">下一步</el-button>
+                                    <el-button type="primary" @click="onSaveSubmit('formWy')">保存配置</el-button>
+                                </el-form-item>
+                            </el-form>
+                            <el-form ref="formNone" :model="form_none" label-width="150px" v-show="dxchoose == 'none'">
+                                <el-form-item>
+                                    <el-button type="primary" @click="onSaveSubmit('formNone')">保存配置</el-button>
                                 </el-form-item>
                             </el-form>
 
                         </el-form>
                     </el-form>
-
                 </el-tab-pane>
-                <el-tab-pane label="其他设置" name="5">
 
-                    <div class="form-box tab-cont form-box2">
-                        <el-form ref="form_other" :model="form_other" :rules="rules_other" label-width="150px">
+                <el-tab-pane label="基本设置" name="base_setting">
+                    <div class="form-box tab-cont form-box2 flex-container">
+                        <div class="left-side">
+                            <el-form ref="form_base" :model="form_base" :rules="rules_base" label-width="150px">
+                                <el-form-item label="跳转" prop="portal_url">
+                                    <el-input v-model="form_base.portal_url" class="diainp"></el-input>
+                                </el-form-item>
+                                <el-form-item label="时间" prop="duration">
+                                    <el-select v-model="form_base.duration" class="diainp" placeholder="请选择" @change="changeDuration">
+                                        <el-option
+                                            v-for="item in durations"
+                                            :key="item"
+                                            :label="item"
+                                            :value="item">
+                                        </el-option>
+                                    </el-select>
+                                    <span style="padding:5px 12px;">小时</span>
+                                </el-form-item>
+                                <el-form-item label="客户超时认证时间" prop="client_timeout">
+                                    <el-select v-model="form_base.client_timeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
+                                        <el-option
+                                            v-for="item in client_timeout_op"
+                                            :key="item"
+                                            :label="item"
+                                            :value="item">
+                                        </el-option>
+                                    </el-select>
+                                    <span style="padding:5px 12px;">分钟</span>
+                                </el-form-item>
+                                <el-form-item label="背景图片" prop="background_url">
+                                    <el-upload
+                                        class="upload-demo"
+                                        :action="uploadBgImage"
+                                        ref="upload"
+                                        name="file_name"
+                                        with-credentials="true"
+                                        list-type="picture"
+                                        :limit="1"
+                                        :data="uploadData"
+                                        :before-upload="beforeUpload"
+                                        :on-success="uploadSuccess"
+                                        :on-excceed="handleExceed"
+                                        v-model="fileList"
+                                        accept="image/png,image/jpg"
+                                        :auto-upload="true">
+                                        <el-button slot="trigger" size="small" type="primary" v-if="fileList.length < 1">选取图片</el-button>
+                                        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件,且不超过2M</div>
+                                    </el-upload>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onSaveSubmit('form_base')">保存配置</el-button>
+                                </el-form-item>
+                            </el-form>
+                        </div>
 
-                            <el-form-item label="跳转" prop="portalUrl">
-                                <el-input v-model="form_other.portalUrl" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="时间" prop="duration">
-                                <el-select v-model="form_other.duration" class="diainp" placeholder="请选择" @change="changeDuration">
-                                    <el-option
-                                        v-for="item in durations"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                    </el-option>
-                                </el-select>
-                                <span style="padding:5px 12px;">小时</span>
-                            </el-form-item>
-                            <el-form-item label="客户超时认证时间" prop="clientTimeout">
-                                <el-select v-model="form_other.clientTimeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
-                                    <el-option
-                                        v-for="item in clientTimeoutOp"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                    </el-option>
-                                </el-select>
-                                <span style="padding:5px 12px;">分钟</span>
-                            </el-form-item>
-                            <el-form-item label="背景图片" prop="backgroundUrl">
-                                <el-upload
-                                    class="upload-demo"
-                                    :action="actionUrl"
-                                    ref="upload"
-                                    name="file_name"
-                                    with-credentials="true"
-                                    list-type="picture"
-                                    :data="backgroundUrl"
-                                    :beforeUpload="beforeUpload"
-                                    :on-change="handleChange"
-                                    :on-success="handleSuccess"
-                                    :file-list="fileList"
-                                    :auto-upload="true">
-                                    <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-                                    <div slot="tip" class="el-upload__tip">只能上传jpg/png文件,且不超过1M</div>
-                                </el-upload>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" @click="onLastSubmit('form_other')">保存</el-button>
-                            </el-form-item>
-                        </el-form>
+                        <div class="right-side">
+                            <div v-if="form_base.background_url" class="phone-preview" :style="{ backgroundImage: 'url(' + form_base.background_url + ')' }">
+                            </div>
+                        </div>
                     </div>
-
                 </el-tab-pane>
 
             </el-tabs>
@@ -195,127 +241,163 @@
 </template>
 
 <script>
-    import global_ from 'components/common/Global';
+    import { baseUrl } from 'components/common/Global';
+    import {
+        validateUrl,
+        validateNum,
+        validateTimeNum,
+        validateSpace,
+        validateMac,
+        splitStr,
+        validateAppId,
+        formatMoney,
+        convertMoney
+    } from 'components/common/Helpers.js';
+
     export default {
         data: function () {
             return {
                 params:{},
-                active:0,
-                task_type:'1',
-                form_wx: {
-                    appId: '',
+                task_type:'wxpay_setting',
+                durations:[1,2,3,4,5,6,7,8,9,10,11,12],
+                client_timeout_op:[2,4,6,8,10,20,30,60,120,360],
+                form_wxpay: {
+                    mch_id: '',
+                    mch_serial_no: '',
+                    mch_priv_key: '',
+                    wx_cert: '',
+                    app_id: '',
                     app_secret: '',
-                    shopId:'',
-                    ssid:'',
-                    secretKey: '',
+                    amount: '',
+                    notify_url: '',
+                    desc: '',
                     enable: false,
                     from_server: true,
                 },
-                durations:[1,2,3,4,5,6,7,8,9,10,11,12],
-                multiDevOLs:[1,2,3,4,5,6],
-                clientTimeoutOp:[2,4,6,8,10,20,30,60,120,360],
-                rules_wx: {
-                    appId: [
-                        {required: true, message: '请输入APP_ID', trigger: 'blur'},
+                rules_wxpay: {
+                    mch_id: [
+                        {required: true, message: '请输入商户号', trigger: 'blur'},
+                        {validator: validateNum, trigger: 'blur'}
                     ],
-                    secretKey: [
-                        {required: true, message: '请输入secretKey', trigger: 'blur'}
+                    mch_serial_no: [
+                        {required: true, message: '请输入商户API证书序列号', trigger: 'blur'}
                     ],
-                    shopId: [
-                        {required: true, message: '请输入SHOP_ID', trigger: 'blur'}
+                    mch_priv_key: [
+                        {required: true, message: '请上传商户私钥文件', trigger: 'blur'}
+                    ],
+                    wx_cert: [
+                        {required: true, message: '请上传微信支付平台证书', trigger: 'blur'}
+                    ],
+                    app_id: [
+                        {required: true, message: '请输入公众号appid', trigger: 'blur'},
+                        {validator: validateAppId, trigger: 'blur'}
+                    ],
+                    app_secret: [
+                        {required: true, message: '请输入公众号secret', trigger: 'blur'}
+                    ],
+                    amount: [
+                        {required: true, message: '请输入支付金额', trigger: 'blur'},
+                        {validator: validateNum, trigger: 'blur'}
+                    ],
+                    notify_url: [
+                        {required: true, message: '请输入通知地址', trigger: 'blur'},
+                        {validator: validateUrl, trigger: 'blur'}
+                    ],
+                    desc: [
+                        {required: true, message: '请输入支付描述', trigger: 'blur'}
                     ]
-
                 },
                 form_onekey: {
                     enable: true,
                     from_server: true,
                 },
                 form_user: {
-                  username:'',
-                  password:'',
-                  enable: true,
-                  from_server: true,
+                    username:'apfree',
+                    password:'apfree',
+                    enable: true,
+                    from_server: true,
                 },
                 rules_user: {
-                  username:[
-                    { required: true, message: '请输入用户名', trigger: 'blur'}
-                  ],
-                  password:[
-                    { required: true, message: '请输入用户名密码', trigger: 'blur'}
-                  ]
+                    username:[
+                        { required: true, message: '请输入用户名', trigger: 'blur'}
+                    ],
+                    password:[
+                        { required: true, message: '请输入用户名密码', trigger: 'blur'}
+                    ]
                 },
-                form_other: {
-                    portalUrl:'',
+                form_base: {
+                    portal_url:'',
                     duration:'',
-                    multiDevOL:'',
-                    clientTimeout:'',
+                    client_timeout:'',
+                    background_url:'',
                 },
-                rules_other: {
-                    portalUrl: [
-                        {required: true, message: '请输入跳转页面', trigger: 'blur'},
-                        {validator: this.validateUrl, trigger: 'blur'}
+                rules_base: {
+                    portal_url: [
+                        {required: true, message: '请输入跳转页面', trigger: 'blur'}
                     ],
                     duration: [
                         {required: true, message: '请选择时长', trigger: 'change'}
                     ],
-                    multiDevOL: [
-                        {required: true, message: '请选择能一个电话号能同时认证路由器的台数', trigger: 'change'}
-                    ],
-                    clientTimeout: [
+                    client_timeout: [
                         {required: true, message: '选择客户超时认证时间', trigger: 'change'}
                     ],
                 },
                 form_dx:{
 
                 },
-                formAli:{
-                    appId:'',
-                    appSecret:'',
-                    smsSignName:'',
-                    smsTemplateCode:'',
+                form_ali:{
+                    app_id:'',
+                    app_secret:'',
+                    sms_sign_name:'',
+                    sms_template_code:'',
                     enable:false,
                     from_server: true,
                 },
-                rulesAli: {
-                    appId: [
+                rules_ali: {
+                    app_id: [
                         {required: true, message: '请输入AccessKeyId', trigger: 'blur'},
                     ],
-                    appSecret: [
+                    app_secret: [
                         {required: true, message: '请输入AccessKeySecret', trigger: 'blur'}
                     ],
-                    smsSignName: [
+                    sms_sign_name: [
                         {required: true, message: '请输入SignName', trigger: 'blur'}
                     ],
-                    smsTemplateCode:[
+                    sms_template_code:[
                         {required: true, message: '请输入TemplateCode', trigger: 'blur'}
                     ]
 
                 },
-                formWy:{
-                    wyAppId:'',
-                    wyAppSecret:'',
-                    wyTemplateId:'',
+                form_wy:{
+                    app_id:'',
+                    app_secret:'',
+                    template_id:'',
                     enable: false,
                     from_server: true,
                 },
-                rulesWy: {
-                    wyAppId: [
+                rules_wy: {
+                    app_id: [
                         {required: true, message: '请输入AppKey', trigger: 'blur'},
                     ],
-                    wyAppSecret: [
+                    app_secret: [
                         {required: true, message: '请输入AppSecret', trigger: 'blur'}
                     ],
-                    wyTemplateId: [
+                    template_id: [
                         {required: true, message: '请输入TemplateId', trigger: 'blur'}
                     ]
 
                 },
-                formNone:{
+                form_none:{
                     enable:false,
                 },
                 dxchoose:'none',
-                actionUrl: global_.baseUrl + '/setting/uploadBgImage',
+                uploadBgImage: baseUrl + '/setting/uploadBgImage',
+                uploadData: {},
                 fileList: [],
+                uploadKey: baseUrl + '/setting/uploadKey',
+                mch_priv_key_filelist: [],
+                uploadCert: baseUrl + '/setting/uploadCert',
+                wx_cert_filelist: [],
                 loading:false
             }
         },
@@ -323,203 +405,119 @@
             this.getData();
         },
         methods: {
-            prev: function(){
-                this.active--;
-            },
-            onWeixinSubmit:function (formName) {
-                var self = this;
-                self.$refs[formName].validate(function (valid) {
-                    if (valid) {
-                        self.params = {
-                            user_account:localStorage.getItem('ms_username'),
-                            weixin:{
-                                appId:self.form_wx.appId,
-                                shopId:self.form_wx.shopId,
-                                secretKey:self.form_wx.secretKey,
-                                enable:self.form_wx.enable,
-                            }
-                        };
-                        self.active = 1;
-                        self.task_type = '2';
-                    } else {
+            validateUrl: validateUrl,
+            validateNum: validateNum,
+            validateTimeNum: validateTimeNum,
+            validateSpace: validateSpace,
+            validateMac: validateMac,
+            splitStr: splitStr,
+            validateAppId: validateAppId,
+            formatMoney: formatMoney,
+            convertMoney: convertMoney,
+            
+            onSaveSubmit: function(form_name){
+                const self = this;
+                self.$refs[form_name].validate(function (valid) {
+                    if (!valid) {
                         return false;
-                        console.log('验证失败');
                     }
-                });
 
-            },
-            onOnekeySubmit:function (formName) {
-                var self = this;
-                self.$refs[formName].validate(function (valid) {
-                    if (valid) {
+                    self.params.user_account = localStorage.getItem('ms_username');
+                    if (self.form_wxpay.enable) { 
+                        self.params.wxpay = {
+                            appId: self.form_wxpay.app_id,
+                            appSecret: self.form_wxpay.app_secret,
+                            mchId: self.form_wxpay.mch_id,
+                            mchSerialNo: self.form_wxpay.mch_serial_no,
+                            mchPrivKey: self.form_wxpay.mch_priv_key,
+                            wxCert: self.form_wxpay.wx_cert,
+                            amount: convertMoney(self.form_wxpay.amount),
+                            notifyUrl: self.form_wxpay.notify_url,
+                            desc: self.form_wxpay.desc,
+                            enable: self.form_wxpay.enable,
+                        };
+                    } else {
+                        self.params.wxpay = {
+                            enable: false
+                        };
+                    }
+
+                    if (self.form_onekey.enable) {
                         self.params.onekey = {
-                            enable:self.form_onekey.enable,
-                            fromServer:self.form_onekey.from_server,
+                            enable: self.form_onekey.enable,
+                            fromServer: self.form_onekey.from_server
                         };
-                    
-                        self.active = 2;
-                        self.task_type = '3';
                     } else {
-                        console.log('验证失败');
-                        return false;
+                        self.params.onekey = {
+                            enable: false
+                        };
                     }
-                });
-
-            },
-            onPasswordSubmit: function(formName) {
-              var self = this;
-                self.$refs[formName].validate(function (valid) {
-                    if (valid) {
+                    
+                    if (self.form_user.from_server) {
                         self.params.user = {
-                            user:self.form_user.usernmae,
+                            user:self.form_user.username,
                             password:self.form_user.password,
                             enable:self.form_user.enable,
                             fromServer:self.form_user.from_server,
                         };
-                        self.active = 3;
-                        self.task_type = '4';
                     } else {
-                        return false;
-                        console.log('验证失败');
+                        self.params.user.enable = false;
                     }
-                });
-
-            },
-            onDuanxinSubmit: function(formName) {
-                var self = this;
-                self.$refs[formName].validate(function (valid) {
-                    if (valid) {
-                        if(formName == 'formAli'){
-                            self.params.sms = {
-                                selected:self.dxchoose,
-                                appId:self.formAli.appId,
-                                appSecret:self.formAli.appSecret,
-                                smsSignName:self.formAli.smsSignName,
-                                smsTemplateCode:self.formAli.smsTemplateCode,
-                                enable:self.formAli.enable,
-                            };
-                        }else if(formName == 'formWy'){
-                            self.params.sms = {
-                                selected:self.dxchoose,
-                                wyAppId:self.formWy.wyAppId,
-                                wyAppSecret:self.formWy.wyAppSecret,
-                                wyTemplateId:self.formWy.wyTemplateId,
-                                enable:self.formWy.enable,
-                            };
-                        } else {
-                            self.params.sms = {
-                                selected:'none',
-                                enable:false,
-                            };
+                    
+                    if (self.dxchoose == 'ali') {
+                        self.params.sms = {
+                            aliAppId: self.form_ali.app_id,
+                            aliAppSecret: self.form_ali.app_secret,
+                            aliSmsSignName: self.form_ali.sms_sign_name,
+                            aliSmsTemplateCode: self.form_ali.sms_template_code,
+                            selected:self.dxchoose,
+                            smsAliEnable: self.form_ali.enable,
+                        };
+                    } else if (self.dxchoose == 'wy') {
+                        self.params.sms = {
+                            wyAppId:self.form_wy.app_id,
+                            wyAppSecret:self.form_wy.app_secret,
+                            wyTemplateId:self.form_wy.template_id,
+                            selected:self.dxchoose,
+                            smsWyEnable:self.form_wy.enable,
                         }
-
-                        self.active = 4;
-                        self.task_type = '5';
                     } else {
-                        return false;
-                        console.log('验证失败');
+                        self.params.sms = {
+                            smsAliEnable:false,
+                            smsWyEnable:false,
+                        }
                     }
-                });
 
-            },
-            onLastSubmit: function(formName){
-                var self = this;
-                self.$refs['form_wx'].validate(function (valid) {
-                    if(valid){
-                        self.$refs[formName].validate(function (valid) {
-                            if (valid) {
-                                self.params.user_account = localStorage.getItem('ms_username');
-                                self.params.weixin = {
-                                    appId:self.form_wx.appId,
-                                    shopId:self.form_wx.shopId,
-                                    secretKey:self.form_wx.secretKey,
-                                    enable:self.form_wx.enable,
-                                    fromServer:self.form_wx.from_server,
-                                };
+                    self.params.portalUrl = self.form_base.portal_url;
+                    self.params.backgroundUrl = self.form_base.background_url || '/static/img/lg_pic.png';
+                    self.params.duration = self.form_base.duration;
+                    self.params.clientTimeout = self.form_base.client_timeout;
+                    
+                    self.loading = true;
+                    self.$axios.post(baseUrl + '/setting/saveSetting',self.params).then(function (res) {
+                        self.loading = false;
+                        if(res.data.ret_code == '1001'){
+                            self.$message({message:res.data.extra,type:'warning'});
+                            setTimeout(function(){
+                                self.$router.replace('login');
+                            },2000)
+                        }
+                        if(res.data.ret_code == 0){
+                            self.$message({message:res.data.extra,type:'success'});
 
-                                self.params.onekey = {
-                                    enable:self.form_onekey.enable,
-                                    fromServer:self.form_onekey.from_server,
-                                };
-
-                                self.params.user = {
-                                    user:self.form_user.username,
-                                    password:self.form_user.password,
-                                    enable:self.form_user.enable,
-                                    fromServer:self.form_user.from_server,
-                                };
-
-                                self.params.portalUrl = self.form_other.portalUrl;
-                                self.params.duration = self.form_other.duration;
-                                self.params.multiDevOL = self.form_other.multiDevOL;
-                                self.params.clientTimeout = self.form_other.clientTimeout;
-                                if (self.fileList.length > 0) {
-                                    self.params.backgroundUrl = self.fileList[0].response;
-                                    self.fileList.pop();
-                                } else {
-                                    self.params.backgroundUrl = '/static/img/lg_pic.png';
-                                }
-                                
-                                if(self.dxchoose == 'ali'){
-                                    self.params.sms = {
-                                        selected:self.dxchoose,
-                                        appId:self.formAli.appId,
-                                        appSecret:self.formAli.appSecret,
-                                        smsSignName:self.formAli.smsSignName,
-                                        smsTemplateCode:self.formAli.smsTemplateCode,
-                                        enable:self.formAli.enable,
-                                        fromServer:self.formAli.from_server,
-                                    }
-                                } else if (self.dxchoose == 'wy'){
-                                    self.params.sms = {
-                                        selected:self.dxchoose,
-                                        wyAppId:self.formWy.wyAppId,
-                                        wyAppSecret:self.formWy.wyAppSecret,
-                                        wyTemplateId:self.formWy.wyTemplateId,
-                                        enable:self.formWy.enable,
-                                        fromServer:self.formWy.from_server,
-                                    }
-                                } else {
-                                    self.params.sms = {
-                                        selected:self.dxchoose,
-                                        enable: self.formNone.enable,
-                                    }
-                                }
-
-                                self.loading = true;
-                                self.$axios.post(global_.baseUrl + '/setting/wfcSetting',self.params).then(function (res) {
-                                    self.loading = false;
-                                    self.active = 4;
-                                    if(res.data.ret_code == '1001'){
-                                        self.$message({message:res.data.extra,type:'warning'});
-                                        setTimeout(function(){
-                                            self.$router.replace('login');
-                                        },2000)
-                                    }
-                                    if(res.data.ret_code == 0){
-                                        self.$message({message:res.data.extra,type:'success'});
-
-                                    }else{
-                                        self.$message.error(res.data.extra)
-                                    }
-                                })
-                            } else {
-                                return false;
-                                console.log('验证失败');
-                            }
-                        });
-                    }else{
-                        self.task_type = '1';
-                        return false;
-                    }
+                        }else{
+                            self.$message.error(res.data.extra)
+                        }
+                    })
                 });
             },
+
             getData: function(){//获取数据
-                var self = this;
-                var params = {
+                const self = this;
+                const params = {
                     user_account:localStorage.getItem('ms_username')
                 }
-                self.$axios.post(global_.baseUrl+'/setting/getSetting',params).then(function(res){
+                self.$axios.post(baseUrl+'/setting/getSetting',params).then(function(res){
                     if(res.data.ret_code == '1001'){
                         self.$message({message:res.data.extra,type:'warning'});
                         setTimeout(function(){
@@ -527,191 +525,167 @@
                         },2000)
                     }
                     if(res.data.ret_code == 0){
-                        var requestData = res.data.extra;
-                        self.form_wx.appId = requestData.appId;
-                        self.form_wx.shopId = requestData.shopId;
-                        self.form_wx.secretKey = requestData.secretKey;
-                        self.form_wx.ssid = requestData.ssid;
-                        self.form_wx.enable = requestData.wxEnable;
+                        const result = res.data.extra;
                         
-                        self.form_other.portalUrl = requestData.portalUrl;
-                        self.form_other.duration = String(requestData.duration);
-                        self.form_other.multiDevOL = requestData.multiDevOL;
-                        self.form_other.clientTimeout = requestData.clientTimeout;
+                        self.form_wxpay.app_id = result.wxpayAppId || '';
+                        self.form_wxpay.app_secret = result.wxpayAppSecret || '';
+                        self.form_wxpay.mch_id = result.mchId || '';
+                        self.form_wxpay.mch_serial_no = result.mchSerialNo || '';
+                        self.form_wxpay.mch_priv_key = result.mchPrivateKey || '';
+                        self.form_wxpay.wx_cert = result.wxCert || '';
+                        self.form_wxpay.amount = formatMoney(result.wxpayAmount || 1);
+                        self.form_wxpay.notify_url = result.wxpayNotifyUrl || '';
+                        self.form_wxpay.desc = result.wxpayDesc || '';
+                        self.form_wxpay.enable = result.wxPayEnable || false;
+
+                        self.form_base.portal_url = result.portalUrl || '';
+                        self.form_base.duration = String(result.duration || '');
+                        self.form_base.client_timeout = result.clientTimeout || '';
+                        self.form_base.background_url = result.backgroundUrl || '/static/img/lg_pic.png';
                         
+                        self.form_user.username = result.user || '';
+                        self.form_user.password = result.password || '';
+                        self.form_user.enable = result.userEnable || false;
 
-                        self.form_user.username = requestData.user;
-                        self.form_user.password = requestData.password;
-                        self.form_user.enable = requestData.userEnable;
-                        self.form_user.from_server = requestData.userFromServerEnable;
-
-                        if (requestData.onekeyEnable) {
+                        if (result.onekeyEnable) {
                             self.form_onekey.enable = true;
-                            self.form_onekey.from_server = requestData.onekeyFromServerEnable;
-                            self.form_onekey.once_auth = requestData.onekeyFromServerOnceAuth;
-                            self.form_onekey.auth_duration = requestData.onekeyFromServerNextAuthTime;
+                            self.form_onekey.from_server = result.onekeyFromServerEnable || true;
                         } else {
                             self.form_onekey.enable = false;
                             self.form_onekey.from_server = false;
-                            self.form_onekey.once_auth = 0;
-                            self.form_onekey.auth_duration = 0;
                         }
                         
-                        self.formAli.appId = requestData.smsAppId;
-                        self.formAli.appSecret = requestData.smsAppSecret;
-                        self.formAli.smsSignName = requestData.smsSignName;
-                        self.formAli.smsTemplateCode = requestData.smsTemplateCode;
-                        self.formAli.enable = requestData.smsAliEnable;
+                        self.form_ali.app_id = result.smsAliAppId || '';
+                        self.form_ali.app_secret = result.smsAliAppSecret || '';
+                        self.form_ali.sms_sign_name = result.smsAliSignName || '';
+                        self.form_ali.sms_template_code = result.smsAliTemplateCode || '';
+                        self.form_ali.enable = result.smsAliEnable || false;
 
+                        self.form_wy.app_id = result.smsWyAppId || '';
+                        self.form_wy.app_secret = result.smsWyAppSecret || '';
+                        self.form_wy.template_id = result.smsWyTemplateId || '';
+                        self.form_wy.enable = result.smsWyEnable || false;
 
-                        self.formWy.wyAppId = requestData.smsWyAppId;
-                        self.formWy.wyAppSecret = requestData.smsWyAppSecret;
-                        self.formWy.wyTemplateId = requestData.smsWyTemplateId;
-                        self.formWy.enable = requestData.smsWyEnable;
-
-
-                        self.dxchoose = requestData.smsSelected;
+                        self.dxchoose = result.smsSelected || 'none';
                     }
                 })
             },
+
             changeDxchoose: function(e){
-                var self = this;
+                const self = this;
                 self.dxchoose = e;
-
             },
+
             changeDuration: function(value){
-                var self = this;
-                self.form_other.duration = String(value);
+                const self = this;
+                self.form_base.duration = String(value);
             },
-            changeMultiDevOL: function(value) {
-                var self = this;
-                self.form_other.multiDevOL = String(value);
-            },
+
             changeClientTimeout: function(value) {
-                var self = this;
-                self.form_other.clientTimeout = String(value);
-            },
-            validateUrl: function (rule, value, callback) {
-                var self = this;
-                var reg = /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
-                if(!reg.test(value)){
-                    callback(new  Error('请输入正确网址，如(http://baidu.com)'));
-                }else{
-                    callback();
-                }
-
-            },
-            validateNum: function (rule, value, callback) {
-                var self = this;
-                var reg = /^\d+(\.\d+)?$/; //非负浮点数
-                if(!reg.test(value)){
-                    callback(new  Error('输入必须是数字'));
-                }else{
-                    callback();
-                }
-
-            },
-            validateTimeNum: function (rule, value, callback) {
-                var self = this;
-                var reg = /^\d+$/;
-                if(!reg.test(value)){
-                    callback(new  Error('输入必须是数字'));
-                }else{
-                    callback();
-                }
-
-            },
-            getChannelPath: function(){
-                var self = this;
-                self.loading = true;
-                self.$axios.post(global_.baseUrl+'/script/list').then(function(res){
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    self.loading = false;
-                    if(res.data.ret_code == 0){
-                        self.scriptListData = res.data.extra;
-                    }else{
-                        self.$message.error(res.data.extra)
-                    }
-                })
-            },
-            handleClick:function (tab,event) {
-                var self = this;
-                if(tab.name == '1'){
-                    // self.getGwid();
-                }
-                if(tab.name == '2'){
-                    // self.getChannelPath();
-                }
+                const self = this;
+                self.form_base.client_timeout = String(value);
             },
 
-            validateSpace: function (rule, value, callback) {
-                var self = this;
-                if(value.indexOf(' ')>=0){
-                    callback(new Error('输入有空格'));
-                }else{
-                    callback();
-                }
-            },
-            validateMac: function (rule, value, callback) {
-                var self = this;
-                var reg_name = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
-                var reg_name2 = /^[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}$/;
-                var macarr = self.splitStr(value);
-                var len = macarr.length;
-                for (var i = 0; i < len; i++) {
-                    if (!reg_name.test(macarr[i]) && !reg_name2.test(macarr[i])) {
-                        callback(new Error('输入有误，以逗号或回车分隔'));
-                    } else {
-                        callback();
-                    }
-                }
-            },
-            //按逗号和回车分隔字符串
-            splitStr: function (str) {
-                var temp = str.split(/[\n,]/g);
-                for (var i = 0; i < temp.length; i++) {
-                    if (temp[i] == "") {
-                        temp.splice(i, 1);
-                        //删除数组索引位置应保持不变
-                        i--;
-                    }
-                }
-                return temp;
-            },
-            beforeUpload: function(file){
-                var testmsg=file.name.substring(file.name.lastIndexOf('.')+1);
-                const extension = testmsg === 'png';
-                const extension2 = testmsg === 'jpg';
-                const isLt2M = file.size / 1024 / 1024 < 1;
-                if (!extension && !extension2) {
-                    this.$message({message:'上传图片只支持png或者jpg格式!',type:'warning'});
-                    return false;
-                }
+            beforeUpload: function(file) {
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
                 if (!isLt2M) {
-                    this.$message({message:'上传图片大小不能超过 1MB!',type:'warning'});
+                    this.$message({ message: '上传图片大小不能超过 2MB!', type: 'warning' });
                     return false;
                 }
-                
+
                 return true;
             },
-            handleSuccess: function(response, file, fileList) {
+
+            beforeWxpayUpload: function(file){
+                const isLt128K = file.size / 1024 < 128;
+                if (!isLt128K) {
+                    this.$message({message:'上传文件大小不能超过 128KB!',type:'warning'});
+                    return false;
+                }
+                return true;
+            },
+
+            uploadSuccess: function(response, file, fileList) {
                 if (response.ret_code == 0) {
                     file.response = response.extra;
-                    this.fileList.push(file);
+                    if (file.response.type == 'cert') {
+                        this.form_wxpay.wx_cert = file.response.url;
+                        this.wx_cert_filelist = fileList;
+                    } else if (file.response.type == 'key') {
+                        this.form_wxpay.mch_priv_key = file.response.url;
+                        this.mch_priv_key_filelist = fileList;
+                    } else if (file.response.type == 'bgImage') {
+                        this.form_base.background_url = file.response.url;
+                        this.fileList = fileList;
+                    } else {
+                        this.$message.error('上传文件类型错误');
+                    }
                 } else {
                     this.$message.error(response.extra);
                 }
+            },
+
+            handleExceed: function(files, fileList) {
+                this.$message.error('只能上传一张图片');
             },
         }
     }
 </script>
 <style scoped>
-    .last-cont{}
+    .flex-container {
+        display: flex;
+    }
+
+    .left-side {
+        flex: 1;
+        padding-right: 40px;
+    }
+
+    .right-side {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-left: 40px;
+    }
+
+    .phone-preview {
+        width: 200px; /* Adjusted width */
+        height: 400px; /* Adjusted height */
+        border: 16px solid black;
+        border-radius: 36px;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+        background-color: #fff; /* White background to resemble an iPhone */
+    }
+
+    .phone-preview::before {
+        content: '';
+        position: absolute;
+        width: 60px; /* Adjusted width */
+        height: 5px;
+        background-color: #333;
+        border-radius: 10px;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .phone-preview::after {
+        content: '';
+        position: absolute;
+        width: 35px; /* Adjusted width */
+        height: 35px; /* Adjusted height */
+        background-color: #333;
+        border-radius: 50%;
+        bottom: 20px; /* Adjusted position */
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    /* .last-cont{} */
     .steps-tit{margin-bottom:30px;}
     .mb40 {margin-bottom: 40px;}
     .tab-cont {padding: 40px; /*border-top:1px solid #dfe6ec;*/}
