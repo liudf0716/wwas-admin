@@ -10,24 +10,6 @@ import "babel-polyfill";
 Vue.use(ElementUI);
 axios.defaults.withCredentials=true;
 
-// axios.interceptors.response.use((response) => {
-//     const data = response.data;
-//     // const err = new Error(data.description);
-//     switch (data.ret_code){
-//         case '1001':
-//             err.message = '请先登录';
-//             location.replace('/login');
-//                  return data
-//     }
-//
-//
-// })
-
-
-
-
-
-
 Vue.prototype.$axios = axios;
 new Vue({
     router,

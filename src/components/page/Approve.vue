@@ -14,10 +14,13 @@
                             <el-form-item label="商户号" prop="mch_id">
                                 <el-input v-model="form_wxpay.mch_id" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="商户API证书序列号" prop="mch_serial_no">
+                            <el-form-item label="商户证书序列号" prop="mch_serial_no">
                                 <el-input v-model="form_wxpay.mch_serial_no" class="diainp"></el-input>
                             </el-form-item>
-                            <el-form-item label="商户私钥文件" prop="mch_priv_key">
+                            <el-form-item label="商户APIv3密钥" prop="mch_v3_key">
+                                <el-input v-model="form_wxpay.mch_v3_key" class="diainp"></el-input>
+                            </el-form-item>
+                            <el-form-item label="商户API私钥文件" prop="mch_priv_key">
                                 <el-upload
                                     class="upload-demo"
                                     :action="uploadKey"
@@ -34,7 +37,7 @@
                                     <el-button slot="trigger" size="small" type="primary">选取商户私钥</el-button>
                                     <div slot="tip" class="el-upload__tip">上传商户私钥文件,大小不能超过128K</div>
                                 </el-upload>
-                            </el-form-item>
+                            </el-form-item>   
                             <el-form-item label="微信支付平台证书" prop="wx_cert">
                                 <el-upload
                                     class="upload-demo"
@@ -264,6 +267,7 @@
                 form_wxpay: {
                     mch_id: '',
                     mch_serial_no: '',
+                    mch_v3_key: '',
                     mch_priv_key: '',
                     wx_cert: '',
                     app_id: '',
@@ -281,6 +285,9 @@
                     ],
                     mch_serial_no: [
                         {required: true, message: '请输入商户API证书序列号', trigger: 'blur'}
+                    ],
+                    mch_v3_key: [
+                        {required: true, message: '请输入商户APIv3密钥', trigger: 'blur'}
                     ],
                     mch_priv_key: [
                         {required: true, message: '请上传商户私钥文件', trigger: 'blur'}
@@ -429,6 +436,7 @@
                             appSecret: self.form_wxpay.app_secret,
                             mchId: self.form_wxpay.mch_id,
                             mchSerialNo: self.form_wxpay.mch_serial_no,
+                            mchV3Key: self.form_wxpay.mch_v3_key,
                             mchPrivKey: self.form_wxpay.mch_priv_key,
                             wxCert: self.form_wxpay.wx_cert,
                             amount: convertMoney(self.form_wxpay.amount),
@@ -531,6 +539,7 @@
                         self.form_wxpay.app_secret = result.wxpayAppSecret || '';
                         self.form_wxpay.mch_id = result.mchId || '';
                         self.form_wxpay.mch_serial_no = result.mchSerialNo || '';
+                        self.form_wxpay.mch_v3_key = result.mchV3Key || '';
                         self.form_wxpay.mch_priv_key = result.mchPrivateKey || '';
                         self.form_wxpay.wx_cert = result.wxCert || '';
                         self.form_wxpay.amount = formatMoney(result.wxpayAmount || 1);
