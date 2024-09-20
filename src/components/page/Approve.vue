@@ -57,18 +57,22 @@
                                     <div slot="tip" class="el-upload__tip">上传微信支付平台证书文件, 大小不能超过128K</div>
                                 </el-upload>
                             </el-form-item>
-                            <el-form-item label="公众号appid" prop="app_id">
+                            <el-form-item label="AppID" prop="app_id">
                                 <el-input v-model="form_wxpay.app_id" class="diainp"></el-input>
-                            </el-form-item>
-                            <el-form-item label="公众号secret" prop="app_secret">
-                                <el-input v-model="form_wxpay.app_secret" class="diainp"></el-input>
                             </el-form-item>
                             <el-form-item label="支付金额" prop="amount">
                                 <el-input v-model="form_wxpay.amount" class="diainp"></el-input>
                                 <span style="padding:5px 12px;">元</span>
                             </el-form-item>
-                            <el-form-item label="支付完成通知地址" prop="notify_url">
-                                <el-input v-model="form_wxpay.notify_url" class="diainp"></el-input>
+                            <el-form-item label="支付完成通知域名" prop="notify_domain">
+                                <el-input v-model="form_wxpay.notify_domain" class="diainp" @input="updateNotifyUrl"></el-input>
+                                <div class="text">
+                                    <p>
+                                        支付完成通知域名是微信支付完成后的回调地址<br>
+                                        用于接收微信支付结果通知。<br>
+                                        支付通知url为: <code>{{ form_wxpay.notify_url }}</code>
+                                    </p>
+                                </div>
                             </el-form-item>
                             <el-form-item label="描述" prop="desc">
                                 <el-input v-model="form_wxpay.desc" class="diainp"></el-input>
@@ -271,8 +275,8 @@
                     mch_priv_key: '',
                     wx_cert: '',
                     app_id: '',
-                    app_secret: '',
                     amount: '',
+                    notify_domain: '',
                     notify_url: '',
                     desc: '',
                     enable: false,
@@ -296,19 +300,15 @@
                         {required: true, message: '请上传微信支付平台证书', trigger: 'blur'}
                     ],
                     app_id: [
-                        {required: true, message: '请输入公众号appid', trigger: 'blur'},
+                        {required: true, message: '请输入公众号或者小程序AppID', trigger: 'blur'},
                         {validator: validateAppId, trigger: 'blur'}
-                    ],
-                    app_secret: [
-                        {required: true, message: '请输入公众号secret', trigger: 'blur'}
                     ],
                     amount: [
                         {required: true, message: '请输入支付金额', trigger: 'blur'},
                         {validator: validateNum, trigger: 'blur'}
                     ],
-                    notify_url: [
-                        {required: true, message: '请输入通知地址', trigger: 'blur'},
-                        {validator: validateUrl, trigger: 'blur'}
+                    notify_domain: [
+                        {required: true, message: '请输入通知域名', trigger: 'blur'},
                     ],
                     desc: [
                         {required: true, message: '请输入支付描述', trigger: 'blur'}
@@ -433,14 +433,13 @@
                     if (self.form_wxpay.enable) { 
                         self.params.wxpay = {
                             appId: self.form_wxpay.app_id,
-                            appSecret: self.form_wxpay.app_secret,
                             mchId: self.form_wxpay.mch_id,
                             mchSerialNo: self.form_wxpay.mch_serial_no,
                             mchV3Key: self.form_wxpay.mch_v3_key,
                             mchPrivKey: self.form_wxpay.mch_priv_key,
                             wxCert: self.form_wxpay.wx_cert,
                             amount: convertMoney(self.form_wxpay.amount),
-                            notifyUrl: self.form_wxpay.notify_url,
+                            notifyDomain: self.form_wxpay.notify_domain,
                             desc: self.form_wxpay.desc,
                             enable: self.form_wxpay.enable,
                         };
@@ -536,14 +535,14 @@
                         const result = res.data.extra;
                         
                         self.form_wxpay.app_id = result.wxpayAppId || '';
-                        self.form_wxpay.app_secret = result.wxpayAppSecret || '';
                         self.form_wxpay.mch_id = result.mchId || '';
                         self.form_wxpay.mch_serial_no = result.mchSerialNo || '';
                         self.form_wxpay.mch_v3_key = result.mchV3Key || '';
                         self.form_wxpay.mch_priv_key = result.mchPrivateKey || '';
                         self.form_wxpay.wx_cert = result.wxCert || '';
                         self.form_wxpay.amount = formatMoney(result.wxpayAmount || 1);
-                        self.form_wxpay.notify_url = result.wxpayNotifyUrl || '';
+                        self.form_wxpay.notify_domain = result.wxpayNotifyDomain || '';
+                        self.form_wxpay.notify_url = 'https://' + self.form_wxpay.notify_domain + '/api/v1/wxpay/notify';
                         self.form_wxpay.desc = result.wxpayDesc || '';
                         self.form_wxpay.enable = result.wxPayEnable || false;
 
@@ -578,6 +577,11 @@
                         self.dxchoose = result.smsSelected || 'none';
                     }
                 })
+            },
+
+            updateNotifyUrl: function(e){
+                const self = this;
+                self.notify_url = 'https://' + e + '/api/v1/wxpay/notify';
             },
 
             changeDxchoose: function(e){
@@ -648,7 +652,7 @@
 
     .left-side {
         flex: 1;
-        padding-right: 40px;
+        padding-right: 80px;
     }
 
     .right-side {
@@ -656,7 +660,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding-left: 40px;
+        padding-left: 80px;
     }
 
     .phone-preview {
