@@ -544,7 +544,7 @@
                         self.form_wxpay.notify_domain = result.wxpayNotifyDomain || '';
                         self.form_wxpay.notify_url = 'https://' + self.form_wxpay.notify_domain + '/api/v1/wxpay/notify';
                         self.form_wxpay.desc = result.wxpayDesc || '';
-                        self.form_wxpay.enable = result.wxPayEnable || false;
+                        self.form_wxpay.enable = result.wxpayEnable || false;
 
                         self.form_base.portal_url = result.portalUrl || '';
                         self.form_base.duration = String(result.duration || '');
