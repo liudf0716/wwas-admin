@@ -65,9 +65,13 @@
     import { baseUrl } from 'components/common/Global';
     import { timeStamp, dateForm, bandwidthLabel, search } from 'components/common/Helpers.js';
 
+    const API_SUCCESS_CODE = '0';
+    const API_SESSION_EXPIRED_CODE = '1001';
+    const USER_TYPE_ADMIN = '0';
+    const USER_TYPE_CHANNEL_ADMIN = '1';
+
     export default {
         data: function(){
-            const self = this;
             return {
                 radio3:'online',
                 search_word:'',
@@ -92,60 +96,57 @@
             bandwidthLabel: bandwidthLabel,
             search: search,
 
+            _apiRequest: function(urlEndpoint, params, successCallback) {
+                // Return the promise for further chaining like .finally()
+                return this.$axios.post(baseUrl + urlEndpoint, params).then((res) => {
+                    if (res.data.ret_code == API_SESSION_EXPIRED_CODE) {
+                        this.$message({ message: res.data.extra, type: 'warning' });
+                        setTimeout(() => {
+                            this.$router.replace('login');
+                        }, 2000);
+                    } else if (res.data.ret_code == API_SUCCESS_CODE) {
+                        successCallback(res.data.extra);
+                    } else {
+                        this.$message({ message: res.data.extra, type: 'warning' });
+                    }
+                }).catch((error) => {
+                    console.error('API Request Error:', error);
+                    this.$message({ message: '请求失败，请检查网络或联系管理员', type: 'error' });
+                });
+            },
+
             getUser: function(){
-                var self = this;
-                self.$axios.post(baseUrl+'/admin/info').then(function(res){
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
+                this._apiRequest('/admin/info', {}, (data) => {
+                    const user = data;
+                    this.curUser = user.userType;
+                    if(this.curUser === USER_TYPE_CHANNEL_ADMIN || this.curUser === USER_TYPE_ADMIN){
+                        this.getData();
+                    } else {
+                        this.$message({message:'用户类型错误',type:'warning'});
                     }
-                    if(res.data.ret_code == 0){
-                        const user = res.data.extra;
-                        self.curUser = user.userType;
-                        if(self.curUser == '1' || self.curUser === '0'){
-                            self.getData();
-                        } else {
-                            self.$message({message:'用户类型错误',type:'warning'});
-                        }
-                    }
-                })
+                });
             },
 
             getData: function(){
-                const self = this;
-                self.loading = true;
+                this.loading = true;
                 let params = { };
-                if (self.curUser == '1') {
+                if (this.curUser === USER_TYPE_CHANNEL_ADMIN) {
                     params['gw_channel'] = localStorage.getItem('ms_username');
-                };
-                self.$axios.post(baseUrl+'/client/list', params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-
-                    if(res.data.ret_code == 0){
-                        self.pageTotal = res.data.extra.result.length || self.pageTotal;
-                        if(!params.hasOwnProperty('current_page')){
-                            self.listData = res.data.extra.result;
-                        }else{
-                            self.listData = res.data.extra.result;
-                        }
-                    } else {
-                        self.$message({message:res.data.extra,type:'warning'});
-                    }
+                }
+                this._apiRequest('/client/list', params, (data) => {
+                    this.pageTotal = data.result.length || this.pageTotal;
+                    // Simplified: The if/else for listData assignment was redundant.
+                    this.listData = data.result;
                 })
+                // Ensure loading is false regardless of _apiRequest outcome for getData
+                .finally(() => {
+                    this.loading = false;
+                });
             },
 
             showDetail: function(row){
-                const self = this;
-                self.showClientDetailDialog = true;
-                self.selectedClient = [
+                this.showClientDetailDialog = true;
+                this.selectedClient = [
                     {key:'用户MAC',value:row.clients.mac},
                     {key:'用户IP',value:row.clients.ip},
                     {key:'设备ID',value:row.deviceID},
@@ -153,12 +154,12 @@
                     {key:'渠道',value:row.gwChannel},
                     {key:'用户名',value:row.clients.name},
                     {key:'是否有线用户',value:row.clients.wired},
-                    {key:'下行流量',value:self.bandwidthLabel(row.clients.incoming)},
-                    {key:'上行流量',value:self.bandwidthLabel(row.clients.outgoing)},
+                    {key:'下行流量',value:this.bandwidthLabel(row.clients.incoming)},
+                    {key:'上行流量',value:this.bandwidthLabel(row.clients.outgoing)},
                     {key:'认证方式',value:row.clients.authType},
-                    {key:'认证时间',value:self.dateForm(row.clients.firstLogin)},
-                    {key:'在线时长',value:self.timeStamp(row.clients.onlineTime)},
-                    {key:'最后在线时间',value:self.dateForm(row.clients.lastTime)},
+                    {key:'认证时间',value:this.dateForm(row.clients.firstLogin)},
+                    {key:'在线时长',value:this.timeStamp(row.clients.onlineTime)},
+                    {key:'最后在线时间',value:this.dateForm(row.clients.lastTime)},
                     {key:'认证令牌',value:row.clients.token},
                 ];
             },
@@ -168,33 +169,22 @@
             },
 
             kickOffline: function(row){
-                const self = this;
                 const deviceID = row.deviceID;
                 const gwID = row.gwID;
                 const mac = row.clients.mac;
                 const ip = row.clients.ip;
-                self.$axios.post(baseUrl+'/client/kickoffClient', {device_id: deviceID, gw_id:gwID, mac:mac, ip:ip}).then(function(res){
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.$message({message:'用户下线成功',type:'success'});
-                        self.getData();
-                    } else {
-                        self.$message({message:res.data.extra,type:'warning'});
-                    }
-                })
+                this._apiRequest('/client/kickoffClient', {device_id: deviceID, gw_id:gwID, mac:mac, ip:ip}, (data) => {
+                    this.$message({message:'用户下线成功',type:'success'});
+                    this.getData();
+                });
             },
         }
     }
 </script>
-<style>
+<style scoped>
     .rad-group{margin-bottom:20px;}
     .diainp{width:217px;}
-    .handle-input{  width: 300px;  display: inline-block;  }
+    .handle-input{ width: 300px; display: inline-block; }
     .handle-box2{display:inline-block;float:right;}
     .orange{color:#eb9e05;background:none;}
     .btn-search{position:absolute;}
