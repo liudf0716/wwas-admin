@@ -48,4 +48,4 @@ export default new Router({
                 component: resolve => require(['../components/page/Register.vue'], resolve)
         },
     ]
-})
+});

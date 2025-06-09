@@ -1,6 +1,7 @@
 <template>
     <div class="table" v-loading="loading2">
-        <div v-if="isUser =='1'?false:true">
+        <!-- User Management View (Super Admin) -->
+        <div v-if="isUser === '0'">
             <div class="crumbs">
                 <el-breadcrumb separator="/">
                     <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
@@ -9,17 +10,17 @@
             </div>
             <el-form :inline="true" class="handle-box">
                 <el-form-item>
-                    <el-button type="primary" icon="plus"  class="handle-del mr10" @click="dialogFormVisible=true">新建子渠道</el-button>
+                    <el-button type="primary" icon="plus" class="handle-del mr10" @click="openNewChannelDialog">新建子渠道</el-button>
                 </el-form-item>
                 <el-form-item label="">
                     <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" icon="search" @click="search">查询</el-button>
+                    <el-button type="primary" icon="search" @click="searchUsers">查询</el-button>
                 </el-form-item>
             </el-form>
             <div class='rad-group'>
-                <el-radio-group v-model="radio3" @change="changeTab">
+                <el-radio-group v-model="userStatusFilter" @change="handleUserStatusFilterChange">
                     <el-radio-button label="all">全部</el-radio-button>
                     <el-radio-button label="0">未冻结</el-radio-button>
                     <el-radio-button label="1">已冻结</el-radio-button>
@@ -47,23 +48,27 @@
                 </el-table-column>
                 <el-table-column label="操作" width="380">
                     <template slot-scope="scope">
-                        <el-button class="btn1" size="small" type="text" @click="resetPassword(scope.row.userAccount)">重置密码</el-button>
-                        <el-button class="btn1" size="small" v-if="scope.row.userStatus =='0' && scope.row.userType =='1'" @click="revoke(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">冻结账户</el-button>
-                        <el-button class="btn1" size="small" v-else-if="scope.row.userStatus =='1' && scope.row.userType =='1'" @click="restore(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">解冻账户</el-button>
-                        <el-button class="btn1" size="small" v-if="scope.row.userType =='1'?true:false" type="success" @click="toEnter(scope.row.userAccount)">点击进入</el-button>
+                        <el-button class="btn1" size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">重置密码</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.userStatus =='0' && scope.row.userType =='1'" @click="freezeUserAccount(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">冻结账户</el-button>
+                        <el-button class="btn1" size="small" v-else-if="scope.row.userStatus =='1' && scope.row.userType =='1'" @click="unfreezeUserAccount(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">解冻账户</el-button>
+                        <el-button class="btn1" size="small" v-if="scope.row.userType =='1'?true:false" type="success" @click="switchToChannelView(scope.row.userAccount)">点击进入</el-button>
+                         <el-button class="btn1" size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
+                         <el-button class="btn1" size="small" type="text" @click="openImportRouterDialogForUser(scope.row.userAccount)">导入路由</el-button>
+                         <el-button class="btn1" size="small" type="text" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pagination">
                 <el-pagination
-                    @current-change ="handleCurrentChange"
+                    @current-change ="handleTablePageChange"
                     :current-page="currentPage"
                     layout="prev, pager, next"
                     :total="pageTotal">
                 </el-pagination>
             </div>
         </div>
-        <div v-if="isUser == '1'?true:false">
+
+        <div v-if="isUser === '1'">
             <div class="crumbs">
                 <el-breadcrumb separator="/">
                     <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道设备</el-breadcrumb-item>
@@ -71,1127 +76,514 @@
                 </el-breadcrumb>
             </div>
             <el-form :inline="true" class="handle-box">
-            <el-form-item>
-            <el-button type="primary" icon="plus" class="handle-del mr10" @click="addGateway">添加认证网关设备</el-button>
-            </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="plus" class="handle-del mr10" @click="openAddGatewayDialog">添加认证网关设备</el-button>
+                </el-form-item>
             </el-form>
-            <div v-if="noSuperData.length === 0" class="no-device">no device available</div>
-            <el-table v-else :data="noSuperData" border style="width: 100%" ref="multipleTable">
-            <el-table-column prop="gwChannel" label="渠道"></el-table-column>
-            <el-table-column prop="deviceID" label="设备ID"></el-table-column>
-            <el-table-column prop="gwID" label="网关ID"></el-table-column>
-            <el-table-column prop="onceAuth" label="单次认证网关ID">
-            <template slot-scope="scope">
-            <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-            </template>
-            </el-table-column>
-            <el-table-column prop="nextAuthTime" label="单次认证免认证时长"></el-table-column>
-            <el-table-column label="操作">
-            <template slot-scope="scope">
-            <el-button class="btn1" size="small" type="danger" @click="delGateway(scope.row.deviceID, scope.row.gwID)">
-                删除网关
-            </el-button>
-            <el-button class="btn1" size="small" type="primary" @click="updateGateway(scope.row.deviceID, scope.row.gwID, scope.row.onceAuth, scope.row.nextAuthTime)">
-                更新网关
-            </el-button>
-            </template>
-            </el-table-column>
+            <div v-if="gatewayData.length === 0" class="no-device">no device available</div>
+            <el-table v-else :data="gatewayData" border style="width: 100%" ref="gatewayTable">
+                <el-table-column prop="gwChannel" label="渠道"></el-table-column>
+                <el-table-column prop="deviceID" label="设备ID"></el-table-column>
+                <el-table-column prop="gwID" label="网关ID"></el-table-column>
+                <el-table-column prop="onceAuth" label="单次认证网关ID">
+                    <template slot-scope="scope">
+                        <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949" @change="updateGatewayAuthStatus(scope.row)"></el-switch>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="nextAuthTime" label="单次认证免认证时长"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button class="btn1" size="small" type="danger" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
+                        <el-button class="btn1" size="small" type="primary" @click="openUpdateGatewayDialog(scope.row)">更新网关</el-button>
+                    </template>
+                </el-table-column>
             </el-table>
         </div>
-        <el-dialog :title="dialogTitle" :visible.sync="showDialogAddUpdateGateway" class="digcont">
-            <el-form :model="formAddUpdateGateway" ref="formAddUpdateGateway">
-                <el-form-item label="设备ID" prop="device_id" :label-width="formLabelWidth" class="form-item-center">
-                    <el-tooltip effect="dark" content="设备ID用于标识整个设备，一个设备下有多个认证网关" placement="top">
-                        <el-input v-model="formAddUpdateGateway.device_id" maxlength="12" style="width: 150px;" :disabled="isUpdate"></el-input>
-                    </el-tooltip>
-                </el-form-item>
-                <el-form-item label="网关ID" prop="gw_id" :label-width="formLabelWidth" class="form-item-center">
-                    <el-tooltip effect="dark" content="认证网关ID，一般为每个桥接口的MAC地址，长度不超过12个字符" placement="top">
-                        <el-input v-model="formAddUpdateGateway.gw_id" maxlength="12" style="width: 150px;" :disabled="isUpdate"></el-input>
-                    </el-tooltip>
-                </el-form-item>
-                <el-form-item label="开启单次认证" prop="once_auth" :label-width="formLabelWidth" class="form-item-center">
-                    <el-switch v-model="formAddUpdateGateway.once_auth" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
-                </el-form-item>
-                <el-form-item v-if="formAddUpdateGateway.once_auth" label="免认证时长" prop="next_auth_time" :label-width="formLabelWidth" class="form-item-center">
-                    <el-tooltip effect="dark" content="免认证时长单位为天，当有一个用户通过认证后，后续免认证时长内该网关不再需要认证" placement="top">
-                        <el-input v-model="formAddUpdateGateway.next_auth_time" maxlength="12" style="width: 150px;"></el-input>
-                    </el-tooltip>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="showDialogAddUpdateGateway = false">取消</el-button>
-                <el-button type="primary" @click="addUpdateGatewayConfirm('formAddUpdateGateway')">{{ isUpdate ? '修改' : '添加' }}</el-button>
-            </div>
-        </el-dialog>
-        <el-dialog title="修改密码" :visible.sync="showDialogPwd" class="digcont">
-            <el-form :model="formP" ref="formP" :rules="rulesP">
-                <el-form-item label="密码" prop="user_password" :label-width="formLabelWidth">
-                    <el-input v-model="formP.user_password" type="password" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="新密码" prop="user_new_password" :label-width="formLabelWidth">
-                    <el-input v-model="formP.user_new_password" type="password" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="确认密码" prop="user_validate_password" :label-width="formLabelWidth">
-                    <el-input v-model="formP.user_validate_password" type="password" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="showDialogPwd = false">取 消</el-button>
-                <el-button type="primary" @click="savePwdChange('formP')" v-loading.fullscreen.lock="fullscreenLoading">确 定</el-button>
-            </div>
-        </el-dialog>
-        <el-dialog title="新建子渠道" :visible.sync="dialogFormVisible" class="digcont">
-            <el-form :model="form" :rules="rules" ref="form">
-                <el-form-item label="账号/渠道名称" prop="user" :label-width="formLabelWidth">
-                    <el-input v-model="form.user" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
-                    <el-input v-model="form.password" type="password" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="联系电话" prop="tel" :label-width="formLabelWidth">
-                    <el-input v-model="form.tel" class="diainp" auto-complete="off"></el-input>
-                </el-form-item>
-                <el-form-item label="地址" :label-width="formLabelWidth">
-                    <el-select size="small" style="width: 110px"
-                               v-model="form.selectProv"
-                               placeholder="请选择省份"
-                               v-on:change="getProv($event)">
-                        <el-option
-                            v-for="item in provs"
-                            :key="item.label"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                    <el-select size="small" style="width: 104px"
-                               v-if="form.selectProv!=''"
-                               v-model="form.selectCity"
-                               placeholder="请选择城市"
-                               v-on:change="getCity($event)">
-                        <el-option
-                            v-for="item in citys"
-                            :key="item.label"
-                            :label="item.label"
-                            :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="" :label-width="formLabelWidth">
-                    <el-input v-model="form.addr" class="diainp2" auto-complete="off" placeholder="请输入详细地址"></el-input>
-                </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveCreate('form')">创 建</el-button>
-            </div>
-        </el-dialog>
 
-        <el-dialog title="导入路由" :visible.sync="showRouterDialog" class="digcont">
-            <el-tabs v-model="activeName2" type="card" @tab-click="handleClick">
-                <el-tab-pane label="文件上传" name="1">
-                    <div>
-                        <h4>下载示范模板</h4>
-                        <p class="mb30">
-                            路由导入模板.xls
-                            <a href="http://cloud.kunteng.org/yunac/static/tmp/routers.xls" target="_blank">
-                                <el-button class="btn1" size="small" type="primary">下载</el-button>
-                            </a>
-                        </p>
-                    </div>
-                    <div>
-                        <h4>上传</h4>
-                        <el-form :model="formMacfile" ref="formMacfile">
-                            <el-form-item label="">
-                                <el-upload
-                                    class="upload-demo"
-                                    ref="upload"
-                                    name="file_name"
-                                    :action="uploadUrl"
-                                    with-credentials="true"
-                                    :data="formMacfile"
-                                    :beforeUpload="beforeUpload"
-                                    :on-change="handleChange"
-                                    :on-success="handleSuccess"
-                                    :file-list="fileList"
-                                    :auto-upload="false">
-                                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>                                   
-                                </el-upload>
-                            </el-form-item>
-                        </el-form>
-                    </div>
-                    <div class="mt30">
-                        <el-button @click="showDialog == false">取 消</el-button>
-                        <el-button type="primary" @click="fileAdd('formMacfile')">保 存</el-button>
-                    </div>
-                </el-tab-pane>
-                <el-tab-pane label="手动导入" name="2">
-                    <el-form :model="formRouter2" ref="formRouter2" :rules="rulesRouter2">
-                        <el-form-item label="设备ID" prop="device_id">
-                            <el-input v-model="formRouter2.device_id" class="diainp"></el-input>
-                        </el-form-item>
-                        <el-form-item label="启用认证网关设备" prop="route_mac">
-                            <el-input
-                                type="textarea"
-                                :rows="2"
-                                placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
-                                v-model="formRouter2.route_mac">
-                            </el-input> 
-                        </el-form-item>
-                        <el-form-item label="启用单次认证网关设备" prop="route_mac_once_auth">
-                            <el-input
-                                type="textarea"
-                                :rows="2"
-                                placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
-                                v-model="formRouter2.route_mac_once_auth">
-                            </el-input> 
-                        </el-form-item>
-                        <el-form-item label="单次认证免认证时长" prop="next_auth_time">
-                            <el-input 
-                            v-model="formRouter2.next_auth_time" 
-                            placeholder="请输入免认证时长"
-                            class="diainp">
-                            </el-input>
-                        </el-form-item>
-                    </el-form>
-                    <div class="mt30">
-                        <el-button @click="showRouterDialog = false">取 消</el-button>
-                        <el-button type="primary" @click="saveToRouterChange('formRouter2')">保 存</el-button>
-                    </div>
-                </el-tab-pane>
-            </el-tabs>
-        </el-dialog>
-        <el-dialog title="删除路由" :visible.sync="showDelRouterDialog" class="digcont">
-            <div style="margin-bottom:16px;">*批量添加功能MAC之间以换行分割，每行一个MAC；MAC格式为12位字母或数字组合，不区分大小写:</div>
-            <el-form :model="formRouter3" ref="formRouter3" :rules="rulesRouter3">
-                <el-form-item prop="route_mac">
-                    <el-input
-                        type="textarea"
-                        :rows="5"
-                        placeholder="请输入内容"
-                        v-model="formRouter3.route_mac">
-                    </el-input>
-                </el-form-item>
-            </el-form>
-            <div class="mt30">
-                <el-button @click="showDelRouterDialog = false">取 消</el-button>
-                <el-button type="primary" @click="saveDelRouterChange('formRouter3')">保 存</el-button>
-            </div>
-        </el-dialog>
+        <new-channel-dialog
+            :visible.sync="dialogs.newChannel.visible"
+            :form-label-width="formLabelWidth"
+            :initial-provs="dialogs.newChannel.provs"
+            @save="handleSaveNewChannel"
+            @close="dialogs.newChannel.visible = false"
+            ref="newChannelDialogRef"
+        ></new-channel-dialog>
 
+        <change-password-dialog
+            :visible.sync="dialogs.changePassword.visible"
+            :form-label-width="formLabelWidth"
+            :target-account="dialogs.changePassword.currentAccount"
+            @save="handleSavePasswordChange"
+            @close="dialogs.changePassword.visible = false"
+            ref="changePasswordDialogRef"
+        ></change-password-dialog>
+
+        <add-update-gateway-dialog
+            :visible.sync="dialogs.addUpdateGateway.visible"
+            :form-label-width="formLabelWidth"
+            :is-update="dialogs.addUpdateGateway.isUpdate"
+            :initial-data="dialogs.addUpdateGateway.form"
+            @save="handleSaveGateway"
+            @close="dialogs.addUpdateGateway.visible = false"
+            ref="addUpdateGatewayDialogRef"
+        ></add-update-gateway-dialog>
+
+        <import-router-dialog
+            :visible.sync="dialogs.importRouter.visible"
+            :form-label-width="formLabelWidth"
+            :target-account="dialogs.importRouter.currentAccount"
+            :upload-url-prop="dialogs.importRouter.uploadUrl"
+            @upload-success="handleImportRouterUploadSuccess"
+            @upload-error="handleImportRouterUploadError"
+            @manual-save="handleImportRouterManualSave"
+            @close="dialogs.importRouter.visible = false"
+            ref="importRouterDialogRef"
+        ></import-router-dialog>
+
+        <delete-router-dialog
+            :visible.sync="dialogs.deleteRouter.visible"
+            :target-account="dialogs.deleteRouter.currentAccount"
+            @save="handleDeleteRouterSave"
+            @close="dialogs.deleteRouter.visible = false"
+            ref="deleteRouterDialogRef"
+        ></delete-router-dialog>
     </div>
 </template>
 
 <script>
-    import  md5 from 'js-md5';
+    import md5 from 'js-md5';
     import global_ from 'components/common/Global';
-    const crypto = require('crypto');
+
+    // Import Dialog Components
+    import NewChannelDialog from '@/components/dialogs/NewChannelDialog.vue';
+    import ChangePasswordDialog from '@/components/dialogs/ChangePasswordDialog.vue';
+    import AddUpdateGatewayDialog from '@/components/dialogs/AddUpdateGatewayDialog.vue';
+    import ImportRouterDialog from '@/components/dialogs/ImportRouterDialog.vue';
+    import DeleteRouterDialog from '@/components/dialogs/DeleteRouterDialog.vue';
+
     export default {
+        name: 'BaseTable',
+        components: {
+            NewChannelDialog,
+            ChangePasswordDialog,
+            AddUpdateGatewayDialog,
+            ImportRouterDialog,
+            DeleteRouterDialog,
+        },
         data: function() {
             return {
-                uploadUrl:global_.baseUrl+'/device/import/excel',
-                radio3:'online',
-                isUser:localStorage.getItem('userType'),
-                loading2:false,
-                dialogFormVisible: false,
-                noSuperData:[],
-                form: {
-                    user:'',
-                    password:'',
-                    name: '',
-                    tel:'',
-                    selectProv: '',
-                    selectCity: '',
-                    addr:'',
-                    region: '',
-                    date1: '',
-                    date2: '',
-                    delivery: false,
-                    type: [],
-                    resource: '',
-                    desc: ''
-                },
-                rules: {
-                    user:[
-                        {required: true, message: '请输入账号', trigger: 'blur'},
-                        {validator:this.validateSpace,trigger:'blur'}
-                    ],
-                    password:[
-                        {required: true, message: '请输入密码', trigger: 'blur'},
-                        {validator:this.validateSpace,trigger:'blur'},
-                        {min:3,max:32,message:'长度在3到32个字符',trigger:'blur'},
-                        {validator:this.validatePwd,trigger:'blur'}
-                    ],
-                    name:[
-                        {required: true, message: '请输入渠道名称', trigger: 'blur'},
-                        {validator:this.validateSpace,trigger:'blur'},
-                        {validator:this.validateSpace,trigger:'blur'}
-                    ],
-                    tel:[
-                        {required: true, message: '请输入联系电话', trigger: 'blur'},
-                        {validator:this.validateTel,trigger:'blur'}
-                    ]
-                },
-                formLabelWidth: '120px',
-                provs:global_.provs,
-                citys: [],
-                showRouterDialog:false,
-                showDelRouterDialog:false,
-                showDialogAddUpdateGateway:false,
-                isUpdate:false,
-                radiotoRout:'文件上传',
-                fileList:[],
-                search_word:'',
-                activeName2:'1',
-                textarea_macs:'',
-
-                userData:[],
-                loading:false,
-                pageTotal:0,
-                currentPage:1,
-                emptyMsg:'暂无数据',
-                formP:{
-                    user_account:localStorage.getItem('ms_username'),
-                    user_password:'',
-                    user_new_password:'',
-                    user_validate_password:''
-                },
-                formAddUpdateGateway:{
-                    user_account:localStorage.getItem('ms_username'),
-                    gw_channel: localStorage.getItem('ms_username'),
-                    device_id:'',
-                    gw_id:'',
-                    once_auth:false,
-                    next_auth_time:''
-                },
-                rulesP: {
-                    user_password:[
-                        {required: true, message: '请输入密码', trigger: 'blur'}
-                    ],
-                    user_new_password:[
-                        {required: true, message: '请输入新密码', trigger: 'blur'}
-                    ],
-                    user_validate_password:[
-                        {required: true, message: '请输入确认密码', trigger: 'blur'},
-                        {validator:this.validateRepwd,trigger:'blur'}
-                    ]
-                },
-                showDialogPwd: false,
-                curAccount:'',
-                curAccount2:'',
-                curAccount3:'',
+                // General Page State & User Type
+                isUser: localStorage.getItem('userType') || '0',
+                loading: false,
+                loading2: false,
                 fullscreenLoading: false,
-                formRouter2:{route_mac:''},
-                rulesRouter2: {
-                    route_mac: [
-                        {required: true, message: '请输入MAC', trigger: 'blur'},
-                        {validator: this.validateMac, trigger: 'blur'}
-                    ]
-                },
-                formRouter3:{route_mac:''},
-                rulesRouter3: {
-                    route_mac: [
-                        {required: true, message: '请输入MAC', trigger: 'blur'},
-                        {validator: this.validateMac, trigger: 'blur'}
-                    ]
-                },
-                formMacfile:{
-                    user_name:'',
-                    user_name3:''
-                }
-            }
-        },
 
-        computed: {
-            dialogTitle: function(){
-                return this.isUpdate ? '修改认证网关' : '添加认证网关';
+                // User (Channel) Management
+                userData: [],
+                search_word: '',
+                userStatusFilter: 'all',
+
+                // Device/Gateway Management (for channel admin view)
+                gatewayData: [],
+
+                // Table & Pagination
+                pageTotal: 0,
+                currentPage: 1,
+                emptyMsg: '暂无数据',
+
+                formLabelWidth: '120px',
+
+                dialogs: {
+                    newChannel: {
+                        visible: false,
+                        provs: global_.provs || [],
+                    },
+                    changePassword: {
+                        visible: false,
+                        currentAccount: '',
+                    },
+                    addUpdateGateway: {
+                        visible: false,
+                        isUpdate: false,
+                        form: {
+                            device_id: '',
+                            gw_id: '',
+                            once_auth: false,
+                            next_auth_time: ''
+                        },
+                    },
+                    importRouter: {
+                        visible: false,
+                        currentAccount: '',
+                        uploadUrl: global_.baseUrl + '/device/import/excel',
+                    },
+                    deleteRouter: {
+                        visible: false,
+                        currentAccount: '',
+                    }
+                },
             }
         },
 
         created: function() {
-            let isUser = localStorage.getItem('userType');
-            if (isUser == '1') {
-                this.getDeviceByChannel(localStorage.getItem('ms_username'));
+            if (this.isUser === '1') {
+                this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
             } else {
-                this.getUsers({},'all');
+                this.fetchUsers({ page_size: 10, current_page: this.currentPage }, 'all');
             }
         },
 
         methods: {
-            getUsers: function(params,url){//获取渠道列表
-                var self = this;
-                self.loading = true;
-                self.$axios.post(global_.baseUrl+'/admin/'+url, params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){//未登录状态
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == '1010'){//权限不足
-                        // self.emptyMsg = res.data.extra;
-                        
-                    }
-                    if(res.data.ret_code == 0){
-                        self.pageTotal = res.data.extra.count || self.pageTotal;
-                        if(!params.hasOwnProperty('current_page')){
-                            // self.pageTotal = res.data.extra.length;
-                            // self.userData = res.data.extra.slice(0,10);
-                            self.userData = res.data.extra.allAdmin;
-                        }else{
-                            self.userData = res.data.extra.allAdmin;
-                        }
-                    }
-                })
-            },
-
-            getDeviceByChannel: function(gw_channel) {
-                var self = this;
-                var params = {
-                    gw_channel: gw_channel
-                };
-                self.loading2 = true;
-                self.$axios.post(global_.baseUrl+'/device/queryGateway',params).then(function(res){
-                    self.loading2 = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.noSuperData = res.data.extra;
-                    }
-                })
-            },
-
-            changeTab: function(){
-                var self = this;
-                var params = {};
-                self.currentPage = 1;
-                if(self.radio3 == 'all'){
-                    self.currentPage = 1;
-                    self.getUsers(params,'all');
-                }else{
-                    self.getUsers({user_status:self.radio3},'status');
+            handleApiError: function(message, redirectToLogin = false) {
+                this.$message({ message: message || '操作失败，请稍后再试', type: 'warning' });
+                if (redirectToLogin) {
+                    setTimeout(() => this.$router.replace('login'), 2000);
                 }
             },
-
-            revoke: function(account){//冻结操作
-                var self = this;
-                var params = {
-                    user_account:account
-                };
-                self.loading = true;
-                self.$axios.post(global_.baseUrl+'/admin/revoke',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 1){
-                        self.$message({message:res.data.extra,type:'warning'});
-                    }
-                    if(res.data.ret_code == 0){
-                        self.$message({message:res.data.extra,type:'success'});
-                        if(self.radio3 == 'all'){
-                            self.getUsers({page_size:10,current_page:self.currentPage},'all');
-                        }else{
-                            self.getUsers({user_status:self.radio3,page_size:10,current_page:self.currentPage},'status');
+            fetchUsers: function(params, endpoint) {
+                this.loading = true;
+                this.$axios.post(global_.baseUrl + '/admin/' + endpoint, params).then(res => {
+                    this.loading = false;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                    } else if (res.data.ret_code === '1010') {
+                        this.emptyMsg = res.data.extra;
+                        this.userData = []; this.pageTotal = 0;
+                    } else if (res.data.ret_code === 0) {
+                        const extraData = res.data.extra;
+                        this.pageTotal = extraData.count || this.pageTotal;
+                        this.userData = extraData.allAdmin || [];
+                         if (endpoint === 'query' && res.data.data) {
+                            this.userData = res.data.data;
+                            this.pageTotal = res.data.data.length;
                         }
-                    }
-
-                },function(err){
-                    self.$message.error('操作失败');
-                    self.loading = false;
-                    console.log(err);
-                })
-
-            },
-
-            restore: function(account){//解冻操作
-                var self = this;
-                var params = {
-                    user_account:account
-                };
-                self.loading = true;
-                self.$axios.post(global_.baseUrl+'/admin/restore',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.$message({message:res.data.extra,type:'success'});
-                        var param = {};
-                        if(self.radio3 == 'all'){
-                            self.getUsers({page_size:10,current_page:self.currentPage},'all');
-                        }else{
-                            self.getUsers({user_status:self.radio3,page_size:10,current_page:self.currentPage},'status');
-                        }
-                    }
-
-                },function(err){
-                    self.$message.error('操作失败');
-                    self.loading = false;
-                    console.log(err);
-                })
-
-            },
-
-            getUser: function(){
-                var self = this;
-                self.$axios.post(global_.baseUrl+'/admin/info').then(function(res){
-                    if(res.data.ret_code == 0){
-                        const user = res.data.extra;
-                        localStorage.setItem('userType', res.data.userType);
-                        if(res.data.ret_msg == '1'){//普通管理员
-
-                        }
-                        setTimeout(function(){
-                            // self.$router.push('/setpush')
-                            self.$router.push({path:'/'});
-                        },2000)
-
-                    }
-                })
-            },
-
-            toEnter: function(user){
-                var self = this;
-                self.loading = true;
-                var params = {
-                    user_account:user
-                };
-                self.$axios.post(global_.baseUrl+'/admin/switch',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == '1003'){
-                        self.emptyMsg = res.data.extra;
-                    }
-                    if(res.data.ret_code == 0){
-                        self.$message({message:res.data.extra,type:'success'});
-                        localStorage.setItem('ms_username',user);
-                        localStorage.setItem('userType','1');
-                        window.location.reload();
-                    }else{
-                        self.$message.error(res.data.extra);
-                    }
-                })
-            },
-
-            saveCreate: function(formName){
-                let self = this;
-                self.$refs[formName].validate(function(valid){
-                    if(valid){
-                        console.log('验证成功')
-                    }else{
-                        return false;
-                        console.log('验证失败');
-                    }
-                    let params = {
-                        user_account:self.form.user,
-                        user_password:md5(self.form.password),
-                        user_name:self.form.name,
-                        user_phone:self.form.tel,
-                        user_city:self.form.selectProv+self.form.selectCity+self.form.addr
-                    };
-                    self.$axios.post(global_.baseUrl + '/admin/register',params).then(function(res){
-                        if(res.data.ret_code == '1001'){
-                            self.$message({message:res.data.extra,type:'warning'});
-                            setTimeout(function(){
-                                self.$router.replace('login');
-                            },2000)
-                        }
-                        if(res.data.ret_code == 0){
-                            self.$message('注册成功！');
-                            self.form.user = '';
-                            self.form.password = '';
-                            self.form.name = '';
-                            self.form.tel = '';
-                            self.form.selectProv = '';
-                            self.form.selectCity = '';
-                            self.form.addr = '';
-                            self.radio3 = 'all';
-                            self.dialogFormVisible = false;
-                            self.getUsers({},'all');
-                        }else{
-                            self.$message(res.data.extra);
-                        }
-                    })
-
-                });
-
-            },
-
-            search: function(){
-                var self = this;
-                if(self.search_word == ''){
-                    self.$message({message:'输入不能为空',type:'warning'});
-                    return false;
-                }
-                self.loading = true;
-                var params = {
-                    user:self.search_word
-                };
-                self.$axios.post(global_.baseUrl+'/admin/query',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == '1003'){
-                        self.emptyMsg = res.data.extra;
-                    }
-                    if(res.data.ret_code == 0){
-                        if(JSON.stringify(params) == '{}'){
-                            self.pageTotal = res.data.data.length;
-                            self.userData = res.data.data.slice(0,10);
-                        }else{
-                            self.userData = res.data.data;
-                        }
-                    }
-                })
-
-            },
-
-            resetPwd: function(account){
-                var self = this;
-                self.showDialogPwd = true;
-                self.curAccount = account;
-            },
-
-            resetPassword:function(account){
-                var self = this;
-                var params = {
-                    user_account:account
-                }
-                self.loading  = true;
-                self.$axios.post(global_.baseUrl+'/admin/reset',params).then(function(res){
-                    self.loading  = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.showDialogPwd = false;
-                        self.$message({message:res.data.extra,type:'success'})
-                    }else{
-                        self.$message.error(res.data.extra);
-                    }
-                },function(err){
-                    self.loading  = false;
-                    self.$message.error(err);
-                })
-
-            },
-
-            savePwdChange: function(formName){
-                var self = this;
-                self.$refs[formName].validate(function(valid){
-                    if(valid){
-                        var params = {
-                            user_account: self.curAccount,
-                            user_password:md5(self.formP.user_password),
-                            user_new_password: md5(self.formP.user_new_password)
-                        };
-                        self.fullscreenLoading  = true;
-                        self.$axios.post(global_.baseUrl+'/admin/change',params).then(function(res){
-                            self.fullscreenLoading  = false;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == 0){
-                                self.showDialogPwd = false;
-                                self.$message({message:res.data.extra,type:'success'})
-                            }else{
-                                self.$message.error(res.data.extra);
-                            }
-                        },function(err){
-                            self.fullscreenLoading  = false;
-                            self.$message.error(err);
-                        })
-                    }else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                })
-
-
-            },
-
-            toRouter: function(account){
-                var self = this;
-                self.showRouterDialog = true;
-                self.curAccount2 = account;
-                self.formMacfile.user_name = account;
-            },
-
-            delRouter: function(account){
-                var self = this;
-                self.showDelRouterDialog = true;
-                self.curAccount3 = account;
-                self.formMacfile.user_name3 = account;
-            },
-
-            outRouter: function(account){
-                var self = this;
-                var params = {
-                    user_account: account
-                };
-                self.loading  = true;
-                self.$axios.post(global_.baseUrl+'/device/export',params).then(function(res){
-                    self.loading  = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        const aLink = document.createElement('a');
-                        const evt = document.createEvent('MouseEvents');
-                        // var evt = document.createEvent("HTMLEvents")
-                        evt.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                        var str = res.data.extra;
-                        var index = str.lastIndexOf("\/");
-                        str  = str .substring(index + 1, str .length);
-                        aLink.download = str;
-                        aLink.href = global_.baseUrl+res.data.extra;
-                        aLink.dispatchEvent(evt);
-                        self.$message({message:'导出成功',type:'success'})
-                    }else{
-                        self.$message.error(res.data.extra);
-                    }
-                },function(err){
-                    self.loading  = false;
-                    self.$message.error(err);
-                })
-            },
-
-            outClient: function(account) {
-                var self = this;
-                var params = {
-                    user_account: account
-                };
-                self.loading  = true;
-                self.$axios.post(global_.baseUrl+'/client/export',params).then(function(res){
-                    self.loading  = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        const aLink = document.createElement('a');
-                        const evt = document.createEvent('MouseEvents');
-                        // var evt = document.createEvent("HTMLEvents")
-                        evt.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-                        var str = res.data.extra;
-                        var index = str.lastIndexOf("\/");
-                        str  = str .substring(index + 1, str .length);
-                        aLink.download = str;
-                        aLink.href = global_.baseUrl+res.data.extra;
-                        aLink.dispatchEvent(evt);
-                        self.$message({message:'导出成功',type:'success'})
-                    }else{
-                        self.$message.error(res.data.extra);
-                    }
-                },function(err){
-                    self.loading  = false;
-                    self.$message.error(err);
-                })
-            },
-
-            saveToRouterChange: function(formName){
-                var self = this;
-                self.$refs[formName].validate(function(valid){
-                    if(valid){
-                        var params = {
-                            user_name:  self.curAccount2,
-                            device_id:  self.formRouter2.device_id,
-                            route_mac:  self.formRouter2.route_mac,
-                            route_mac_once_auth:  self.formRouter2.route_mac_once_auth,
-                            next_auth_time:  self.formRouter2.next_auth_time
-                        };
-                        self.loading2  = true;
-                        self.$axios.post(global_.baseUrl+'/device/import',params).then(function(res){
-                            self.loading2  = false;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == '1017'){
-                                self.showRouterDialog = false;
-                                var arr = res.data.extra;
-                                var str = '';
-                                if(arr.length > 3){
-                                    var newarr = arr.slice(0,3);
-                                    str = newarr.join(' / ')+'...';
-                                }else{
-                                    str = arr.join(' / ');
-                                }
-                                self.$message({message:'"'+ str +' "已存在',type:'warning'})
-                            }
-                            if(res.data.ret_code == 0){
-                                self.showRouterDialog = false;
-                                self.$message({message:'导入成功',type:'success'});
-                                if(self.radio3 == 'all'){
-                                    self.getUsers({page_size:10,current_page:self.currentPage},'all');
-                                }else{
-                                    self.getUsers({user_status:self.radio3,page_size:10,current_page:self.currentPage},'status');
-                                }
-                            }else{
-                                self.$message.error(res.data.extra);
-                            }
-                        },function(err){
-                            self.loading2  = false;
-                            self.$message.error(err);
-                        })
-                    }else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                })
-            },
-
-            saveDelRouterChange: function(formName){
-                var self = this;
-                self.$refs[formName].validate(function(valid){
-                    if(valid){
-                        var params = {
-                            user_name: self.curAccount3,
-                            route_mac:self.formRouter3.route_mac
-                        };
-                        return false;
-                        self.loading2  = true;
-                        self.$axios.post(global_.baseUrl+'/device/import',params).then(function(res){
-                            self.loading2  = false;
-                            if(res.data.ret_code == '1001'){
-                                self.$message({message:res.data.extra,type:'warning'});
-                                setTimeout(function(){
-                                    self.$router.replace('login');
-                                },2000)
-                            }
-                            if(res.data.ret_code == '1017'){
-                                self.showRouterDialog = false;
-                                var arr = res.data.extra;
-                                var str = '';
-                                if(arr.length > 3){
-                                    var newarr = arr.slice(0,3);
-                                    str = newarr.join(' / ')+'...';
-                                }else{
-                                    str = arr.join(' / ');
-                                }
-                                self.$message({message:'"'+ str +' "已存在',type:'warning'})
-                            }
-                            if(res.data.ret_code == 0){
-                                self.showRouterDialog = false;
-                                self.$message({message:'导入成功',type:'success'});
-                                if(self.radio3 == 'all'){
-                                    self.getUsers({page_size:10,current_page:self.currentPage},'all');
-                                }else{
-                                    self.getUsers({user_status:self.radio3,page_size:10,current_page:self.currentPage},'status');
-                                }
-                            }else{
-                                self.$message.error(res.data.extra);
-                            }
-                        },function(err){
-                            self.loading2  = false;
-                            self.$message.error(err);
-                        })
-                    }else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                })
-            },
-
-            validateRepwd: function(rule,value,callback){
-                if(value !== this.formP.user_new_password){
-                    callback(new Error('两次输入密码不一致'));
-                }else{
-                    callback();
-                }
-            },
-
-            validateUser: function(rule,value,callback){
-                if(value === ''){
-                    callback(new Error('请输入账号'))
-                }else{
-                    callback();
-                }
-            },
-
-            validatePwd: function(rule,value,callback){
-                if(value === ''){
-                    callback(new Error('请输入密码'))
-                }else{
-                    callback();
-                }
-            },
-
-            validateTel:function(rule,value,callback){
-                var regTel3 = /(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/.test(value);
-                if(!regTel3){
-                    callback(new Error('电话号码输入有误！'))
-                }else{
-                    callback();
-                }
-            },
-
-            validateMac: function (rule, value, callback) {
-                var self = this;
-                var reg_name = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
-                var reg_name2 = /^[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}[A-Fa-f\d]{2}$/;
-                var macarr = self.splitStr(value);
-                for (var i = 0, len = macarr.length; i < len; i++) {
-                    if (!reg_name.test(macarr[i]) && !reg_name2.test(macarr[i])) {
-                        callback(new Error('输入有误，以逗号或回车分隔'));
                     } else {
-                        callback();
+                         this.handleApiError(res.data.extra);
+                         this.userData = []; this.pageTotal = 0;
                     }
-                }
-            },
-
-            validateSpace: function (rule, value, callback) {
-                var self = this;
-                if(value.indexOf(' ')>=0){
-                    callback(new Error('输入有空格'));
-                }else{
-                    callback();
-                }
-            },
-
-            //按逗号和回车分隔字符串
-            splitStr: function (str) {
-                var temp = str.split(/[\n,]/g);
-                for (var i = 0; i < temp.length; i++) {
-                    if (temp[i] == "") {
-                        temp.splice(i, 1);
-                        //删除数组索引位置应保持不变
-                        i--;
-                    }
-                }
-                return temp;
-            },
-
-            handleClick:function(tab,event){
-
-            },
-
-            getProv: function(prov){
-                let tempCity=[];
-                this.citys=[];
-                this.selectCity='';
-                let allCity=global_.allCity;
-                for (var val of allCity){
-                    if (prov == val.prov){
-                        console.log(val);
-                        tempCity.push({label: val.label, value: val.label})
-                    }
-                }
-                this.citys = tempCity;
-            },
-
-            getCity: function (city) {
-                console.log(city);
-                console.log(this.selectCity)
-            },
-
-            handleCurrentChange:function(val){
-                this.currentPage = val;
-                var url = this.radio3=='all'?'all':'status';
-                var params = {};
-                if(this.radio3 == 'all'){
-                    params = {page_size:10,current_page:this.currentPage};
-                }else{
-                    params = {page_size:10,current_page:this.currentPage,user_status:this.radio3};
-                }
-                this.getUsers(params,url);
-            },
-
-            filterTag:function(value, row) {
-                return row.user_status == value;
-            },
-
-            fileAdd: function(formName){
-                var self = this;
-                self.$refs.upload.submit();
-            },
-
-            beforeUpload: function(file){
-                var testmsg=file.name.substring(file.name.lastIndexOf('.')+1);
-                const extension = testmsg === 'xls';
-                const extension2 = testmsg === 'xlsx';
-                const extension3 = testmsg === 'doc';
-                const extension4 = testmsg === 'docx';
-                const isLt2M = file.size / 1024 / 1024 < 10;
-                if (!extension && !extension2 && !extension3 && !extension4) {
-                    this.$message({message:'上传模板只能是 xls格式!',type:'warning'});
-                    return false;
-                }
-                if (!isLt2M) {
-                    this.$message({message:'上传模板大小不能超过 10MB!',type:'warning'});
-                    return false;
-                }
-            },
-
-            addUpdateGatewayConfirm: function(formName){
-                let self = this;
-                self.$refs[formName].validate(function(valid){
-                    if(valid){
-                        console.log('验证成功')
-                    }else{
-                        return false;
-                        console.log('验证失败');
-                    }
-                    const params = {
-                        gw_channel:self.formAddUpdateGateway.gw_channel,
-                        device_id:self.formAddUpdateGateway.device_id,
-                        gw_id:self.formAddUpdateGateway.gw_id,
-                        once_auth:self.formAddUpdateGateway.once_auth,
-                        next_auth_time:self.formAddUpdateGateway.next_auth_time
-                    };
-                    
-                    self.$axios.post(global_.baseUrl+'/device/updateGateway', params).then(function(res){
-                        if(res.data.ret_code == '1001'){
-                            self.$message({message:res.data.extra,type:'warning'});
-                            setTimeout(function(){
-                                self.$router.replace('login');
-                            },2000)
-                        }
-                        if(res.data.ret_code == 0){
-                            self.$message({message:'创建成功',type:'success'});
-                            self.getDeviceByChannel(self.formAddUpdateGateway.gw_channel);
-                        }else{
-                            self.$message.error(res.data.extra);
-                        }
-                        self.showDialogAddUpdateGateway = false;
-                    })
-
+                }).catch(err => {
+                    this.loading = false; this.handleApiError('请求用户列表失败: ' + err.message);
+                    this.userData = []; this.pageTotal = 0;
                 });
             },
-
-            addGateway: function(){
-                let self = this;
-                self.showDialogAddUpdateGateway = true;
-                self.isUpdate = false;
-                self.formAddUpdateGateway.device_id = '';
-                self.formAddUpdateGateway.gw_id = '';
-                self.formAddUpdateGateway.once_auth = false;
-            },
-
-            updateGateway: function(device_id, gw_id, once_auth, next_auth_time){
-                let self = this;
-                self.showDialogAddUpdateGateway = true;
-                self.isUpdate = true;
-                self.formAddUpdateGateway.device_id = device_id;
-                self.formAddUpdateGateway.gw_id = gw_id;
-                self.formAddUpdateGateway.once_auth = once_auth;
-                self.formAddUpdateGateway.next_auth_time = next_auth_time;
-            },
-
-            delGateway: function(device_id, gw_id){
-                let self = this;
-                self.$confirm('此操作将删除该网关, 是否继续?', '提示', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                }).then(() => {
-                    const params = {
-                        device_id: device_id,
-                        gw_id: gw_id
-                    };
-                    self.$axios.post(global_.baseUrl+'/device/deleteGateway', params).then(function(res){
-                        if(res.data.ret_code == '1001'){
-                            self.$message({message:res.data.extra,type:'warning'});
-                            setTimeout(function(){
-                                self.$router.replace('login');
-                            },2000)
-                        }
-                        if(res.data.ret_code == 0){
-                            self.$message({message:'删除成功',type:'success'});
-                            self.getDeviceByChannel(localStorage.getItem('ms_username'));
-                        }else{
-                            self.$message.error(res.data.extra);
-                        }
-                    })
-                }).catch(() => {
-                    self.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
+            fetchGatewayDataForChannel: function(gw_channel) {
+                this.loading2 = true;
+                const params = { gw_channel: gw_channel };
+                this.$axios.post(global_.baseUrl + '/device/queryGateway', params).then(res => {
+                    this.loading2 = false;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                    } else if (res.data.ret_code === 0) {
+                        this.gatewayData = res.data.extra;
+                    } else {
+                        this.handleApiError(res.data.extra); this.gatewayData = [];
+                    }
+                }).catch(err => {
+                    this.loading2 = false; this.handleApiError('请求网关数据失败: ' + err.message);
+                    this.gatewayData = [];
                 });
             },
-
-            handleSuccess: function(response,file,fileList){
-                if(response.ret_code == '1017'){
-                    this.showRouterDialog = false;
-                    var arr = response.extra;
-                    var str = '';
-                    if(arr.length > 3){
-                        var newarr = arr.slice(0,3);
-                        str = newarr.join(' / ')+'...';
-                    }else{
-                        str = arr.join(' / ');
-                    }
-                    this.$message({message:'"'+ str +' "已存在',type:'warning'})
+            handleUserStatusFilterChange: function() {
+                this.currentPage = 1;
+                const params = { page_size: 10, current_page: this.currentPage };
+                if (this.userStatusFilter !== 'all') {
+                    params.user_status = this.userStatusFilter;
                 }
-                if(response.ret_code == 0){
-                    this.$message({message:'创建成功',type:'success'});
-                    if(self.radio3 == 'all'){
-                        self.getUsers({page_size:10,current_page:self.currentPage},'all');
-                    }else{
-                        self.getUsers({user_status:self.radio3,page_size:10,current_page:self.currentPage},'status');
-                    }
-                }else{
-                    this.$message.error(response.extra);
+                this.fetchUsers(params, this.userStatusFilter === 'all' ? 'all' : 'status');
+            },
+            searchUsers: function() {
+                if (!this.search_word.trim()) {
+                    this.$message({ message: '输入不能为空', type: 'warning' }); return;
                 }
-                this.showRouterDialog = false;
+                this.currentPage = 1;
+                this.fetchUsers({ user: this.search_word, page_size:10, current_page: this.currentPage }, 'query');
             },
-
-            handleError: function(response,file,fileList){
-                this.$message.error('操作失败');
+            openNewChannelDialog: function() {
+                this.dialogs.newChannel.visible = true;
             },
-
-            handleChange:function(file) {
-                
+            handleSaveNewChannel: function(formData) {
+                const params = {
+                    user_account: formData.user,
+                    user_password: md5(formData.password),
+                    user_name: formData.name,
+                    user_phone: formData.tel,
+                    user_city: formData.selectProv + formData.selectCity + formData.addr
+                };
+                this.$axios.post(global_.baseUrl + '/admin/register', params).then(res => {
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                        if(this.$refs.newChannelDialogRef) this.$refs.newChannelDialogRef.onSaveError();
+                    } else if (res.data.ret_code === 0) {
+                        this.$message({ message: '注册成功！', type: 'success' });
+                        if(this.$refs.newChannelDialogRef) this.$refs.newChannelDialogRef.onSaveSuccess();
+                        this.userStatusFilter = 'all';
+                        this.fetchUsers({ page_size: 10, current_page: 1 }, 'all');
+                    } else {
+                        this.handleApiError(res.data.extra || '创建渠道失败');
+                        if(this.$refs.newChannelDialogRef) this.$refs.newChannelDialogRef.onSaveError();
+                    }
+                }).catch(err => {
+                     this.handleApiError('创建渠道请求失败: ' + err.message);
+                     if(this.$refs.newChannelDialogRef) this.$refs.newChannelDialogRef.onSaveError();
+                });
+            },
+            freezeUserAccount: function(account) {
+                this.performUserStatusUpdate(account, '/admin/revoke', '冻结');
+            },
+            unfreezeUserAccount: function(account) {
+                this.performUserStatusUpdate(account, '/admin/restore', '解冻');
+            },
+            performUserStatusUpdate: function(account, urlPath, actionName) {
+                this.loading = true;
+                this.$axios.post(global_.baseUrl + urlPath, { user_account: account }).then(res => {
+                    this.loading = false;
+                    if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+                    else if (res.data.ret_code === 0) {
+                        this.$message({ message: res.data.extra || `${actionName}成功`, type: 'success' });
+                        this.handleUserStatusFilterChange();
+                    } else this.handleApiError(res.data.extra || `${actionName}失败`);
+                }).catch(err => { this.loading = false; this.handleApiError(`${actionName}操作失败: ` + err.message); });
+            },
+            switchToChannelView: function(userAccount) {
+                this.loading = true;
+                this.$axios.post(global_.baseUrl + '/admin/switch', { user_account: userAccount }).then(res => {
+                    this.loading = false;
+                    if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+                    else if (res.data.ret_code === 0) {
+                        this.$message({ message: res.data.extra || '切换成功', type: 'success' });
+                        localStorage.setItem('ms_username', userAccount);
+                        localStorage.setItem('userType', '1');
+                        window.location.reload();
+                    } else this.handleApiError(res.data.extra || '切换失败');
+                }).catch(err => { this.loading = false; this.handleApiError('切换渠道请求失败: ' + err.message);});
+            },
+            openChangePasswordDialogForUser: function(account) {
+                this.dialogs.changePassword.currentAccount = account;
+                this.dialogs.changePassword.visible = true;
+            },
+            adminResetPassword: function(account) {
+                this.loading = true;
+                this.$axios.post(global_.baseUrl + '/admin/reset', { user_account: account }).then(res => {
+                    this.loading = false;
+                    if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+                    else if (res.data.ret_code === 0) this.$message({ message: res.data.extra || '密码重置成功', type: 'success' });
+                    else this.handleApiError(res.data.extra || '密码重置失败');
+                }).catch(err => { this.loading = false; this.handleApiError('密码重置请求失败: ' + err.message);});
+            },
+            handleSavePasswordChange: function(formData) {
+                this.fullscreenLoading = true;
+                this.$axios.post(global_.baseUrl + '/admin/change', formData).then(res => {
+                    this.fullscreenLoading = false;
+                    const dialogRef = this.$refs.changePasswordDialogRef;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                        if(dialogRef) dialogRef.onSaveError();
+                    } else if (res.data.ret_code === 0) {
+                        this.$message({ message: res.data.extra || '密码修改成功', type: 'success' });
+                        if(dialogRef) dialogRef.onSaveSuccess();
+                    } else {
+                        this.handleApiError(res.data.extra || '密码修改失败');
+                        if(dialogRef) dialogRef.onSaveError();
+                    }
+                }).catch(err => {
+                    this.fullscreenLoading = false; this.handleApiError('密码修改请求失败: ' + err.message);
+                    if(this.$refs.changePasswordDialogRef) this.$refs.changePasswordDialogRef.onSaveError();
+                });
+            },
+            openAddGatewayDialog: function() {
+                const dlg = this.dialogs.addUpdateGateway;
+                dlg.isUpdate = false;
+                dlg.form = {
+                    user_account: localStorage.getItem('ms_username'),
+                    gw_channel: localStorage.getItem('ms_username'),
+                    device_id: '', gw_id: '', once_auth: false, next_auth_time: ''
+                };
+                dlg.visible = true;
+            },
+            openUpdateGatewayDialog: function(gatewayRowData) {
+                const dlg = this.dialogs.addUpdateGateway;
+                dlg.isUpdate = true;
+                dlg.form = {
+                    ...gatewayRowData,
+                    user_account: localStorage.getItem('ms_username'),
+                    gw_channel: localStorage.getItem('ms_username'),
+                };
+                dlg.visible = true;
+            },
+            handleSaveGateway: function(formData, isUpdateFlag) {
+                const params = { ...formData };
+                this.$axios.post(global_.baseUrl + '/device/updateGateway', params).then(res => {
+                    const dialogRef = this.$refs.addUpdateGatewayDialogRef;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                        if (dialogRef) dialogRef.onSaveError();
+                    } else if (res.data.ret_code === 0) {
+                        this.$message({ message: (isUpdateFlag ? '修改' : '添加') + '成功', type: 'success' });
+                        this.fetchGatewayDataForChannel(params.gw_channel || localStorage.getItem('ms_username'));
+                        if (dialogRef) dialogRef.onSaveSuccess();
+                    } else {
+                        this.handleApiError(res.data.extra || '操作失败');
+                        if (dialogRef) dialogRef.onSaveError();
+                    }
+                }).catch(err => {
+                    this.handleApiError('网关操作请求失败: ' + err.message);
+                    if (this.$refs.addUpdateGatewayDialogRef) this.$refs.addUpdateGatewayDialogRef.onSaveError();
+                });
+            },
+            updateGatewayAuthStatus: function(gatewayRow) {
+                const params = {
+                    device_id: gatewayRow.deviceID, gw_id: gatewayRow.gwID,
+                    once_auth: gatewayRow.onceAuth, next_auth_time: gatewayRow.nextAuthTime,
+                    user_account: localStorage.getItem('ms_username'),
+                    gw_channel: localStorage.getItem('ms_username'),
+                };
+                this.loading2 = true;
+                this.$axios.post(global_.baseUrl + '/device/updateGateway', params).then(res => {
+                    this.loading2 = false;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                    } else if (res.data.ret_code === 0) {
+                        this.$message({ message: '认证状态更新成功', type: 'success' });
+                    } else {
+                        this.handleApiError(res.data.extra || '更新失败');
+                    }
+                    this.fetchGatewayDataForChannel(localStorage.getItem('ms_username')); // Refresh state
+                }).catch(err => {
+                    this.loading2 = false; this.handleApiError('认证状态更新请求失败: ' + err.message);
+                    this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
+                });
+            },
+            deleteGateway: function(device_id, gw_id) {
+                this.$confirm('此操作将删除该网关, 是否继续?', '提示', { type: 'warning' })
+                .then(() => {
+                    const params = { device_id: device_id, gw_id: gw_id, user_account: localStorage.getItem('ms_username'), gw_channel: localStorage.getItem('ms_username') };
+                    this.$axios.post(global_.baseUrl + '/device/deleteGateway', params).then(res => {
+                        if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+                        else if (res.data.ret_code === 0) {
+                            this.$message({ message: '删除成功', type: 'success' });
+                            this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
+                        } else this.handleApiError(res.data.extra || '删除失败');
+                    }).catch(err => this.handleApiError('删除网关请求失败: ' + err.message));
+                }).catch(() => this.$message({ type: 'info', message: '已取消删除' }));
+            },
+            openImportRouterDialogForUser: function(account) {
+                this.dialogs.importRouter.currentAccount = account;
+                this.dialogs.importRouter.visible = true;
+            },
+            handleImportRouterUploadSuccess: function(response) {
+                const dialogRef = this.$refs.importRouterDialogRef;
+                if (response.ret_code === '1017') {
+                    let arr = response.extra;
+                    let str = arr.length > 3 ? arr.slice(0, 3).join(' / ') + '...' : arr.join(' / ');
+                    this.$message({ message: `"${str}" 已存在`, type: 'warning' });
+                     if (dialogRef) dialogRef.onUploadFinished(false);
+                } else if (response.ret_code === 0) {
+                    this.$message({ message: '文件导入成功', type: 'success' });
+                    this.handleUserStatusFilterChange();
+                    if (dialogRef) dialogRef.onUploadFinished(true);
+                } else {
+                    this.handleApiError(response.extra || '文件导入失败');
+                    if (dialogRef) dialogRef.onUploadFinished(false);
+                }
+            },
+            handleImportRouterUploadError: function(err) {
+                this.handleApiError('文件上传失败: ' + (err.message || '未知错误'));
+                if (this.$refs.importRouterDialogRef) this.$refs.importRouterDialogRef.onUploadFinished(false);
+            },
+            handleImportRouterManualSave: function(formData) {
+                this.loading2 = true;
+                const dialogRef = this.$refs.importRouterDialogRef;
+                this.$axios.post(global_.baseUrl + '/device/import', formData).then(res => {
+                    this.loading2 = false;
+                    if (res.data.ret_code === '1001') {
+                        this.handleApiError(res.data.extra, true);
+                        if (dialogRef) dialogRef.onSaveManualError();
+                    } else if (res.data.ret_code === '1017') {
+                        let arr = res.data.extra;
+                        let str = arr.length > 3 ? arr.slice(0, 3).join(' / ') + '...' : arr.join(' / ');
+                        this.$message({ message: `"${str}" 已存在`, type: 'warning' });
+                         if (dialogRef) dialogRef.onSaveManualError();
+                    } else if (res.data.ret_code === 0) {
+                        this.$message({ message: '导入成功', type: 'success' });
+                        this.handleUserStatusFilterChange();
+                        if (dialogRef) dialogRef.onSaveManualSuccess();
+                    } else {
+                        this.handleApiError(res.data.extra || '手动导入路由失败');
+                        if (dialogRef) dialogRef.onSaveManualError();
+                    }
+                }).catch(err => {
+                    this.loading2 = false; this.handleApiError('手动导入路由请求失败: ' + err.message);
+                    if (dialogRef) dialogRef.onSaveManualError();
+                });
+            },
+            openDeleteRouterDialogForUser: function(account) {
+                this.dialogs.deleteRouter.currentAccount = account;
+                this.dialogs.deleteRouter.visible = true;
+            },
+            handleDeleteRouterSave: function(formData) {
+                this.$message.warning('删除路由功能API端点未确定，请联系后端开发。');
+                console.warn("Attempted to delete router with data:", formData, "but API endpoint is not specified or incorrect.");
+                if (this.$refs.deleteRouterDialogRef) {
+                    this.$refs.deleteRouterDialogRef.onSaveError();
+                }
+            },
+            exportRouters: function(account) { this.performExport(account, '/device/export', '路由器'); },
+            exportClients: function(account) { this.performExport(account, '/client/export', '客户端'); },
+            performExport: function(account, urlPath, exportType) {
+                this.loading = true;
+                this.$axios.post(global_.baseUrl + urlPath, { user_account: account }).then(res => {
+                    this.loading = false;
+                    if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+                    else if (res.data.ret_code === 0) {
+                        const filePath = res.data.extra;
+                        const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
+                        const link = document.createElement('a');
+                        link.href = global_.baseUrl + filePath; link.download = fileName;
+                        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                        this.$message({ message: `${exportType}导出成功`, type: 'success' });
+                    } else this.handleApiError(res.data.extra || `${exportType}导出失败`);
+                }).catch(err => { this.loading = false; this.handleApiError(`${exportType}导出请求失败: ` + err.message);});
+            },
+            handleTablePageChange: function(newPage) {
+                this.currentPage = newPage;
+                const params = { page_size: 10, current_page: this.currentPage };
+                if (this.search_word) {
+                     params.user = this.search_word;
+                     this.fetchUsers(params, 'query');
+                } else if (this.userStatusFilter === 'all') {
+                    this.fetchUsers(params, 'all');
+                } else {
+                    params.user_status = this.userStatusFilter;
+                    this.fetchUsers(params, 'status');
+                }
+            },
+            filterUserStatusTag: function(value, row) {
+                return row.userStatus == value;
             },
         }
     }
 </script>
 
 <style scoped>
+
     .handle-box{  margin-bottom: 20px;  }
     .handle-select{  width: 120px;  }
     .handle-input{  width: 300px;  display: inline-block;  }
     .rad-group{margin-bottom:20px;}
     .btn1{margin-bottom:5px;margin-top:5px;/*margin-left:0;*/}
-    /*.digcont{width:600px;}*/
+    /*.digcont{width:600px;}*/ /* This was commented out, good to keep as is or remove */
     .diainp{width:217px;}
     .diainp2{width:400px;}
     .upload-demo{}
     .mb30{margin-bottom:30px;}
     .mt30{margin-top:30px;}
+    .no-device{ /* Added this from inspection of original template if needed */
+        padding: 20px;
+        text-align: center;
+        color: #888;
+    }
+    .form-item-center .el-form-item__content { /* For AddUpdateGatewayDialog specific style if needed, though this is broad */
+        /* text-align: center; */ /* Example, if it was meant to center the input itself */
+    }
+
 </style>
