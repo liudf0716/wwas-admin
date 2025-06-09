@@ -16,13 +16,13 @@ export function timeStamp(second_time) {
         }
     }
     return time;
-};
+}
 
 //毫秒数转为时间戳
 export function dateForm(time) {
     const date = new Date(time*1000);
     return date.toLocaleString();
-};
+}
 
 // Check if the device is offline based on the given time
 export function isOffline(time) {
@@ -119,7 +119,7 @@ export function validateMac(rule, value, callback) {
 export function splitStr(str) {
     const temp = str.split(/[\n,]/g);
     for (let i = 0; i < temp.length; i++) {
-        if (temp[i] === "") {
+        if (temp[i] === '') {
             temp.splice(i, 1);
             //删除数组索引位置应保持不变
             i--;
@@ -165,7 +165,7 @@ export function search(baseUrl, uri, self){
             self.$message({message:res.data.extra,type:'warning'});
             setTimeout(function(){
                 self.$router.replace('login');
-            },2000)
+            },2000);
         }
         if(res.data.ret_code == 0){
             self.listData = res.data.extra.result;
@@ -175,5 +175,5 @@ export function search(baseUrl, uri, self){
             self.listData = [];
             self.pageTotal = 0;
         }
-    })
+    });
 }
