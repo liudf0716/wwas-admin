@@ -7,14 +7,14 @@
             </el-breadcrumb>
         </div>
         <div class='rad-group'>
-            <el-radio-group v-model="radio3" @change="changeTab">
+            <el-radio-group v-model="activeFilterTab" @change="changeTab">
                 <el-radio-button label="online">在线</el-radio-button>
                 <el-radio-button label="offline">离线</el-radio-button>
                 <el-radio-button label="all">全部</el-radio-button>
             </el-radio-group>
             <el-form :inline="true" class="handle-box2">
                 <el-form-item label="">
-                    <el-input v-model="search_word" placeholder="请输入设备ID"></el-input>
+                    <el-input v-model="searchQuery" placeholder="请输入设备ID"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="search">搜索</el-button>
@@ -92,22 +92,35 @@
     import { timeStamp, dateForm, bytesLabel, cpuLabel } from 'components/common/Helpers.js';
     import { baseUrl } from 'components/common/Global';
 
+    const deviceDetailMap = [
+        { key: 'deviceID', label: '设备ID' },
+        { key: 'name', label: '设备名称' },
+        { key: 'remoteAddress', label: '设备地址' },
+        { key: 'awVersion', label: 'AW版本' },
+        { key: 'onlineClients', label: '在线客户数' },
+        { key: 'nfConntrackCount', label: '网络会话数' },
+        { key: 'wiredPassed', label: '有线免认证', formatter: val => (val == '1' ? '已开启' : '未开启') },
+        { key: 'wifidogUptime', label: 'wifidog运行时长', formatter: timeStamp },
+        { key: 'lastTime', label: '最近上线时间', formatter: dateForm },
+        { key: 'cpuUsage', label: 'CPU使用率', formatter: cpuLabel },
+        { key: 'sysUptime', label: '系统运行时长', formatter: timeStamp },
+        { key: 'sysMemfree', label: '系统剩余内存', formatter: bytesLabel },
+        { key: 'sysLoad', label: '系统负载' }
+    ];
+
     export default {
         data: function(){
-            const self = this;
             return {
-                radio3:'online',
-                search_word:'',
+                activeFilterTab:'online',
+                searchQuery:'',
                 loading:false,
                 pageTotal:0,
                 listData:[],
                 currentPage:1,
-                curUser:'',
-                formLabelWidth:'120px',
-                fullscreenLoading: false,
+                currentUserType:'',
                 showDeviceDetailDialog: false,
-                selectedDevice: {},
-                selectedGwSettings: {},
+                selectedDevice: [],
+                selectedGwSettings: [],
             }
         },
 
@@ -121,74 +134,50 @@
             bytesLabel: bytesLabel,
             cpuLabel: cpuLabel,
 
-            getUser: function(){
-                var self = this;
-                self.$axios.post(baseUrl+'/admin/info').then(function(res){
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra, type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
+            async getUser() {
+                try {
+                    const res = await this.$axios.post(baseUrl + '/admin/info');
+                    if (res.data.ret_code === '1001') {
+                        this._handleApiError(res.data.extra, true);
+                    } else if (res.data.ret_code === 0) {
                         const user = res.data.extra;
-                        self.curUser = user.userType;
-                        if(self.curUser == '1' || self.curUser === '0'){
-                            self.getData('/online')
+                        this.currentUserType = user.userType;
+                        if (this.currentUserType === '1' || this.currentUserType === '0') {
+                            this.getData('/online');
                         } else {
-                            self.$message({message:'用户类型错误', type:'warning'});
-                        }
-                    }
-                })
-            },
-
-            getData: function(url){
-                const self = this;
-                self.loading = true;
-                let params = { };
-                if (self.curUser == '1') {
-                    params['gw_channel'] = localStorage.getItem('ms_username');
-                };
-                self.$axios.post(baseUrl+'/device/list'+url, params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra, type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-
-                    if(res.data.ret_code == 0){
-                        self.pageTotal = res.data.extra.result.length || self.pageTotal;
-                        if(!params.hasOwnProperty('current_page')){
-                            self.listData = res.data.extra.result;
-                        }else{
-                            self.listData = res.data.extra.result;
+                            // Specific error message for this case, not using _handleApiError
+                            this.$message({ message: '用户类型错误', type: 'warning' });
                         }
                     } else {
-                        self.$message({message:res.data.extra, type:'warning'});
+                        // Handle other non-successful ret_codes from admin/info
+                        this._handleApiError(res.data.extra || 'Failed to get user info', false);
                     }
-                })
+                } catch (error) {
+                    this._handleApiError('Network error or request failed while fetching user info: ' + error.message, false);
+                }
             },
 
-            showDetail: function(row){
-                this.selectedGwSettings = [];
+            getData: function(url) { // Accepts a URL string
+                this._fetchDeviceData(url, {});
+            },
+
+            showDetail: function(row) {
                 this.selectedDevice = [];
-                this.selectedDevice = [
-                    {key:'设备ID',value:row.deviceID},
-                    {key:'设备名称',value:row.name},
-                    {key:'设备地址', value:row.remoteAddress},
-                    {key:'AW版本',value:row.awVersion},
-                    {key:'在线客户数',value:row.onlineClients},
-                    {key:'网络会话数',value:row.nfConntrackCount},
-                    {key:'有线免认证',value:row.wiredPassed == '1'?'已开启':'未开启'},
-                    {key:'wifidog运行时长',value:this.timeStamp(row.wifidogUptime)},
-                    {key:'最近上线时间',value:this.dateForm(row.lastTime)},
-                    {key:'CPU使用率',value:cpuLabel(row.cpuUsage)},
-                    {key:'系统运行时长',value:timeStamp(row.sysUptime)},
-                    {key:'系统剩余内存',value:bytesLabel(row.sysMemfree)},
-                    {key:'系统负载',value:row.sysLoad}
-                ];
+                this.selectedGwSettings = []; // Clear previous settings
+
+                deviceDetailMap.forEach(item => {
+                    if (row.hasOwnProperty(item.key)) {
+                        let value = row[item.key];
+                        if (item.formatter) {
+                            // Ensure formatter is called with the correct context if it's a component method
+                            // For helpers like timeStamp, direct call is fine.
+                            // If a formatter is this.someMethod, it needs this.
+                            // Here, timeStamp, dateForm etc. are imported helpers, not component methods.
+                            value = item.formatter(value);
+                        }
+                        this.selectedDevice.push({ key: item.label, value: value });
+                    }
+                });
 
                 for (let i in row.gwSettings) {
                     this.selectedGwSettings.push({
@@ -198,63 +187,76 @@
                     });
                 }
 
-                console.log(this.selectedDevice, this.selectedGwSettings);
                 this.showDeviceDetailDialog = true;
             },
 
             changeTab: function(){
-                const url = '/'+this.radio3;
+                const url = '/'+this.activeFilterTab;
                 this.currentPage = 1;
                 this.getData(url);
             },
 
-            handleCurrentChange:function(val){
+            handleCurrentChange: function(val) {
                 this.currentPage = val;
-                var url = '';
-                if(this.radio3 == 'all'){
-                    url = '';
-                }else{
-                    url = '/'+this.radio3;
+                let urlPath = '';
+                if (this.activeFilterTab === 'all') {
+                    urlPath = ''; // Will result in /device/list
+                } else {
+                    urlPath = '/' + this.activeFilterTab; // Will result in /device/list/online or /device/list/offline
                 }
-                this.getData({page_size:10,current_page:this.currentPage},url);
+                const params = { page_size: 10, current_page: this.currentPage };
+                this._fetchDeviceData(urlPath, params);
             },
 
-            search: function(){
-                const self = this;
-                if(self.search_word == ''){
-                    self.$message({message:'输入不能为空',type:'warning'});
+            search: function() {
+                if (this.searchQuery === '') {
+                    this.$message({ message: '输入不能为空', type: 'warning' });
                     return false;
                 }
-                
-                self.loading = true;
-                let deviceID = self.search_word;
-                let params = { };
-                params['device_id'] = deviceID;
-                if(localStorage.getItem('userType') == 1){//非超级管理员
-                    params['gw_channel'] = localStorage.getItem('ms_username');
-                }
-                self.$axios.post(baseUrl+'/device/list',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.listData = res.data.extra.result;
-                        self.pageTotal = res.data.extra.result.length;
-                    } else {
-                        self.$message({message:res.data.extra,type:'warning'});
-                        self.listData = [];
-                        self.pageTotal = 0;
-                    }
-                })
-
+                const params = { device_id: this.searchQuery };
+                // Pass an empty string for the URL, as _fetchDeviceData appends '/device/list'
+                this._fetchDeviceData('', params);
             },
 
-            filterTag:function(value, row) {
-                return row.status == value;
+            _handleApiError(errorMessage, isAuthError = false) {
+              this.$message({ message: errorMessage, type: 'warning' });
+              if (isAuthError) {
+                setTimeout(() => {
+                  this.$router.replace('login');
+                }, 2000);
+              }
+            },
+            async _fetchDeviceData(url, params = {}) {
+                this.loading = true;
+                let fullUrl = baseUrl + '/device/list' + url;
+                let requestParams = { ...params };
+
+                if (this.currentUserType == '1') {
+                    requestParams['gw_channel'] = localStorage.getItem('ms_username');
+                }
+
+                try {
+                    const res = await this.$axios.post(fullUrl, requestParams);
+                    this.loading = false;
+
+                    if (res.data.ret_code == '1001') {
+                        this._handleApiError(res.data.extra, true);
+                    } else if (res.data.ret_code == 0) {
+                        this.listData = res.data.extra.result;
+                        // Ensure pageTotal is updated correctly, especially for pagination
+                        if (res.data.extra.total_count !== undefined) {
+                           this.pageTotal = res.data.extra.total_count;
+                        } else {
+                           this.pageTotal = res.data.extra.result.length || 0;
+                        }
+                    } else {
+                        // For other non-successful ret_codes (not 0 and not 1001)
+                        this._handleApiError(res.data.extra || 'Unknown error occurred', false);
+                    }
+                } catch (error) {
+                    this.loading = false;
+                    this._handleApiError('Network error or request failed: ' + error.message, false);
+                }
             }
         }
     }
