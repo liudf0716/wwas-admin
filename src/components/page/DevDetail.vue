@@ -17,7 +17,7 @@
                 </el-table-column>
                 <el-table-column prop="sysMemfree" label="剩余内存">
                     <template slot-scope="scope">
-                        {{((scope.row.sysMemfree)/1024).toFixed(2) + 'M'}}
+                        {{formatSysMemfree(scope.row.sysMemfree)}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="sysLoad" label="系统负载"></el-table-column>
@@ -33,12 +33,12 @@
                 <el-table-column prop="clients.ip" label="终端IP" width="150"></el-table-column>
                 <el-table-column prop="clients.authType" label="当前认证方式" width="120">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.authType == 1 ? 'success' : 'info'" close-transition>{{scope.row.clients.authType == 1?'电话认证': '其他认证'}}</el-tag>
+                        <el-tag :type="clientAuthTypeTag(scope.row.clients).type" close-transition>{{clientAuthTypeTag(scope.row.clients).label}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="clients.telNumber" label="电话号码" width="150">
                     <template slot-scope="scope">
-                        <el-tag :type="scope.row.clients.telNumber == '' ? 'info' : 'success'" close-transition>{{displayClientPhone(scope.row.clients)}}</el-tag>
+                        <el-tag :type="clientTelNumberTagType(scope.row.clients)" close-transition>{{displayClientPhone(scope.row.clients)}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="clients.name" label="终端名称" width="220"></el-table-column>
@@ -59,7 +59,7 @@
                 </el-table-column>
                 <el-table-column prop="clients.lastTime" label="最近访问时间" width="200">
                     <template slot-scope="scope">
-                        <el-tag :type="isOffline(scope.row.clients.lastTime) ? 'warning':'success'" close-transition>
+                        <el-tag :type="clientLastTimeTagType(scope.row.clients.lastTime)" close-transition>
                             {{dateForm(scope.row.clients.lastTime)}}
                         </el-tag>
                     </template>
@@ -89,16 +89,50 @@
 
     export default {
         data: function(){
-            const self = this;
             return {
                 curGwid:'',
                 loading:false,
-                radio3:'ROM升级',
                 gwClients:[],
                 devMsgData:[],
                 pageTotal:0,
                 currentPage:1,
 
+            }
+        },
+        computed: {
+            // Computed property for sysMemfree display
+            formatSysMemfree() {
+                // Returns a function that takes memfree as an argument
+                return (memfree) => {
+                    if (memfree === undefined || memfree === null) return 'N/A';
+                    return ((memfree) / 1024).toFixed(2) + 'M';
+                }
+            },
+            // Computed property for client authType tag
+            clientAuthTypeTag() {
+                // Returns a function that takes client as an argument
+                return (client) => {
+                    if (!client) return { type: 'info', label: '未知' };
+                    return {
+                        type: client.authType == 1 ? 'success' : 'info',
+                        label: client.authType == 1 ? '电话认证' : '其他认证'
+                    };
+                }
+            },
+            // Computed property for client telNumber tag type
+            clientTelNumberTagType() {
+                // Returns a function that takes client as an argument
+                return (client) => {
+                    if (!client) return 'info';
+                    return client.telNumber == '' ? 'info' : 'success';
+                }
+            },
+            // Computed property for client lastTime tag type
+            clientLastTimeTagType() {
+                // Returns a function that takes lastTime as an argument
+                return (lastTime) => {
+                    return this.isOffline(lastTime) ? 'warning' : 'success';
+                }
             }
         },
         created: function(){
@@ -110,74 +144,77 @@
             isOffline: isOffline,
             bandwidthLabel: bandwidthLabel,
 
+            // Helper function for API calls
+            _makeApiCall: function(url, params, successCallback, errorCallback) {
+                this.loading = true;
+                this.$axios.post(url, params).then((res) => {
+                    this.loading = false;
+                    if (res.data.ret_code == '1001') {
+                        this.$message({ message: res.data.extra, type: 'warning' });
+                        setTimeout(() => {
+                            this.$router.replace('login');
+                        }, 2000);
+                    } else if (res.data.ret_code == 0) {
+                        if (successCallback) {
+                            successCallback(res.data);
+                        }
+                    } else {
+                        if (errorCallback) {
+                            errorCallback(res.data);
+                        } else {
+                            this.$message.error(res.data.extra);
+                        }
+                    }
+                }).catch((err) => {
+                    this.loading = false;
+                    console.log(err);
+                    if (errorCallback) {
+                        errorCallback(err);
+                    } else {
+                        this.$message.error('请求失败，请稍后再试');
+                    }
+                });
+            },
+
             getParams: function(){
-                var self = this;
-                self.curGwid = self.$route.query.gwId;
-                self.isShow = 'apps';
-                self.getDetailData({});
-                self.getDevMsg();
+                this.curGwid = this.$route.query.gwId;
+                this.getDetailData({});
+                this.getDevMsg();
             },
 
             getDetailData: function(params){
-                var self = this;
-                params.gwId = self.curGwid;
-                self.$axios.post(global_.baseUrl+'/client/list',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        // self.pageTotal = res.data.extra.count || self.pageTotal;
-                        self.gwClients = res.data.extra.gwClients;
-                    }else{
-                        self.$message.error(res.data.extra)
-                    }
-                },function(err){
-                    self.loading = false;
-                    console.log(err);
+                params.gwId = this.curGwid;
+                this._makeApiCall(baseUrl + '/client/list', params, (data) => {
+                    // this.pageTotal = data.extra.count || this.pageTotal;
+                    this.gwClients = data.extra.gwClients;
                 });
             },
 
             getDevMsg: function(){
-                var self = this;
                 var params = {
-                    filter:{"gwId":self.curGwid}
+                    filter:{"gwId":this.curGwid}
                 };
                 if(localStorage.getItem('userType') == 1){//非超级管理员
                     params.filter.channelPath = localStorage.getItem('ms_username');
                 }
-                self.$axios.post(global_.baseUrl+'/device/list',params).then(function(res){
-                    self.loading = false;
-                    if(res.data.ret_code == '1001'){
-                        self.$message({message:res.data.extra,type:'warning'});
-                        setTimeout(function(){
-                            self.$router.replace('login');
-                        },2000)
-                    }
-                    if(res.data.ret_code == 0){
-                        self.devMsgData = res.data.extra.query;
-                    }
-                })
+                this._makeApiCall(baseUrl + '/device/list', params, (data) => {
+                    this.devMsgData = data.extra.query;
+                });
             },
 
             handleCurrentChange:function(val){
-                var self = this;
-                self.currentPage = val;
+                this.currentPage = val;
                 var params = {
                     page_size:10,
                     current_page:this.currentPage
                 };
-                self.getDetailData(params);
+                this.getDetailData(params);
 
             },
 
             handleCltOffline: function(mac){
-                var self = this;
                 var params = {
-                    filter:{"gwId":self.curGwid, "clients.mac":mac}
+                    filter:{"gwId":this.curGwid, "clients.mac":mac}
                 };
                 
                 this.$confirm('此操作将该用户踢下线, 是否继续?', '提示', {
@@ -185,60 +222,33 @@
                   cancelButtonText: '取消',
                   type: 'warning'
                 }).then(() => {
-                    self.$axios.post(global_.baseUrl+'/client/kickoffClient',params).then(function(res){
-                        self.loading = false;
-                        if(res.data.ret_code == '1001'){
-                            self.$message({message:res.data.extra,type:'warning'});
-                            setTimeout(function(){
-                                self.$router.replace('login');
-                            },2000)
-                        } else if(res.data.ret_code == 0){
-                            self.gwClients = res.data.extra.gwClients;
-                            this.$message({
-                                type: 'success',
-                                message: '操作成功!'
-                            });
-                        }
+                    this._makeApiCall(baseUrl + '/client/kickoffClient', params, (data) => {
+                        this.gwClients = data.extra.gwClients;
+                        this.$message({
+                            type: 'success',
+                            message: '操作成功!'
+                        });
                     });
                 });
             },
 
             handleBlockClient: function(mac, isTelBlocked) {
-                var self = this;
                 var params = {
-                    filter:{"gwId":self.curGwid, "mac":mac, "isTelBlocked":isTelBlocked}
+                    filter:{"gwId":this.curGwid, "mac":mac, "isTelBlocked":isTelBlocked}
                 };
-                console.log('params is ' + params.filter);
                 this.$confirm(isTelBlocked==false?'此操作将禁止该电话号认证上网功能, 是否继续?':'此操作将恢复该电话号认证上网功能，是否继续?', '提示', {
                   confirmButtonText: '确定',
                   cancelButtonText: '取消',
                   type: 'warning'
                 }).then(() => {
-                    self.$axios.post(global_.baseUrl+'/client/blockClient',params).then(function(res){
-                        self.loading = false;
-                        if(res.data.ret_code == '1001'){
-                            self.$message({message:res.data.extra,type:'warning'});
-                            setTimeout(function(){
-                                self.$router.replace('login');
-                            },2000)
-                        }else if(res.data.ret_code == 0){
-                            self.gwClients = res.data.extra.gwClients;
-                            this.$message({
-                                type: 'success',
-                                message: '操作成功!'
-                            });
-                        }
+                    this._makeApiCall(baseUrl + '/client/blockClient', params, (data) => {
+                        this.gwClients = data.extra.gwClients;
+                        this.$message({
+                            type: 'success',
+                            message: '操作成功!'
+                        });
                     });
                 });
-            },
-
-            changePage:function(values) {
-                this.information.pagination.per_page = values.perpage;
-                this.information.data = this.information.data;
-            },
-
-            onSearch:function(searchQuery) {
-                this.query = searchQuery;
             },
             
             displayClientPhone:function(client) {
@@ -252,7 +262,7 @@
         },
     }
 </script>
-<style>
+<style scoped>
     .rad-group{margin-bottom:20px;}
     .handle-input{  width: 300px;  display: inline-block;  }
     .handle-box2{display:inline-block;float:right;}
