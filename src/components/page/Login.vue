@@ -27,7 +27,7 @@
     import md5 from 'js-md5';
     import global_ from 'components/common/Global';
     export default {
-        data: function(){
+        data() {
             return {
                 ruleForm: {
                     username: '',
@@ -40,52 +40,40 @@
                     password: [
                         { required: true, message: '请输入密码', trigger: 'blur' },
                         { min: 3, max: 32, message: '长度在3到32个字符', trigger: 'blur' },
-                        { validator: function(rule, value, callback) {
-                            if (value.indexOf(' ') != -1) {
-                                callback(new Error('密码不能包含空格'));
-                            } else {
-                                callback();
-                            }
-                        }}
+                        { pattern: /^\S*$/, message: '密码不能包含空格', trigger: 'blur' }
                     ]
                 }
             }
         },
-        created: function() {
-            this.getData();
-        },
         methods: {
-            getData: function() {
-                let self = this;
-            },
-            getUser: function() {
-                var self = this;
-                self.$axios.post(global_.baseUrl + '/admin/info').then(function(res) {
-                    if (res.data.ret_code == 0) {
-                        const user = res.data.extra;
-                        localStorage.setItem('userType', user.userType);
-                        self.$router.push('/basetable');
-                    }
-                });
-            },
-            submitForm: function(formName) {
-                const self = this;
-                self.$refs[formName].validate(function(valid) {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
                     if (valid) {
                         let params = {
-                            user_account: self.ruleForm.username,
-                            user_password: md5(self.ruleForm.password)
+                            user_account: this.ruleForm.username,
+                            user_password: md5(this.ruleForm.password)
                         };
-                        self.$axios.post(global_.baseUrl + '/admin/login', params).then(function(res) {
+                        this.$axios.post(global_.baseUrl + '/admin/login', params).then((res) => {
                             if (res.data.ret_code == 0) {
-                                self.$message({ message: '登录成功！', type: 'success' });
-                                localStorage.setItem('ms_username', self.ruleForm.username);
-                                self.getUser();
+                                this.$message({ message: '登录成功！', type: 'success' });
+                                localStorage.setItem('ms_username', this.ruleForm.username);
+                                // Inlined getUser logic
+                                this.$axios.post(global_.baseUrl + '/admin/info').then((userInfoRes) => {
+                                    if (userInfoRes.data.ret_code == 0) {
+                                        const user = userInfoRes.data.extra;
+                                        localStorage.setItem('userType', user.userType);
+                                        this.$router.push('/basetable');
+                                    }
+                                }).catch(error => {
+                                    console.error('User info API error:', error);
+                                    this.$message.error('Failed to fetch user info. Please try again.');
+                                });
                             } else {
-                                self.$message(res.data.extra);
+                                this.$message(res.data.extra);
                             }
-                        }, function(err) {
-                            console.log(err);
+                        }).catch(error => {
+                            console.error('Login API error:', error);
+                            this.$message.error('Login failed. Please try again.');
                         });
                     } else {
                         console.log('error submit!!');
@@ -93,9 +81,8 @@
                     }
                 });
             },
-            register: function() {
-                let self = this;
-                self.$router.push('/register');
+            register() {
+                this.$router.push('/register');
             }
         }
     }
