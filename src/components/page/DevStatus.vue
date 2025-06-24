@@ -23,16 +23,16 @@
         </div>
 
         <el-table :data="listData" border style="width: 100%" ref="multipleTable" v-loading="loading">
-            <el-table-column prop="deviceID" label="设备ID" width="150"></el-table-column>
-            <el-table-column prop="name" label="设备名称" width="200"></el-table-column>
-            <el-table-column prop="awVersion" label="AW版本" width="110"></el-table-column>
-            <el-table-column prop='onlineClients' label="在线客户数" width="110"></el-table-column>
-            <el-table-column prop="wiredPassed" label="有线免认证" width="110">
+            <el-table-column prop="deviceID" label="设备ID"></el-table-column>
+            <el-table-column prop="name" label="设备名称"></el-table-column>
+            <el-table-column prop="awVersion" label="AW版本"></el-table-column>
+            <el-table-column prop='onlineClients' label="在线客户数"></el-table-column>
+            <el-table-column prop="wiredPassed" label="有线免认证">
             <template slot-scope="scope">
             <el-tag :type="scope.row.wiredPassed == '0' ? 'warning':'success'" close-transition>{{scope.row.wiredPassed == '1'?'已开启':'未开启'}}</el-tag>
             </template>
             </el-table-column>
-            <el-table-column prop="wifidogUptime" label="wifidog运行时长" width="160">
+            <el-table-column prop="wifidogUptime" label="wifidog运行时长">
             <template slot-scope="scope">
             <span>{{timeStamp(scope.row.wifidogUptime)}}</span>
             </template>
@@ -54,17 +54,17 @@
             <div class="dialog-section">
                 <div class="dialog-title">设备详细信息</div>
                 <el-table :data="selectedDevice" border style="width: 100%">
-                <el-table-column prop="key" label="描述" width="200"></el-table-column>
-                <el-table-column prop="value" label="值" width="200"></el-table-column>
+                <el-table-column prop="key" label="描述"></el-table-column>
+                <el-table-column prop="value" label="值"></el-table-column>
                 </el-table>
             </div>
             
             <div class="dialog-section">
                 <div class="dialog-title">设备所属认证网关信息</div>
                 <el-table :data="selectedGwSettings" border style="width: 100%">
-                <el-table-column prop="gwID" label="网关ID" width="200"></el-table-column>
-                <el-table-column prop="gwChannel" label="网关渠道" width="150"></el-table-column>
-                <el-table-column prop="authMode" label="认证方式" width="150">
+                <el-table-column prop="gwID" label="网关ID"></el-table-column>
+                <el-table-column prop="gwChannel" label="网关渠道"></el-table-column>
+                <el-table-column prop="authMode" label="认证方式">
                     <template slot-scope="scope">
                     <span>{{ scope.row.authMode == '0' ? '免认证中' : '认证中' }}</span>
                     </template>
@@ -137,12 +137,12 @@
             async getUser() {
                 try {
                     const res = await this.$axios.post(baseUrl + '/admin/info');
-                    if (res.data.ret_code === '1001') {
+                    if (res.data.ret_code === 1001) {
                         this._handleApiError(res.data.extra, true);
                     } else if (res.data.ret_code === 0) {
                         const user = res.data.extra;
                         this.currentUserType = user.userType;
-                        if (this.currentUserType === '1' || this.currentUserType === '0') {
+                        if (this.currentUserType === 1 || this.currentUserType === 0) {
                             this.getData('/online');
                         } else {
                             // Specific error message for this case, not using _handleApiError

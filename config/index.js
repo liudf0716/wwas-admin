@@ -20,7 +20,6 @@ module.exports = {
         // `npm run build --report`
         // Set to `true` or `false` to always turn it on or off
         bundleAnalyzerReport: process.env.npm_config_report,
-        webServer: 'http://wifidogx.online'
     },
     dev: {
         env: require('./dev.env'),
@@ -29,9 +28,25 @@ module.exports = {
         assetsSubDirectory: 'static',
         assetsPublicPath: '/',
         proxyTable: {
-            '/api':{
+            '/admin':{
                 //target:'http://172.21.169.223:8001',
-                target:'http://127.0.0.1:8001',
+                target:'http://121.43.123.42:8001',
+                changeOrigin:true,
+                pathRewrite:{
+                    '/api':''
+                }
+            },
+            '/device':{
+                //target:'http://172.21.169.223:8001',
+                target:'http://121.43.123.42:8001',
+                changeOrigin:true,
+                pathRewrite:{
+                    '/api':''
+                }
+            },
+            '/client':{
+                //target:'http://172.21.169.223:8001',
+                target:'http://121.43.123.42:8001',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''

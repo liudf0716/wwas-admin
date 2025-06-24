@@ -1,8 +1,7 @@
 <script>
     const config = require('../../../config');
     const uniUrl = 'http://wifidogx.online';
-    const baseUrl = config.build.webServer;
-    // var baseUrl = '/api';  
+    const baseUrl = "";
 
     const provs = [
             {label:"北京市",value:"北京市"},
