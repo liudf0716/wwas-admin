@@ -17,7 +17,7 @@ a{text-decoration: none}
     /*bottom:0;*/
     /*width: auto;*/
     padding:20px 40px 40px 40px;
-    box-sizing: border-box;
+    box-sizing: content-box;
     overflow-y: scroll;
 }
 .crumbs{
@@ -34,7 +34,12 @@ a{text-decoration: none}
 .el-button+.el-tooltip {
     margin-left: 10px;
 }
-
+.el-menu--dark {
+  background-color: #262f3e !important;
+}
+.el-menu-item {
+  padding-left: 50px !important;
+}
 .el-table tr:hover{
     background: #f6faff;
 }

@@ -7,7 +7,7 @@
             </el-breadcrumb>
         </div>
         <div class='rad-group mb40'>
-            <el-tabs v-model="task_type" type="card" @tab-click="handleClick">   
+            <el-tabs v-model="task_type" type="card">   
                 <el-tab-pane label="微信支付上网" name="wxpay_setting">
                     <div class="form-box tab-cont form-box2">
                         <el-form ref="form_wxpay" :model="forms.wxpay" :rules="rules.wxpay" label-width="150px">
@@ -25,9 +25,8 @@
                                     class="upload-demo"
                                     :action="upload.wxpayKey.url"
                                     name="file_name"
-                                    with-credentials="true"
+                                    :with-credentials=true
                                     list-type="text"
-                                    :data="forms.wxpay.mch_priv_key"
                                     :beforeUpload="beforeWxpayUpload"
                                     :on-success="uploadSuccess"
                                     :file-list="upload.wxpayKey.fileList"
@@ -42,9 +41,8 @@
                                     class="upload-demo"
                                     :action="upload.wxpayCert.url"
                                     name="file_name"
-                                    with-credentials="true"
+                                    :with-credentials=true
                                     list-type="text"
-                                    :data="forms.wxpay.wx_cert"
                                     :beforeUpload="beforeWxpayUpload"
                                     :on-success="uploadSuccess"
                                     :file-list="upload.wxpayCert.fileList"
@@ -209,14 +207,12 @@
                                         class="upload-demo"
                                         :action="upload.bgImage.url"
                                         name="file_name"
-                                        with-credentials="true"
+                                        :with-credentials=true
                                         list-type="picture"
                                         :limit="1"
-                                        :data="upload.bgImage.data"
                                         :before-upload="beforeUpload"
                                         :on-success="uploadSuccess"
                                         :on-excceed="handleExceed"
-                                        v-model="upload.bgImage.fileList"
                                         accept="image/png,image/jpg"
                                         :auto-upload="true">
                                         <el-button slot="trigger" size="small" type="primary" v-if="upload.bgImage.fileList.length < 1">选取图片</el-button>
@@ -232,6 +228,14 @@
                         <div class="right-side">
                             <!-- Phone preview for the background image -->
                             <div v-if="forms.base.background_url" class="phone-preview" :style="{ backgroundImage: 'url(' + forms.base.background_url + ')' }">
+                            <div class="preview-button-container">
+                              <button type="button" class="btn" v-show="forms.wxpay.enable">微信支付认证上网</button>
+                              <button type="button" class="btn" v-show="forms.ali.enable">短信认证上网</button>
+                              <button type="button" class="btn" v-show="forms.user.enable">密码认证上网</button>
+                              <button type="button" class="btn" v-show="forms.onekey">一键上网</button>
+                             <!-- <button type="button" class="btn" id="tmppass">临时放行</button> !-->
+                              <p class="msg"><input type="checkbox" class="checkbox" id="checkbox" checked> <label for="checkbox">已阅读并同意</label> <span class="xieyihref">上网服务条款</span></p>
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -870,8 +874,9 @@
         height: 400px;
         border: 16px solid black; /* Simulates phone border */
         border-radius: 36px; /* Rounded corners for phone look */
-        background-size: cover; /* Cover the area with the background image */
+        background-size: contain; /* Cover the area with the background image */
         background-position: center; /* Center the background image */
+        background-repeat: no-repeat; 
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
         position: relative; /* For positioning pseudo-elements like notch/button */
         background-color: #fff; /* Default background if image is not set */
@@ -914,4 +919,37 @@
     .txt{width:700px;padding-left:40px;font-size:15px;color:#666;margin-bottom:30px;}
     .txt p{line-height:36px;}
     .txt .txt-small span{display:block;margin-left:20px;font-size:14px;line-height:26px;}
+    .preview-button-container {
+      display: flex;
+      flex-direction: column;     /* 垂直排列 */
+      justify-content: center;    /* 垂直居中 */
+      align-items: center;        /* 水平居中 */
+      height: 100%;              /* 撑满整个视口高度，也可改为固定高度 */
+      gap: 5px;    
+    }
+    .btn{
+      width: 120px;
+      height: 28px;
+      display: block;
+      margin: 0 auto 10px;
+      text-align: center;
+      line-height: 28px;
+      color: #fff;
+      background-color: #0abcdf;
+      border-radius: 1px;
+      border: 1px solid #000;
+      text-decoration: none;
+      font-size: 8px;
+    }
+    .msg{
+      font-size:7px;
+    }
+    .checkbox{
+      width:10px;
+      height:10px;
+      vertical-align: middle;
+    }
+    .xieyihref{
+      color:#11b8b9
+    }
 </style>

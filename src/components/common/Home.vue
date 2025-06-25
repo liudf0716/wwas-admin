@@ -1,11 +1,9 @@
 <template>
     <div class="wrap">
         <v-head></v-head>
-        <div class="coll-cont" :class="[isCollapse?'iscoll':'nocoll']" @click="clickCollapse">
-            <i class="el-icon-my-arrow" :class="[isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left']"></i>
-        </div>
+
         <div class="sidebar sidebar2">
-            <el-menu :default-active="onRoutes" class="el-menu-vertical-demo" theme="dark" unique-opened router :collapse-transition="isTransition" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+            <el-menu :default-active="onRoutes" class="el-menu-vertical-demo" theme="dark" router :collapse-transition="isTransition" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
                 <template v-for="item in isUser === '1' ? userItems : superItems">
                     <template v-if="item.subs">
                         <el-submenu :index="item.index">
@@ -17,7 +15,12 @@
                         <el-menu-item :index="item.index"><i :class="item.icon"></i><span slot="title">{{ item.title }}</span></el-menu-item>
                     </template>
                 </template>
+                
+              <div class="coll-cont" :class="[isCollapse?'iscoll':'nocoll']" @click="clickCollapse">
+                  <i class="el-icon-my-arrow" :class="[isCollapse?'el-icon-d-arrow-right':'el-icon-d-arrow-left']"></i>
+              </div>
             </el-menu>
+
             <div class="content">
                 <div class="main-cont">
                     <transition name="move" mode="out-in">
@@ -26,8 +29,6 @@
                 </div>
                 <v-footer></v-footer>
             </div>
-
-
         </div>
     </div>
 </template>
