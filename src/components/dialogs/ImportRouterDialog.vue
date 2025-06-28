@@ -61,11 +61,7 @@
             ></el-input>
           </el-form-item>
           <el-form-item label="单次认证免认证时长" prop="next_auth_time" :label-width="formLabelWidth">
-            <el-input
-              v-model="manualForm.next_auth_time"
-              placeholder="请输入免认证时长"
-              class="diainp"
-            ></el-input>
+            <el-input v-model="manualForm.next_auth_time" placeholder="请输入免认证时长" class="diainp"></el-input>
           </el-form-item>
         </el-form>
         <div class="mt30 dialog-footer">
@@ -91,8 +87,8 @@ export default {
   data() {
     const validateMacInForm = (rule, value, callback) => {
       if (!value) {
-          callback();
-          return;
+        callback();
+        return;
       }
       const regMac1 = /^[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}:[A-Fa-f\d]{2}$/;
       const regMac2 = /^[A-Fa-f\d]{12}$/;
@@ -109,32 +105,32 @@ export default {
       activeTab: '1',
       fileList: [],
       fileForm: {
-        user_name: this.targetAccount,
+        user_name: this.targetAccount
       },
       uploading: false,
       manualForm: {
         device_id: '',
         route_mac: '',
         route_mac_once_auth: '',
-        next_auth_time: '',
+        next_auth_time: ''
       },
       manualRules: {
-        route_mac: [
-          { validator: validateMacInForm, trigger: 'blur' }
-        ],
-        route_mac_once_auth: [
-          { validator: validateMacInForm, trigger: 'blur' }
-        ],
+        route_mac: [{ validator: validateMacInForm, trigger: 'blur' }],
+        route_mac_once_auth: [{ validator: validateMacInForm, trigger: 'blur' }]
       },
       manualSaving: false,
-      uploadUrl: this.uploadUrlProp || (global_.baseUrl + '/device/import/excel'),
+      uploadUrl: this.uploadUrlProp || global_.baseUrl + '/device/import/excel'
     };
   },
   computed: {
     isVisible: {
-      get() { return this.visible; },
-      set(value) { this.$emit('update:visible', value); },
-    },
+      get() {
+        return this.visible;
+      },
+      set(value) {
+        this.$emit('update:visible', value);
+      }
+    }
   },
   watch: {
     visible(newVal) {
@@ -144,10 +140,10 @@ export default {
       }
     },
     targetAccount(newVal) {
-        this.fileForm.user_name = newVal;
+      this.fileForm.user_name = newVal;
     },
-    uploadUrlProp(newVal){
-        this.uploadUrl = newVal;
+    uploadUrlProp(newVal) {
+      this.uploadUrl = newVal;
     }
   },
   methods: {
@@ -161,7 +157,7 @@ export default {
         device_id: '',
         route_mac: '',
         route_mac_once_auth: '',
-        next_auth_time: '',
+        next_auth_time: ''
       };
       if (this.$refs.manualFormRef) {
         this.$refs.manualFormRef.resetFields();
@@ -201,7 +197,7 @@ export default {
       return true;
     },
     handleFileChange(file, fileList) {
-        this.fileList = fileList.slice(-1);
+      this.fileList = fileList.slice(-1);
     },
     handleUploadSuccess(response, file, fileList) {
       this.uploading = false;
@@ -213,16 +209,16 @@ export default {
       this.$emit('upload-error', err);
     },
     saveManualImport() {
-      this.$refs.manualFormRef.validate((valid) => {
+      this.$refs.manualFormRef.validate(valid => {
         if (valid) {
           if (!this.manualForm.route_mac && !this.manualForm.route_mac_once_auth) {
-              this.$message.warning('至少需要输入一种认证网关设备MAC');
-              return;
+            this.$message.warning('至少需要输入一种认证网关设备MAC');
+            return;
           }
           this.manualSaving = true;
           const dataToSave = {
             user_name: this.targetAccount,
-            ...this.manualForm,
+            ...this.manualForm
           };
           this.$emit('manual-save', dataToSave);
         } else {
@@ -232,30 +228,46 @@ export default {
       });
     },
     onSaveManualSuccess() {
-        this.manualSaving = false;
-        this.handleDialogClose();
+      this.manualSaving = false;
+      this.handleDialogClose();
     },
     onSaveManualError() {
-        this.manualSaving = false;
+      this.manualSaving = false;
     },
     onUploadFinished() {
-        this.uploading = false;
-        this.handleDialogClose();
+      this.uploading = false;
+      this.handleDialogClose();
     },
     splitStringByCommaOrNewline(str) {
-        if (!str) return [];
-        return str.split(/[\n,]/g).map(s => s.trim()).filter(s => s !== "");
-    },
-  },
+      if (!str) return [];
+      return str
+        .split(/[\n,]/g)
+        .map(s => s.trim())
+        .filter(s => s !== '');
+    }
+  }
 };
 </script>
 
 <style scoped>
-.digcont { }
-.diainp { width: 217px; }
-.mb30 { margin-bottom: 30px; }
-.mt30 { margin-top: 30px; }
-.upload-demo { }
-.dialog-footer { text-align: right; }
-.btn1{margin-bottom:5px;margin-top:5px;}
+  .digcont {
+  }
+  .diainp {
+    width: 217px;
+  }
+  .mb30 {
+    margin-bottom: 30px;
+  }
+  .mt30 {
+    margin-top: 30px;
+  }
+  .upload-demo {
+  }
+  .dialog-footer {
+    text-align: right;
+  }
+  .btn1 {
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
 </style>

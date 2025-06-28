@@ -1,14 +1,9 @@
 <template>
   <el-dialog title="删除路由" :visible.sync="isVisible" @close="closeDialog" class="digcont">
-    <div style="margin-bottom:16px;">*批量添加功能MAC之间以换行分割，每行一个MAC；MAC格式为12位字母或数字组合，不区分大小写:</div>
+    <div style="margin-bottom: 16px">*批量添加功能MAC之间以换行分割，每行一个MAC；MAC格式为12位字母或数字组合，不区分大小写:</div>
     <el-form :model="form" ref="deleteRouterForm" :rules="rules">
       <el-form-item prop="route_mac">
-        <el-input
-          type="textarea"
-          :rows="5"
-          placeholder="请输入内容"
-          v-model="form.route_mac"
-        ></el-input>
+        <el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="form.route_mac"></el-input>
       </el-form-item>
     </el-form>
     <div class="mt30 dialog-footer">
@@ -34,7 +29,7 @@ export default {
       const regMac2 = /^[A-Fa-f\d]{12}$/;
       const macs = this.splitStringByCommaOrNewline(value);
       if (macs.length === 0 && value.trim() !== '') {
-          return callback(new Error('请输入有效的MAC地址'));
+        return callback(new Error('请输入有效的MAC地址'));
       }
       for (const mac of macs) {
         if (mac && !regMac1.test(mac) && !regMac2.test(mac)) {
@@ -45,29 +40,33 @@ export default {
     };
     return {
       form: {
-        route_mac: '',
+        route_mac: ''
       },
       rules: {
         route_mac: [
           { required: true, message: '请输入MAC地址', trigger: 'blur' },
           { validator: validateMacInForm, trigger: 'blur' }
-        ],
+        ]
       },
-      loading: false,
+      loading: false
     };
   },
   computed: {
     isVisible: {
-      get() { return this.visible; },
-      set(value) { this.$emit('update:visible', value); },
-    },
+      get() {
+        return this.visible;
+      },
+      set(value) {
+        this.$emit('update:visible', value);
+      }
+    }
   },
   watch: {
     visible(newVal) {
       if (newVal) {
         this.resetForm();
       }
-    },
+    }
   },
   methods: {
     resetForm() {
@@ -82,12 +81,12 @@ export default {
       this.$emit('close');
     },
     save() {
-      this.$refs.deleteRouterForm.validate((valid) => {
+      this.$refs.deleteRouterForm.validate(valid => {
         if (valid) {
           this.loading = true;
           const dataToSave = {
             user_name: this.targetAccount,
-            route_mac: this.form.route_mac,
+            route_mac: this.form.route_mac
           };
           this.$emit('save', dataToSave);
         } else {
@@ -97,22 +96,30 @@ export default {
       });
     },
     onSaveSuccess() {
-        this.loading = false;
-        this.closeDialog();
+      this.loading = false;
+      this.closeDialog();
     },
     onSaveError() {
-        this.loading = false;
+      this.loading = false;
     },
     splitStringByCommaOrNewline(str) {
-        if (!str) return [];
-        return str.split(/[\n,]/g).map(s => s.trim()).filter(s => s !== "");
-    },
-  },
+      if (!str) return [];
+      return str
+        .split(/[\n,]/g)
+        .map(s => s.trim())
+        .filter(s => s !== '');
+    }
+  }
 };
 </script>
 
 <style scoped>
-.digcont { }
-.mt30 { margin-top: 30px; }
-.dialog-footer { text-align: right; }
+  .digcont {
+  }
+  .mt30 {
+    margin-top: 30px;
+  }
+  .dialog-footer {
+    text-align: right;
+  }
 </style>

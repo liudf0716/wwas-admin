@@ -28,54 +28,15 @@ module.exports = {
         assetsSubDirectory: "static",
         assetsPublicPath: "/",
         proxyTable: {
-            "/admin": {
-                //target:'http://172.21.169.223:8001',
+            "/static": {
                 target: "http://121.43.123.42:8001",
                 changeOrigin: true,
-                pathRewrite: {
-                    "/api": "",
-                },
             },
-            "/device": {
-                //target:'http://172.21.169.223:8001',
+            "/api": {
                 target: "http://121.43.123.42:8001",
                 changeOrigin: true,
-                pathRewrite: {
-                    "/api": "",
-                },
             },
-            "/client": {
-                //target:'http://172.21.169.223:8001',
-                target: "http://121.43.123.42:8001",
-                changeOrigin: true,
-                pathRewrite: {
-                    "/api": "",
-                },
-            },
-            "/setting": {
-                //target:'http://172.21.169.223:8001',
-                target: "http://121.43.123.42:8001",
-                changeOrigin: true,
-                pathRewrite: {
-                    "/api": "",
-                },
-            },
-            "/firmware": {
-                //target:'http://172.21.169.223:8001',
-                target: "http://121.43.123.42:8001",
-                changeOrigin: true,
-                pathRewrite: {
-                    "/api": "",
-                },
-            },
-            // '/static':{
-            //     //target:'http://172.21.169.223:8001',
-            //     target:'http://121.43.123.42:8001',
-            //     changeOrigin:true,
-            //     pathRewrite:{
-            //         '/api':''
-            //     }
-            // },
+
             "/ms": {
                 target: "https://www.easy-mock.com/mock/592501a391470c0ac1fab128",
                 changeOrigin: true,

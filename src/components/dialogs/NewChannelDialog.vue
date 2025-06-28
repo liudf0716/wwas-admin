@@ -7,30 +7,17 @@
       <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
         <el-input v-model="form.password" type="password" class="diainp" auto-complete="off"></el-input>
       </el-form-item>
-       <el-form-item label="渠道名称" prop="name" :label-width="formLabelWidth">
+      <el-form-item label="渠道名称" prop="name" :label-width="formLabelWidth">
         <el-input v-model="form.name" class="diainp" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item label="联系电话" prop="tel" :label-width="formLabelWidth">
         <el-input v-model="form.tel" class="diainp" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item label="地址" :label-width="formLabelWidth">
-        <el-select
-          size="small"
-          style="width: 110px"
-          v-model="form.selectProv"
-          placeholder="请选择省份"
-          @change="handleProvinceChangeInDialog"
-        >
+        <el-select size="small" style="width: 110px" v-model="form.selectProv" placeholder="请选择省份" @change="handleProvinceChangeInDialog">
           <el-option v-for="item in provs" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
-        <el-select
-          size="small"
-          style="width: 104px"
-          v-if="form.selectProv"
-          v-model="form.selectCity"
-          placeholder="请选择城市"
-          @change="handleCityChangeInDialog"
-        >
+        <el-select size="small" style="width: 104px" v-if="form.selectProv" v-model="form.selectCity" placeholder="请选择城市" @change="handleCityChangeInDialog">
           <el-option v-for="item in cityOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -54,15 +41,15 @@ export default {
   props: {
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     formLabelWidth: {
       type: String,
-      default: '120px',
+      default: '120px'
     },
     initialProvs: {
-        type: Array,
-        default: () => []
+      type: Array,
+      default: () => []
     }
   },
   data() {
@@ -74,29 +61,29 @@ export default {
         tel: '',
         selectProv: '',
         selectCity: '',
-        addr: '',
+        addr: ''
       },
       rules: {
         user: [
           { required: true, message: '请输入账号', trigger: 'blur' },
-          { validator: this.validateSpace, trigger: 'blur' },
+          { validator: this.validateSpace, trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { validator: this.validateSpace, trigger: 'blur' },
-          { min: 3, max: 32, message: '长度在3到32个字符', trigger: 'blur' },
+          { min: 3, max: 32, message: '长度在3到32个字符', trigger: 'blur' }
         ],
         name: [
           { required: true, message: '请输入渠道名称', trigger: 'blur' },
-          { validator: this.validateSpace, trigger: 'blur' },
+          { validator: this.validateSpace, trigger: 'blur' }
         ],
         tel: [
           { required: true, message: '请输入联系电话', trigger: 'blur' },
-          { validator: this.validateTel, trigger: 'blur' },
-        ],
+          { validator: this.validateTel, trigger: 'blur' }
+        ]
       },
       cityOptions: [],
-      provs: [],
+      provs: []
     };
   },
   computed: {
@@ -106,8 +93,8 @@ export default {
       },
       set(value) {
         this.$emit('update:visible', value);
-      },
-    },
+      }
+    }
   },
   watch: {
     visible(newVal) {
@@ -117,11 +104,11 @@ export default {
       }
     },
     initialProvs: {
-        handler(newProvs) {
-            this.provs = [...newProvs];
-        },
-        immediate: true,
-        deep: true
+      handler(newProvs) {
+        this.provs = [...newProvs];
+      },
+      immediate: true,
+      deep: true
     }
   },
   methods: {
@@ -153,7 +140,7 @@ export default {
         tel: '',
         selectProv: '',
         selectCity: '',
-        addr: '',
+        addr: ''
       };
       this.cityOptions = [];
     },
@@ -162,10 +149,10 @@ export default {
       this.$emit('close');
     },
     save() {
-      this.$refs.newChannelForm.validate((valid) => {
+      this.$refs.newChannelForm.validate(valid => {
         if (valid) {
           const formData = {
-            ...this.form,
+            ...this.form
           };
           this.$emit('save', formData);
         } else {
@@ -177,27 +164,25 @@ export default {
       this.cityOptions = [];
       this.form.selectCity = '';
       if (!provValue) return;
-      this.cityOptions = global_.allCity
-        .filter(cityInfo => cityInfo.prov === provValue)
-        .map(cityInfo => ({ label: cityInfo.label, value: cityInfo.value || cityInfo.label }));
+      this.cityOptions = global_.allCity.filter(cityInfo => cityInfo.prov === provValue).map(cityInfo => ({ label: cityInfo.label, value: cityInfo.value || cityInfo.label }));
     },
     handleCityChangeInDialog(cityValue) {
       // Intentionally left blank
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
-.digcont {
-}
-.diainp {
-  width: 217px;
-}
-.diainp2 {
-  width: 400px;
-}
-.dialog-footer {
-  text-align: right;
-}
+  .digcont {
+  }
+  .diainp {
+    width: 217px;
+  }
+  .diainp2 {
+    width: 400px;
+  }
+  .dialog-footer {
+    text-align: right;
+  }
 </style>

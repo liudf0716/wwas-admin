@@ -26,16 +26,16 @@ export default {
   props: {
     visible: {
       type: Boolean,
-      default: false,
+      default: false
     },
     formLabelWidth: {
       type: String,
-      default: '120px',
+      default: '120px'
     },
     targetAccount: {
       type: String,
-      required: true,
-    },
+      required: true
+    }
   },
   data() {
     const validateRepwd = (rule, value, callback) => {
@@ -49,17 +49,17 @@ export default {
       form: {
         user_password: '',
         user_new_password: '',
-        user_validate_password: '',
+        user_validate_password: ''
       },
       rules: {
         user_password: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
         user_new_password: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
         user_validate_password: [
           { required: true, message: '请输入确认密码', trigger: 'blur' },
-          { validator: validateRepwd, trigger: 'blur' },
-        ],
+          { validator: validateRepwd, trigger: 'blur' }
+        ]
       },
-      loading: false,
+      loading: false
     };
   },
   computed: {
@@ -69,15 +69,15 @@ export default {
       },
       set(value) {
         this.$emit('update:visible', value);
-      },
-    },
+      }
+    }
   },
   watch: {
     visible(newVal) {
       if (newVal) {
         this.resetForm();
       }
-    },
+    }
   },
   methods: {
     resetForm() {
@@ -87,7 +87,7 @@ export default {
       this.form = {
         user_password: '',
         user_new_password: '',
-        user_validate_password: '',
+        user_validate_password: ''
       };
       this.loading = false;
     },
@@ -96,13 +96,13 @@ export default {
       this.$emit('close');
     },
     save() {
-      this.$refs.changePasswordForm.validate((valid) => {
+      this.$refs.changePasswordForm.validate(valid => {
         if (valid) {
           this.loading = true;
           const dataToSave = {
             user_account: this.targetAccount,
             user_password: md5(this.form.user_password),
-            user_new_password: md5(this.form.user_new_password),
+            user_new_password: md5(this.form.user_new_password)
           };
           this.$emit('save', dataToSave);
         } else {
@@ -112,23 +112,23 @@ export default {
       });
     },
     onSaveSuccess() {
-        this.loading = false;
-        this.closeDialog();
+      this.loading = false;
+      this.closeDialog();
     },
     onSaveError() {
-        this.loading = false;
+      this.loading = false;
     }
-  },
+  }
 };
 </script>
 
 <style scoped>
-.digcont {
-}
-.diainp {
-  width: 217px;
-}
-.dialog-footer {
-  text-align: right;
-}
+  .digcont {
+  }
+  .diainp {
+    width: 217px;
+  }
+  .dialog-footer {
+    text-align: right;
+  }
 </style>

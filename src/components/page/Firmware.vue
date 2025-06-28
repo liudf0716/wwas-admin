@@ -31,7 +31,7 @@
           <el-input type="textarea" autosize v-model="uploadForm.releaseNotes" placeholder="请输入固件说明" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="上传固件">
-          <el-upload action="/firmware/upload" :multiple="false" :data="uploadForm" :on-error="handleUploadError" :auto-upload="false" :file-list="uploadFiles" ref="fileUpload">
+          <el-upload action="/api/firmware/upload" :multiple="false" :data="uploadForm" :on-error="handleUploadError" :auto-upload="false" :file-list="uploadFiles" ref="fileUpload">
             <el-button type="primary">选择文件</el-button>
           </el-upload>
         </el-form-item>
@@ -125,7 +125,7 @@ export default {
     },
     async getFirmwares() {
       try {
-        const res = await this.$axios.get(baseUrl + '/firmware/query?page_size=10&current_page=' + this.currentPage);
+        const res = await this.$axios.get(baseUrl + '/firmware/query?size=10&page=' + this.currentPage);
         if (res.data.ret_code === 1001) {
           this._handleApiError(res.data.extra, true);
         } else if (res.data.ret_code === 0) {
@@ -163,14 +163,7 @@ export default {
 
     handleCurrentChange: function (val) {
       this.currentPage = val;
-      let urlPath = '';
-      if (this.activeFilterTab === 'all') {
-        urlPath = ''; // Will result in /device/list
-      } else {
-        urlPath = '/' + this.activeFilterTab; // Will result in /device/list/online or /device/list/offline
-      }
-      const params = { page_size: 10, current_page: this.currentPage };
-      this._fetchDeviceData(urlPath, params);
+      this.getFirmwares(); // Fetch data for the new page
     },
 
     search: function () {
