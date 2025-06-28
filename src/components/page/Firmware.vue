@@ -19,7 +19,7 @@
       <el-button type="primary" @click="handleDialogVisible">上传固件</el-button>
     </div>
 
-    <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny">
+    <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny" @close="handleDialogClose">
       <el-form ref="uploadForm" :model="uploadForm" label-width="120px">
         <el-form-item label="设备型号">
           <el-input v-model="uploadForm.deviceModel" placeholder="请输入设备类型" style="width: 80%"></el-input>
@@ -31,23 +31,27 @@
           <el-input type="textarea" autosize v-model="uploadForm.releaseNotes" placeholder="请输入固件说明" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="上传固件">
-          <el-upload action="/api/firmware/upload" :multiple="false" :data="uploadForm" :on-error="handleUploadError" :auto-upload="false" :file-list="uploadFiles" ref="fileUpload">
+          <el-upload action="/api/firmware/upload" :multiple="false" :limit="1" :data="uploadForm" :on-success="handleUploadSuccess" :auto-upload="false" ref="fileUpload">
             <el-button type="primary">选择文件</el-button>
           </el-upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="showUploadDialogVisible = false">取消</el-button>
+        <el-button @click="handleDialogClose">取消</el-button>
         <el-button type="primary" @click="submitUpload">上传</el-button>
       </span>
     </el-dialog>
-    <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
+    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable" v-loading="loading">
       <el-table-column type="index"></el-table-column>
-      <el-table-column prop="deviceModel" label="设备型号"></el-table-column>
-      <el-table-column prop="version" label="固件版本"></el-table-column>
+      <el-table-column prop="deviceModel" label="设备型号" width="100"></el-table-column>
+      <el-table-column prop="version" label="固件版本" width="100"></el-table-column>
       <el-table-column prop="name" label="固件名称"></el-table-column>
-      <el-table-column prop="fileSize" label="固件大小"> </el-table-column>
-      <el-table-column prop="releaseNotes" label="固件说明"> </el-table-column>
+      <el-table-column prop="fileSize" label="固件大小" width="100">
+        <template slot-scope="scope">
+          <span>{{ bytesLabel(scope.row.fileSize / 1024) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="releaseNotes" label="固件说明" width="300" show-overflow-tooltip> </el-table-column>
       <el-table-column prop="lastTime" label="发布时间" width="190">
         <template slot-scope="scope">
           <span>{{ dateForm(scope.row.releaseDate) }}</span>
@@ -67,7 +71,7 @@
 </template>
 
 <script>
-import { timeStamp, dateForm } from 'components/common/Helpers.js';
+import { timeStamp, dateForm, bytesLabel } from 'components/common/Helpers.js';
 import { baseUrl } from 'components/common/Global';
 
 export default {
@@ -87,8 +91,7 @@ export default {
         deviceModel: '',
         version: '',
         releaseNotes: ''
-      },
-      uploadFiles: []
+      }
     };
   },
 
@@ -99,7 +102,20 @@ export default {
   methods: {
     timeStamp: timeStamp,
     dateForm: dateForm,
-
+    bytesLabel: bytesLabel,
+    handleDialogClose() {
+      this.showUploadDialogVisible = false;
+      this.uploadForm = {
+        deviceModel: '',
+        version: '',
+        releaseNotes: ''
+      };
+      this.$nextTick(() => {
+        if (this.$refs.fileUpload) {
+          this.$refs.fileUpload.clearFiles();
+        }
+      });
+    },
     handleDialogVisible() {
       this.showUploadDialogVisible = true;
       this.uploadForm = {
@@ -107,7 +123,6 @@ export default {
         version: '',
         releaseNotes: ''
       };
-      this.uploadFiles = [];
     },
     handleUploadError() {},
     submitUpload() {
@@ -116,12 +131,15 @@ export default {
         return;
       }
       this.$refs.fileUpload.submit();
-
-      // Simulate a successful upload
-      this.$message({ message: '固件上传成功', type: 'success' });
-      this.showUploadDialogVisible = false;
-      this.uploadFiles = [];
-      this.getFirmwares(); // Refresh the firmware list after upload
+    },
+    handleUploadSuccess(response, file, fileList) {
+      if (response.ret_code === 0) {
+        this.$message({ message: '固件上传成功', type: 'success' });
+        this.handleDialogClose(); // 关闭对话框并清理状态
+        this.getFirmwares(); // 刷新固件列表
+      } else {
+        this.$message({ message: response.extra || '上传失败', type: 'error' });
+      }
     },
     async getFirmwares() {
       try {

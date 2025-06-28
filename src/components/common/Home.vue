@@ -123,6 +123,10 @@ export default {
             {
               index: 'cltstatus',
               title: '认证用户'
+            },
+            {
+              index: 'fwUpgrade',
+              title: '固件升级'
             }
           ]
         },
@@ -158,10 +162,10 @@ export default {
   },
   methods: {
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+      // console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+      // console.log(key, keyPath);
     },
     clickCollapse() {
       this.isCollapse = !this.isCollapse;

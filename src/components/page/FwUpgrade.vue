@@ -3,7 +3,7 @@
     <div class="crumbs">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item><i class="el-icon-setting"></i> 设备管理</el-breadcrumb-item>
-        <el-breadcrumb-item>设备状态</el-breadcrumb-item>
+        <el-breadcrumb-item>固件升级</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="rad-group">
@@ -14,25 +14,22 @@
       </el-radio-group>
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备ID"></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入设备ID" icon="circle-close" :on-icon-click="reset"></el-input>
         </el-form-item>
+        <el-form-item> <el-button type="primary" @click="search">搜索</el-button> </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="danger" @click="handleUpgrade(null)">批量升级</el-button>
         </el-form-item>
       </el-form>
     </div>
 
-    <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
+    <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" @select-all="handleSelectAll" @select="handleCheck" @selection-change="handleSelectionChange" v-loading="loading">
+      <el-table-column type="selection" width="55"> </el-table-column>
       <el-table-column prop="deviceID" label="设备ID"></el-table-column>
       <el-table-column prop="name" label="设备名称"></el-table-column>
+      <el-table-column prop="type" label="设备型号"></el-table-column>
       <el-table-column prop="awVersion" label="AW版本"></el-table-column>
       <el-table-column prop="fmVersion" label="固件版本"></el-table-column>
-      <el-table-column prop="onlineClients" label="在线客户数"></el-table-column>
-      <el-table-column prop="wiredPassed" label="有线免认证">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.wiredPassed == '0' ? 'warning' : 'success'" close-transition>{{ scope.row.wiredPassed == '1' ? '已开启' : '未开启' }}</el-tag>
-        </template>
-      </el-table-column>
       <el-table-column prop="wifidogUptime" label="wifidog运行时长">
         <template slot-scope="scope">
           <span>{{ timeStamp(scope.row.wifidogUptime) }}</span>
@@ -52,38 +49,36 @@
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="showDetail(scope.row)">详情</el-button>
+          <el-button type="text" @click="handleUpgrade(scope.row)">固件升级</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-dialog title="设备详情" :visible.sync="showDeviceDetailDialog" width="50%">
+    <el-dialog title="固件升级" :visible.sync="showSelectFmDialog" size="tiny">
       <div class="dialog-content">
         <div class="dialog-section">
-          <div class="dialog-title">设备详细信息</div>
-          <el-table :data="selectedDevice" border style="width: 100%">
-            <el-table-column prop="key" label="描述"></el-table-column>
-            <el-table-column prop="value" label="值"></el-table-column>
-          </el-table>
+          <div class="dialog-title">设备ID:</div>
+          <div>{{ selectedDevice.map(device => device.deviceID).join(',') }}</div>
         </div>
-
         <div class="dialog-section">
-          <div class="dialog-title">设备所属认证网关信息</div>
-          <el-table :data="selectedGwSettings" border style="width: 100%">
-            <el-table-column prop="gwID" label="网关ID"></el-table-column>
-            <el-table-column prop="gwChannel" label="网关渠道"></el-table-column>
-            <el-table-column prop="authMode" label="认证方式">
-              <template slot-scope="scope">
-                <span>{{ scope.row.authMode == '0' ? '免认证中' : '认证中' }}</span>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="dialog-title">设备型号:</div>
+          <div>{{ selectedDeviceModel }}</div>
+        </div>
+        <div class="dialog-section">
+          <div class="dialog-title">固件版本:</div>
+          <el-select v-model="selectedFirmware" placeholder="请选择固件版本" value-key="id" style="width: 200px">
+            <el-option v-for="firmware in filteredFirmwareList" :key="firmware.id" :label="firmware.version" :value="firmware"></el-option>
+          </el-select>
+        </div>
+        <div class="dialog-section" v-if="selectedFirmware">
+          <div class="dialog-title">固件名称:</div>
+          <div>{{ selectedFirmware.name }}</div>
         </div>
       </div>
-
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="showDeviceDetailDialog = false">确定</el-button>
-      </span>
+      <div class="dialog-footer">
+        <el-button @click="showSelectFmDialog = false">取消</el-button>
+        <el-button type="primary" @click="confirmFirmwareSelection">确定</el-button>
+      </div>
     </el-dialog>
     <div class="pagination">
       <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal"> </el-pagination>
@@ -95,25 +90,13 @@
 import { timeStamp, dateForm, bytesLabel, cpuLabel } from 'components/common/Helpers.js';
 import { baseUrl } from 'components/common/Global';
 
-const deviceDetailMap = [
-  { key: 'deviceID', label: '设备ID' },
-  { key: 'name', label: '设备名称' },
-  { key: 'type', label: '设备型号' },
-  { key: 'remoteAddress', label: '设备地址' },
-  { key: 'awVersion', label: 'AW版本' },
-  { key: 'fmVersion', label: '固件版本' },
-  { key: 'onlineClients', label: '在线客户数' },
-  { key: 'nfConntrackCount', label: '网络会话数' },
-  { key: 'wiredPassed', label: '有线免认证', formatter: val => (val == '1' ? '已开启' : '未开启') },
-  { key: 'wifidogUptime', label: 'wifidog运行时长', formatter: timeStamp },
-  { key: 'lastTime', label: '最近上线时间', formatter: dateForm },
-  { key: 'cpuUsage', label: 'CPU使用率', formatter: cpuLabel },
-  { key: 'sysUptime', label: '系统运行时长', formatter: timeStamp },
-  { key: 'sysMemfree', label: '系统剩余内存', formatter: bytesLabel },
-  { key: 'sysLoad', label: '系统负载' }
-];
-
 export default {
+  computed: {
+    filteredFirmwareList() {
+      // Filter firmware list based on selected device model
+      return this.firmwareList.filter(fm => fm.deviceModel === this.selectedDeviceModel);
+    }
+  },
   data: function () {
     return {
       activeFilterTab: 'all',
@@ -121,16 +104,19 @@ export default {
       loading: false,
       pageTotal: 0,
       listData: [],
+      firmwareList: [],
       currentPage: 1,
       currentUserType: '',
-      showDeviceDetailDialog: false,
+      showSelectFmDialog: false,
       selectedDevice: [],
-      selectedGwSettings: []
+      selectedDeviceModel: '',
+      selectedFirmware: null
     };
   },
 
   created: function () {
     this.getUser();
+    this.getFirmwares();
   },
 
   methods: {
@@ -148,7 +134,7 @@ export default {
           const user = res.data.extra;
           this.currentUserType = user.userType;
           if (this.currentUserType === 1 || this.currentUserType === 0) {
-            this.getData('/all');
+            this.getDevices('/all');
           } else {
             // Specific error message for this case, not using _handleApiError
             this.$message({ message: '用户类型错误', type: 'warning' });
@@ -162,44 +148,29 @@ export default {
       }
     },
 
-    getData: function (url) {
+    getDevices: function (url) {
       // Accepts a URL string
       this._fetchDeviceData(url, {});
     },
-
-    showDetail: function (row) {
-      this.selectedDevice = [];
-      this.selectedGwSettings = []; // Clear previous settings
-
-      deviceDetailMap.forEach(item => {
-        if (row.hasOwnProperty(item.key)) {
-          let value = row[item.key];
-          if (item.formatter) {
-            // Ensure formatter is called with the correct context if it's a component method
-            // For helpers like timeStamp, direct call is fine.
-            // If a formatter is this.someMethod, it needs this.
-            // Here, timeStamp, dateForm etc. are imported helpers, not component methods.
-            value = item.formatter(value);
-          }
-          this.selectedDevice.push({ key: item.label, value: value });
-        }
-      });
-
-      for (let i in row.gwSettings) {
-        this.selectedGwSettings.push({
-          gwID: row.gwSettings[i].gwID,
-          gwChannel: row.gwSettings[i].gwChannel,
-          authMode: row.gwSettings[i].authMode
-        });
+    handleUpgrade: function (device) {
+      if (device) {
+        this.$refs.multipleTable.clearSelection();
+        this.selectedDevice = [device]; // Wrap in an array for consistency
+        this.selectedDeviceModel = device.type;
       }
 
-      this.showDeviceDetailDialog = true;
+      if (!this.selectedDevice || this.selectedDevice.length === 0) {
+        this.$message({ message: '请先选择设备', type: 'warning' });
+        return;
+      }
+
+      this.showSelectFmDialog = true;
     },
 
     changeTab: function () {
       const url = '/' + this.activeFilterTab;
       this.currentPage = 1;
-      this.getData(url);
+      this.getDevices(url);
     },
 
     handleCurrentChange: function (val) {
@@ -214,6 +185,11 @@ export default {
       this._fetchDeviceData(urlPath, params);
     },
 
+    reset: function () {
+      this.activeFilterTab = 'all';
+      this.searchQuery = '';
+      this.changeTab();
+    },
     search: function () {
       if (this.searchQuery === '') {
         this.$message({ message: '输入不能为空', type: 'warning' });
@@ -234,6 +210,7 @@ export default {
     },
     async _fetchDeviceData(url, params = {}) {
       this.loading = true;
+      this.listData = [];
       let fullUrl = baseUrl + '/device/list' + url;
       let requestParams = { ...params };
 
@@ -262,6 +239,70 @@ export default {
       } catch (error) {
         this.loading = false;
         this._handleApiError('Network error or request failed: ' + error.message, false);
+      }
+    },
+    async getFirmwares() {
+      const res = await this.$axios.get(baseUrl + '/firmware/query?size=100&page=1');
+      if (res.data.ret_code === 0) {
+        this.firmwareList = res.data.extra.data;
+      }
+    },
+    confirmFirmwareSelection() {
+      if (!this.selectedFirmware) {
+        this.$message({ message: '请选择固件版本', type: 'warning' });
+        return;
+      }
+      const selectedDeviceIDs = this.selectedDevice.map(device => device.deviceID);
+      if (selectedDeviceIDs.length === 0) {
+        this.$message({ message: '请先选择设备', type: 'warning' });
+        return;
+      }
+
+      const params = {
+        deviceIds: selectedDeviceIDs,
+        firmwareId: this.selectedFirmware.id,
+        md5sum: this.selectedFirmware.md5sum,
+        downloadUrl: this.selectedFirmware.downloadUrl,
+        gw_channel: localStorage.getItem('ms_username')
+      };
+
+      this.$axios
+        .post(baseUrl + '/device/sysUpgrade', params)
+        .then(res => {
+          if (res.data.ret_code === 0) {
+            this.$message({ message: '固件升级任务已提交', type: 'success' });
+            this.showSelectFmDialog = false;
+            // this.getDevices('/all'); // Refresh the device list
+          } else {
+            this.$message({ message: res.data.extra, type: 'warning' });
+          }
+        })
+        .catch(error => {
+          this.$message({ message: '固件升级失败，请稍后再试', type: 'error' });
+        });
+    },
+    handleSelectionChange(selection) {
+      this.selectedDevice = selection;
+      if (selection.length > 0) {
+        this.selectedDeviceModel = selection[0].type;
+      } else {
+        this.selectedDeviceModel = '';
+      }
+    },
+    handleCheck(selection, row) {
+      if (this.selectedDeviceModel != '' && row.type !== this.selectedDeviceModel) {
+        this.$refs.multipleTable.toggleRowSelection(row, false);
+        this.$message({ message: '设备型号不一致，已取消选中', type: 'warning' });
+      }
+    },
+    handleSelectAll(selection) {
+      if (this.selectedDeviceModel !== '') {
+        selection.forEach(row => {
+          if (row.type !== this.selectedDeviceModel) {
+            this.$refs.multipleTable.toggleRowSelection(row, false);
+            this.$message({ message: '设备型号不一致，已取消选中', type: 'warning' });
+          }
+        });
       }
     }
   }
@@ -304,11 +345,12 @@ export default {
 
   .dialog-title {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
     margin-bottom: 10px;
   }
 
   .dialog-footer {
+    margin-top: 10px;
     text-align: right;
   }
 </style>

@@ -49,6 +49,11 @@ export default new Router({
                     component: (resolve) =>
                         require(["../components/page/EventLog.vue"], resolve), // vue-datasource组件
                 },
+                {
+                    path: "/fwUpgrade",
+                    component: (resolve) =>
+                        require(["../components/page/fwUpgrade.vue"], resolve), // vue-datasource组件
+                },
             ],
         },
         {
