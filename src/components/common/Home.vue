@@ -112,13 +112,24 @@
                         ]
                     },
                     {
-                        icon: 'el-icon-document',
+                        icon: 'el-icon-date',
                         index: '5',
                         title: '认证管理',
                         subs: [
                             {
                                 index: 'approve',
                                 title: '认证设置'
+                            }
+                        ]
+                    },
+                    {
+                        icon: 'el-icon-document',
+                        index: '6',
+                        title: '固件管理',
+                        subs: [
+                            {
+                                index: 'firmware',
+                                title: '固件列表'
                             }
                         ]
                     }

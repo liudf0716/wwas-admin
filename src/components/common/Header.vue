@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="logo">认证服务器管理平台</div>
+        <div class="logo"><img class="header-logo" src="../../../static/img/logo.png">认证服务器管理平台</div>
         <div class="user-info">
             <el-dropdown trigger="click" @command="handleCommand">
                 <span class="el-dropdown-link">
