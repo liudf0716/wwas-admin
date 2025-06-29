@@ -169,10 +169,10 @@ export default {
 
     kickOffline: function (row) {
       const deviceID = row.deviceID;
-      const gwID = row.gwID;
+      const gwId = row.gwID;
       const mac = row.mac;
       const ip = row.ip;
-      this._apiRequest('/client/kickoffClient', { device_id: deviceID, gw_id: gwID, mac: mac, ip: ip }, data => {
+      this._apiRequest('/client/kickoffClient', { deviceId: deviceID, gwId: gwId, mac: mac, ip: ip }, data => {
         this.$message({ message: '用户下线成功', type: 'success' });
         this.getData();
       });
