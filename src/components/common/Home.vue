@@ -3,7 +3,7 @@
     <v-head></v-head>
 
     <div class="sidebar sidebar2">
-      <el-menu :default-active="onRoutes" class="el-menu-vertical-demo" theme="dark" router :collapse-transition="isTransition" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
+      <el-menu :default-active="onRoutes" class="el-menu-vertical-demo" router :collapse-transition="isTransition" @open="handleOpen" @close="handleClose" :collapse="isCollapse">
         <template v-for="item in isUser === '1' ? userItems : superItems">
           <template v-if="item.subs">
             <el-submenu :index="item.index">

@@ -127,6 +127,43 @@ body {
 .login-btn {
   text-align: center;
 }
+.el-menu {
+  background-color: unset;
+}
+.el-table__header th {
+  background-color: #f5f7fa !important;  /* 可选颜色：#f5f7fa（浅灰），#ebeef5（灰白） */
+  /* color: #333 !important; */
+  font-weight: 600;
+}
+.el-table__body-wrapper, .el-table__footer-wrapper, .el-table__header-wrapper {
+    width: 100%;
+    /* background-color: #63471d; */
+}
+.el-menu-item{
+   color: #f5f4f4;
+}
+.el-submenu__title{
+  color: #f5f4f4;
+}
+.el-menu-item:focus{
+  background-color: #409EFF !important;
+  color: #fff !important; 
+}
+.el-submenu__title:hover
+ {
+  background-color: #409EFF !important;
+  color: #fff !important;  
+}
+.el-menu-item:hover {
+  background-color: #409EFF !important;
+  color: #fff !important;                
+}
+
+/* 可选：修改 submenu-item hover 效果 */
+.el-submenu .el-menu-item:hover {
+  background-color: #409EFF !important;
+  color: #fff !important;
+}
 
 .login-btn .el-button {
   width: 100%;

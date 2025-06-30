@@ -28,10 +28,6 @@ module.exports = {
         assetsSubDirectory: "static",
         assetsPublicPath: "/",
         proxyTable: {
-            "/static": {
-                target: "http://121.43.123.42:8001",
-                changeOrigin: true,
-            },
             "/api": {
                 target: "http://121.43.123.42:8001",
                 changeOrigin: true,
