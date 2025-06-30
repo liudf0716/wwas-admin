@@ -8,67 +8,67 @@
           <el-breadcrumb-item>渠道列表</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <el-form :inline="true" class="handle-box">
-        <el-form-item>
-          <el-button type="primary" icon="plus" class="handle-del mr10" @click="openNewChannelDialog">新建子渠道</el-button>
-        </el-form-item>
-        <el-form-item label="">
-          <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="search" @click="searchUsers">查询</el-button>
-        </el-form-item>
-      </el-form>
+
       <div class="rad-group">
         <el-radio-group v-model="userStatusFilter" @change="handleUserStatusFilterChange">
           <el-radio-button label="all">全部</el-radio-button>
           <el-radio-button label="0">未冻结</el-radio-button>
           <el-radio-button label="1">已冻结</el-radio-button>
         </el-radio-group>
+
+        <el-form :inline="true" class="handle-box">
+          <el-form-item>
+            <el-button type="primary" icon="plus" class="handle-del mr10" @click="openNewChannelDialog">新建子渠道</el-button>
+          </el-form-item>
+          <el-form-item label="">
+            <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10" clearable></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" icon="search" @click="searchUsers">查询</el-button>
+          </el-form-item>
+        </el-form>
       </div>
       <el-table :data="userData" stripe style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
-        <el-table-column prop="userAccount" label="账 号" width="150"></el-table-column>
+        <el-table-column prop="userAccount" label="账 号"></el-table-column>
         <el-table-column prop="userName" label="渠道名称"></el-table-column>
-        <el-table-column prop="userPhone" label="联系电话" width="130"></el-table-column>
-        <el-table-column prop="userStatus" label="冻结状态" width="120">
+        <el-table-column prop="userPhone" label="联系电话"></el-table-column>
+        <el-table-column prop="userStatus" label="冻结状态">
           <template slot-scope="scope">
             <el-tag :type="scope.row.userStatus == '1' ? 'warning' : 'success'" close-transition>{{ scope.row.userStatus == '1' ? '已冻结' : '未冻结' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="渠道类型" width="120">
+        <el-table-column label="渠道类型">
           <template slot-scope="scope">
             <el-tag :type="scope.row.userType == '0' ? 'danger' : 'info'" close-transition>{{ scope.row.userType == '0' ? '超级管理员' : '管理员' }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="userCreateTime" label="创建时间" width="150"></el-table-column>
-        <el-table-column label="在线设备" width="100">
+        <el-table-column label="在线设备">
           <template slot-scope="scope">
             <el-tag type="warning">{{ scope.row.userOnlineCount + '/ ' + scope.row.userDeviceCount }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="380">
+        <el-table-column label="操作" min-width="250">
           <template slot-scope="scope">
-            <el-button class="btn1" size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">重置密码</el-button>
+            <el-button size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">重置密码</el-button>
             <el-button
-              class="btn1"
-              size="small"
+              size="mini"
               v-if="scope.row.userStatus == '0' && scope.row.userType == '1'"
               @click="freezeUserAccount(scope.row.userAccount)"
               :type="scope.row.userStatus == '1' ? 'warning' : 'danger'"
               >冻结账户</el-button
             >
             <el-button
-              class="btn1"
               size="small"
               v-else-if="scope.row.userStatus == '1' && scope.row.userType == '1'"
               @click="unfreezeUserAccount(scope.row.userAccount)"
               :type="scope.row.userStatus == '1' ? 'warning' : 'danger'"
               >解冻账户</el-button
             >
-            <el-button class="btn1" size="small" v-if="scope.row.userType == '1' ? true : false" type="success" @click="switchToChannelView(scope.row.userAccount)">点击进入</el-button>
-            <el-button class="btn1" size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
-            <el-button class="btn1" size="small" type="text" @click="openImportRouterDialogForUser(scope.row.userAccount)">导入路由</el-button>
-            <el-button class="btn1" size="small" type="text" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
+            <el-button size="small" v-if="scope.row.userType == '1' ? true : false" type="success" @click="switchToChannelView(scope.row.userAccount)">点击进入</el-button>
+            <el-button size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
+            <el-button size="small" type="text" @click="openImportRouterDialogForUser(scope.row.userAccount)">导入路由</el-button>
+            <el-button size="small" type="text" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,8 +102,8 @@
         <el-table-column prop="nextAuthTime" label="单次认证免认证时长"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button class="btn1" size="small" type="danger" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
-            <el-button class="btn1" size="small" type="primary" @click="openUpdateGatewayDialog(scope.row)">更新网关</el-button>
+            <el-button size="small" type="danger" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
+            <el-button size="small" type="primary" @click="openUpdateGatewayDialog(scope.row)">更新网关</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -647,6 +647,7 @@ export default {
 <style scoped>
   .handle-box {
     /* margin-bottom: 10px; */
+    float: right;
   }
   .handle-select {
     width: 120px;
@@ -657,10 +658,6 @@ export default {
   }
   .rad-group {
     margin-bottom: 20px;
-  }
-  .btn1 {
-    margin-bottom: 5px;
-    margin-top: 5px; /*margin-left:0;*/
   }
   /*.digcont{width:600px;}*/ /* This was commented out, good to keep as is or remove */
   .diainp {

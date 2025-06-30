@@ -9,7 +9,7 @@
     <div class="rad-group">
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备型号"></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入设备型号" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
@@ -19,29 +19,49 @@
       <el-button type="primary" @click="handleDialogVisible">上传固件</el-button>
     </div>
 
-    <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny" @close="handleDialogClose">
+    <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny" @close="handleDialogClose" width="700px">
+      <el-alert
+        title="设备型号和版本号从固件名称自动解析(openwrt固件名称格式 )"
+        type="info"
+        :closable="false"
+        show-icon
+        style="margin-bottom: 10px"
+        description="openwrt-发行版-(r固件版本)-架构-方案-厂商_(设备型号)-squashfs-sysupgrade.bin"
+      >
+      </el-alert>
       <el-form ref="uploadForm" :model="uploadForm" label-width="120px">
+        <el-form-item label="上传固件">
+          <el-upload
+            action="/api/firmware/upload"
+            :multiple="false"
+            :limit="1"
+            :data="uploadForm"
+            :on-success="handleUploadSuccess"
+            :before-upload="handleBeforUpload"
+            :on-change="handleFileChange"
+            :auto-upload="false"
+            :on-exceed="handleBeforExced"
+            ref="fileUpload"
+          >
+            <el-button type="primary" size="mini">选择文件</el-button>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="设备型号">
-          <el-input v-model="uploadForm.deviceModel" placeholder="请输入设备类型" style="width: 80%"></el-input>
+          <el-input v-model="uploadForm.deviceModel" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="固件版本">
-          <el-input v-model="uploadForm.version" placeholder="请输入版本号" style="width: 80%"></el-input>
+          <el-input v-model="uploadForm.version" style="width: 80%"></el-input>
         </el-form-item>
         <el-form-item label="固件说明">
-          <el-input type="textarea" autosize v-model="uploadForm.releaseNotes" placeholder="请输入固件说明" style="width: 80%"></el-input>
-        </el-form-item>
-        <el-form-item label="上传固件">
-          <el-upload action="/api/firmware/upload" :multiple="false" :limit="1" :data="uploadForm" :on-success="handleUploadSuccess" :auto-upload="false" ref="fileUpload">
-            <el-button type="primary">选择文件</el-button>
-          </el-upload>
+          <el-input type="textarea" autosize v-model="uploadForm.releaseNotes" placeholder="请输入固件说明" style="width: 80%" :autosize="{ minRows: 2 }"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleDialogClose">取消</el-button>
-        <el-button type="primary" @click="submitUpload">上传</el-button>
+        <el-button type="primary" @click="submitUpload" :loading="uploading">上传</el-button>
       </span>
     </el-dialog>
-    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable" v-loading="loading">
+    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable">
       <el-table-column type="index"></el-table-column>
       <el-table-column prop="deviceModel" label="设备型号" width="100"></el-table-column>
       <el-table-column prop="version" label="固件版本" width="100"></el-table-column>
@@ -79,7 +99,6 @@ export default {
     return {
       activeFilterTab: 'online',
       searchQuery: '',
-      loading: false,
       pageTotal: 0,
       listData: [],
       currentPage: 1,
@@ -91,7 +110,8 @@ export default {
         deviceModel: '',
         version: '',
         releaseNotes: ''
-      }
+      },
+      uploading: false
     };
   },
 
@@ -103,6 +123,21 @@ export default {
     timeStamp: timeStamp,
     dateForm: dateForm,
     bytesLabel: bytesLabel,
+    handleBeforExced() {
+      this.$message.warning('请删除已选择的文件');
+    },
+    handleFileChange(file, fileList) {
+      this.firmwareFile = file.raw;
+      const fileName = file.name;
+
+      // 提取版本号
+      const versionMatch = fileName.match(/r\d+(?=-)/);
+      this.uploadForm.version = versionMatch ? versionMatch[0] : '';
+
+      // 提取设备型号
+      const modelMatch = fileName.match(/_([^-]+)/);
+      this.uploadForm.deviceModel = modelMatch ? modelMatch[1] : '';
+    },
     handleDialogClose() {
       this.showUploadDialogVisible = false;
       this.uploadForm = {
@@ -124,17 +159,22 @@ export default {
         releaseNotes: ''
       };
     },
-    handleUploadError() {},
+    handleUploadError() {
+      this.uploading = false;
+    },
     submitUpload() {
       if (!this.uploadForm.deviceModel || !this.uploadForm.version) {
         this.$message({ message: '请填写所有必填项', type: 'warning' });
         return;
       }
+
       this.$refs.fileUpload.submit();
+      this.uploading = true;
     },
     handleUploadSuccess(response, file, fileList) {
       if (response.ret_code === 0) {
         this.$message({ message: '固件上传成功', type: 'success' });
+        this.uploading = false;
         this.handleDialogClose(); // 关闭对话框并清理状态
         this.getFirmwares(); // 刷新固件列表
       } else {

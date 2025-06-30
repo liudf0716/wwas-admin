@@ -185,6 +185,10 @@ body {
   color: #303133;
 }
 
+.el-dialog__body {
+  padding: 1px 20px;
+}
+
 .login-btn .el-button {
   width: 100%;
   height: 40px;
