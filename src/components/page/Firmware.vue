@@ -21,7 +21,7 @@
 
     <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny" @close="handleDialogClose" width="700px">
       <el-alert
-        title="设备型号和版本号从固件名称自动解析(openwrt固件名称格式 )"
+        title="设备型号和版本号从固件名称自动解析(openwrt固件名称格式)"
         type="info"
         :closable="false"
         show-icon

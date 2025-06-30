@@ -54,15 +54,23 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="固件升级" :visible.sync="showSelectFmDialog" width="500px">
+    <el-dialog title="固件升级" :visible.sync="showSelectFmDialog" width="600px">
+      <el-alert title="选择指定固件版本后, 设备将以保存配置的方式升级固件" type="info" :closable="false" show-icon style="margin-bottom: 10px"></el-alert>
       <div class="dialog-content">
         <div class="dialog-section">
           <div class="dialog-title">设备ID:</div>
-          <div>{{ selectedDevice.map(device => device.deviceID).join(',') }}</div>
+          <div>
+            <el-tag v-for="device in selectedDevice" :key="device.deviceID" style="margin-right: 3px">
+              {{ device.deviceID }}
+            </el-tag>
+          </div>
+          <!-- <div>{{ selectedDevice.map(device => device.deviceID).join(',') }}</div> -->
         </div>
         <div class="dialog-section">
           <div class="dialog-title">设备型号:</div>
-          <div>{{ selectedDeviceModel }}</div>
+          <div>
+            <el-tag type="info">{{ selectedDeviceModel }}</el-tag>
+          </div>
         </div>
         <div class="dialog-section">
           <div class="dialog-title">固件版本:</div>
@@ -164,6 +172,7 @@ export default {
         return;
       }
 
+      this.selectedFirmware = null;
       this.showSelectFmDialog = true;
     },
 
@@ -356,6 +365,7 @@ export default {
 
   .dialog-footer {
     margin-top: 10px;
+    margin-bottom: 20px;
     text-align: right;
   }
 </style>
