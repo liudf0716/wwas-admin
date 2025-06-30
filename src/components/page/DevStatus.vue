@@ -2,7 +2,7 @@
   <div class="table">
     <div class="crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-setting"></i> 设备管理</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-bank-card"></i> 设备管理</el-breadcrumb-item>
         <el-breadcrumb-item>设备状态</el-breadcrumb-item>
       </el-breadcrumb>
     </div>

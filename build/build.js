@@ -22,7 +22,6 @@ shell.rm("-rf", assetsPath);
 shell.mkdir("-p", assetsPath);
 shell.config.silent = true;
 shell.cp("-R", "static/*", assetsPath);
-shell.cp("-R", "static/favicon.ico", assetsPath);
 shell.config.silent = false;
 
 webpack(webpackConfig, function (err, stats) {

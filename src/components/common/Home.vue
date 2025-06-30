@@ -62,7 +62,7 @@ export default {
           ]
         },
         {
-          icon: 'el-icon-setting',
+          icon: 'el-icon-bank-card',
           index: '4',
           title: '设备管理',
           subs: [
@@ -77,7 +77,7 @@ export default {
           ]
         },
         {
-          icon: 'el-icon-document',
+          icon: 'el-icon-mobile-phone',
           index: '5',
           title: '认证管理',
           subs: [
@@ -112,7 +112,7 @@ export default {
           ]
         },
         {
-          icon: 'el-icon-setting',
+          icon: 'el-icon-bank-card',
           index: '4',
           title: '设备管理',
           subs: [
@@ -131,7 +131,7 @@ export default {
           ]
         },
         {
-          icon: 'el-icon-date',
+          icon: 'el-icon-mobile-phone',
           index: '5',
           title: '认证管理',
           subs: [
@@ -142,7 +142,7 @@ export default {
           ]
         },
         {
-          icon: 'el-icon-message',
+          icon: 'el-icon-help',
           index: '6',
           title: '固件管理',
           subs: [

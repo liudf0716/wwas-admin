@@ -2,7 +2,7 @@
   <div class="table">
     <div class="crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-setting"></i> 固件管理</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-help"></i> 固件管理</el-breadcrumb-item>
         <el-breadcrumb-item>固件列表</el-breadcrumb-item>
       </el-breadcrumb>
     </div>

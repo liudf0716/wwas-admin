@@ -14,7 +14,7 @@
       </el-radio-group>
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备ID" icon="circle-close" :on-icon-click="reset"></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入设备ID" clearable></el-input>
         </el-form-item>
         <el-form-item> <el-button type="primary" @click="search">搜索</el-button> </el-form-item>
         <el-form-item>
@@ -54,7 +54,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="固件升级" :visible.sync="showSelectFmDialog" size="tiny">
+    <el-dialog title="固件升级" :visible.sync="showSelectFmDialog" width="500px">
       <div class="dialog-content">
         <div class="dialog-section">
           <div class="dialog-title">设备ID:</div>
@@ -191,13 +191,18 @@ export default {
       this.changeTab();
     },
     search: function () {
-      if (this.searchQuery === '') {
-        this.$message({ message: '输入不能为空', type: 'warning' });
-        return false;
+      if (!this.searchQuery.length) {
+        this.reset();
+        return;
       }
-      const params = { device_id: this.searchQuery };
+      let params = {};
+      let url = '/all';
+      if (this.searchQuery.length) {
+        url = '';
+        params = { device_id: this.searchQuery };
+      }
       // Pass an empty string for the URL, as _fetchDeviceData appends '/device/list'
-      this._fetchDeviceData('', params);
+      this._fetchDeviceData(url, params);
     },
 
     _handleApiError(errorMessage, isAuthError = false) {
