@@ -93,6 +93,10 @@ export default {
           title: '日志管理',
           subs: [
             {
+              index: 'operation',
+              title: '操作日志'
+            },
+            {
               index: 'eventlog',
               title: '上网日志'
             }

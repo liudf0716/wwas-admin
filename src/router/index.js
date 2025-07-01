@@ -54,6 +54,13 @@ export default new Router({
                     component: (resolve) =>
                         require(["../components/page/fwUpgrade.vue"], resolve), // vue-datasource组件
                 },
+                {
+                    path: "/operation",
+                    component: (resolve) =>
+                        require([
+                            "../components/page/OperationLog.vue",
+                        ], resolve),
+                },
             ],
         },
         {
