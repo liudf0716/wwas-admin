@@ -6,6 +6,9 @@
         <el-breadcrumb-item>固件升级</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
+    <div class="table-alert">
+      <el-alert title="可以通过单选或多选向指定的设备发送固件升级指令.（目前仅支持在线设备）" type="warning" :closable="false" show-icon></el-alert>
+    </div>
     <div class="rad-group">
       <el-radio-group v-model="activeFilterTab" @change="changeTab">
         <el-radio-button label="all">全部</el-radio-button>
@@ -24,7 +27,7 @@
     </div>
 
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" @select-all="handleSelectAll" @select="handleCheck" @selection-change="handleSelectionChange" v-loading="loading">
-      <el-table-column type="selection" width="55"> </el-table-column>
+      <el-table-column type="selection" width="55" :selectable="checkSelectable"> </el-table-column>
       <el-table-column prop="deviceID" label="设备ID"></el-table-column>
       <el-table-column prop="name" label="设备名称"></el-table-column>
       <el-table-column prop="type" label="设备型号"></el-table-column>
@@ -49,7 +52,7 @@
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="handleUpgrade(scope.row)">固件升级</el-button>
+          <el-button type="text" @click="handleUpgrade(scope.row)" :disabled="scope.row.deviceStatus !== '1'">固件升级</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -132,7 +135,10 @@ export default {
     dateForm: dateForm,
     bytesLabel: bytesLabel,
     cpuLabel: cpuLabel,
-
+    checkSelectable(row, index) {
+      // 仅当设备为在线状态时可选
+      return row.deviceStatus == '1';
+    },
     async getUser() {
       try {
         const res = await this.$axios.post(baseUrl + '/admin/info');
@@ -345,6 +351,9 @@ export default {
     position: absolute;
   }
 
+  .table-alert {
+    margin-bottom: 10px;
+  }
   .dialog-content {
     display: flex;
     flex-direction: column;

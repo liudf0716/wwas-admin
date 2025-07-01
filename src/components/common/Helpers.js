@@ -190,3 +190,69 @@ export function convertIp(num) {
         num & 0xff,
     ].join(".");
 }
+export function portToCode(port) {
+    const map = {
+        80: "01", // HTTP
+        9201: "02", // WAP (WSP)
+        25: "03", // SMTP
+        110: "04", // POP3
+        143: "05", // IMAP
+        119: "06", // NNTP
+        21: "07", // FTP
+        22: "08", // SFTP
+        23: "09", // TELNET
+        443: "10", // HTTPS
+        554: "11", // RTSP
+        1755: "12", // MMS
+        0: "13", // WEP（非标准端口，示意）
+        0: "14", // WPA（非标准端口，示意）
+        1723: "15", // PPTP
+        1701: "16", // L2TP
+        1080: "17", // SOCKS
+        465: "18", // Compo
+        587: "19", // Cmsmtp
+    };
+
+    if (map[port]) {
+        return map[port];
+    } else if (port >= 1024 && port <= 65535) {
+        return "91"; // 私有协议
+    } else {
+        return "99"; // 其他
+    }
+}
+
+export function portToProtocol(port) {
+    const portMap = {
+        20: "FTP-Data",
+        21: "FTP",
+        22: "SSH",
+        23: "Telnet",
+        25: "SMTP",
+        53: "DNS",
+        67: "DHCP Server",
+        68: "DHCP Client",
+        69: "TFTP",
+        80: "HTTP",
+        110: "POP3",
+        123: "NTP",
+        143: "IMAP",
+        161: "SNMP",
+        162: "SNMP Trap",
+        179: "BGP",
+        443: "HTTPS",
+        465: "SMTPS",
+        514: "Syslog",
+        587: "SMTP (TLS)",
+        993: "IMAPS",
+        995: "POP3S",
+        3306: "MySQL",
+        3389: "RDP",
+        5432: "PostgreSQL",
+        6379: "Redis",
+        8080: "HTTP-Alt",
+        8443: "HTTPS-Alt",
+    };
+
+    return portMap[port] || "TCP";
+}

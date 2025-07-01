@@ -23,8 +23,12 @@
           <span>{{ dateForm(scope.row.msg.timestamp) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="msg.sid" label="会话ID" width="80"></el-table-column>
-      <el-table-column prop="msg.protocol" label="服务类型" width="100"></el-table-column>
+      <el-table-column prop="msg.session_id" label="会话ID" width="80"></el-table-column>
+      <el-table-column prop="msg.protocol" label="服务类型" width="100">
+        <template slot-scope="scope">
+          <span>{{ portToProtocol(scope.row.msg.dst_port) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="msg.src_ip" label="内网IP" width="150">
         <template slot-scope="scope">
           <span>{{ convertIp(scope.row.msg.src_ip) }}</span>
@@ -48,13 +52,14 @@
     </el-table>
 
     <div class="pagination">
+      <el-button type="primary" size="mini" @click="exportToCSV" style="float: left; margin-right: 10px">导出</el-button>
       <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal"> </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
-import { timeStamp, dateForm, convertIp } from 'components/common/Helpers.js';
+import { timeStamp, dateForm, convertIp, portToProtocol } from 'components/common/Helpers.js';
 import { baseUrl } from 'components/common/Global';
 
 export default {
@@ -96,6 +101,7 @@ export default {
     timeStamp: timeStamp,
     dateForm: dateForm,
     convertIp: convertIp,
+    portToProtocol: portToProtocol,
     async getList() {
       try {
         const res = await this.$axios.get(this.queryUrl);
@@ -121,7 +127,76 @@ export default {
         this._handleApiError('Network error or request failed while fetching user info: ' + error.message, false);
       }
     },
+    async exportToCSV() {
+      try {
+        const res = await this.$axios.get(baseUrl + '/eventLog/query?size=1000&page=1');
+        if (res.data.ret_code === 0) {
+          const logList = res.data.extra.data.map(item => {
+            try {
+              item.msg = JSON.parse(item.msg);
+              item.startPort = 1024;
+              item.endPort = 65535;
+            } catch (e) {
+              console.error('Failed to parse msg field:', e);
+              item.msg = {}; // Fallback to an empty object if parsing fails
+            }
+            return item;
+          });
 
+          const csvContent = [
+            [
+              '记录时间',
+              '会话ID',
+              '服务类型',
+              '内网IP',
+              '内网端口',
+              '源外网IP',
+              '源外网起始端口',
+              '源外网结束端口',
+              '目的公网IP',
+              '目的公网端口',
+              '终端MAC',
+              '场所编码',
+              '设备编码',
+              '设备经度',
+              '设备纬度'
+            ],
+            ...logList.map(item => [
+              this.dateForm(item.msg.timestamp),
+              item.msg.session_id,
+              this.portToProtocol(item.msg.dst_port),
+              this.convertIp(item.msg.src_ip),
+              item.msg.src_port,
+              item['fromhost-ip'],
+              item.startPort,
+              item.endPort,
+              this.convertIp(item.msg.dst_ip),
+              item.msg.dst_port,
+              item.msg.clt_mac,
+              item.msg.location_id,
+              item.msg.ap_device_id,
+              item.msg.ap_longitude,
+              item.msg.ap_latitude
+            ])
+          ];
+
+          const csvString = csvContent.map(row => row.join(',')).join('\n');
+          const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+          const link = document.createElement('a');
+          const url = URL.createObjectURL(blob);
+          link.setAttribute('href', url);
+          link.setAttribute('download', 'event_logs.csv');
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } else {
+          this._handleApiError('Failed to fetch data for CSV export.', false);
+        }
+      } catch (error) {
+        this._handleApiError('Network error or request failed while exporting CSV: ' + error.message, false);
+      }
+    },
     handleCurrentChange: function (val) {
       this.currentPage = val;
       this.getList();
