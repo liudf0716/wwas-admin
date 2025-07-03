@@ -61,6 +61,11 @@ export default new Router({
                             "../components/page/OperationLog.vue",
                         ], resolve),
                 },
+                {
+                    path: "/authlog",
+                    component: (resolve) =>
+                        require(["../components/page/AuthLog.vue"], resolve),
+                },
             ],
         },
         {

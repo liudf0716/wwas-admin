@@ -31,6 +31,9 @@
       <div class="login-right">
         <!-- 可设置背景图或svg图形 -->
       </div>
+      <footer class="login-footer">
+        <p>© 2025 AWAS认证服务器管理平台 ICP备案号: 京ICP备12345678号</p>
+      </footer>
     </div>
   </div>
 </template>
@@ -176,5 +179,15 @@ export default {
     flex: 1;
     background: url('/static/img/login-bg.svg') no-repeat center;
     background-size: cover;
+  }
+  .login-footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 12px;
+    color: #3b3a41;
   }
 </style>

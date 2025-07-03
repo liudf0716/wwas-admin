@@ -7,7 +7,7 @@
       </el-breadcrumb>
     </div>
     <div class="rad-group mb40">
-      <el-tabs v-model="task_type" type="card">
+      <el-tabs v-model="task_type">
         <el-tab-pane label="微信支付上网" name="wxpay_setting">
           <div class="form-box tab-cont form-box2">
             <el-form ref="form_wxpay" :model="forms.wxpay" :rules="rules.wxpay" label-width="150px">
@@ -184,15 +184,13 @@
                 </el-form-item>
                 <el-form-item label="时间" prop="duration">
                   <el-select v-model="forms.base.duration" class="diainp" placeholder="请选择" @change="changeDuration">
-                    <el-option v-for="item in durations" :key="item" :label="item" :value="item"> </el-option>
+                    <el-option v-for="item in durations" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                   </el-select>
-                  <span style="padding: 5px 12px">小时</span>
                 </el-form-item>
                 <el-form-item label="客户超时认证时间" prop="client_timeout">
                   <el-select v-model="forms.base.client_timeout" class="diainp" placeholder="请选择" @change="changeClientTimeout">
-                    <el-option v-for="item in client_timeout_op" :key="item" :label="item" :value="item"> </el-option>
+                    <el-option v-for="item in client_timeout_op" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                   </el-select>
-                  <span style="padding: 5px 12px">分钟</span>
                 </el-form-item>
                 <el-form-item label="背景图片" prop="background_url">
                   <el-upload
@@ -251,8 +249,32 @@ export default {
     return {
       params: {}, // Holds parameters for API calls, especially for saving settings
       task_type: 'wxpay_setting', // Controls the active tab
-      durations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], // Options for 'duration' in base settings (hours)
-      client_timeout_op: [2, 4, 6, 8, 10, 20, 30, 60, 120, 360], // Options for 'client_timeout' in base settings (minutes)
+      durations: [
+        { value: 1, label: '1小时' },
+        { value: 2, label: '2小时' },
+        { value: 3, label: '3小时' },
+        { value: 4, label: '4小时' },
+        { value: 5, label: '5小时' },
+        { value: 6, label: '6小时' },
+        { value: 7, label: '7小时' },
+        { value: 8, label: '8小时' },
+        { value: 9, label: '9小时' },
+        { value: 10, label: '10小时' },
+        { value: 11, label: '11小时' },
+        { value: 12, label: '12小时' }
+      ],
+      client_timeout_op: [
+        { value: 2, label: '2分钟' },
+        { value: 4, label: '4分钟' },
+        { value: 6, label: '6分钟' },
+        { value: 8, label: '8分钟' },
+        { value: 10, label: '10分钟' },
+        { value: 20, label: '20分钟' },
+        { value: 30, label: '30分钟' },
+        { value: 60, label: '1小时' },
+        { value: 120, label: '2小时' },
+        { value: 360, label: '6小时' }
+      ],
       forms: {
         // Encapsulates all form data models, organized by feature.
         wxpay: {
@@ -285,8 +307,8 @@ export default {
         base: {
           // Base settings form model (portal URL, session duration, client timeout, background image)
           portal_url: '',
-          duration: '',
-          client_timeout: '',
+          duration: 1,
+          client_timeout: 20,
           background_url: '' // URL for the portal background image
         },
         dx: {}, // Placeholder for general SMS settings; not actively used for fields but part of structure.
@@ -601,8 +623,8 @@ export default {
     _assignBaseData: function (result) {
       const self = this;
       self.forms.base.portal_url = result.portalUrl || '';
-      self.forms.base.duration = String(result.duration || ''); // Ensure value is string for el-select
-      self.forms.base.client_timeout = String(result.clientTimeout || ''); // Ensure value is string for el-select
+      self.forms.base.duration = result.duration || 1; // Ensure value is string for el-select
+      self.forms.base.client_timeout = result.clientTimeout || 20; // Ensure value is string for el-select
       const backgroundUrl = result.backgroundUrl || '/static/img/lg_pic.png'; // Default background
       self.forms.base.background_url = backgroundUrl;
 
@@ -728,8 +750,9 @@ export default {
      * @param {*} value - The selected duration.
      */
     changeDuration: function (value) {
+      console.log('select:', value);
       const self = this;
-      self.forms.base.duration = String(value);
+      self.forms.base.duration = value;
     },
 
     /**
@@ -739,7 +762,7 @@ export default {
      */
     changeClientTimeout: function (value) {
       const self = this;
-      self.forms.base.client_timeout = String(value);
+      self.forms.base.client_timeout = value;
     },
 
     /**

@@ -97,6 +97,10 @@ export default {
               title: '操作日志'
             },
             {
+              index: 'authlog',
+              title: '认证日志'
+            },
+            {
               index: 'eventlog',
               title: '上网日志'
             }
