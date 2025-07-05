@@ -65,8 +65,7 @@
                   <el-button size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
 
                   <el-dropdown style="margin-left: 10px">
-                    <!-- <span class="el-dropdown-link"><i class="el-icon-arrow-down el-icon--right"></i> </span> -->
-                    <el-button size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">更多...</el-button>
+                    <el-button size="small" type="text">更多...</el-button>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item>
                         <el-button size="small" v-if="scope.row.userType == '1' ? true : false" type="success" @click="switchToChannelView(scope.row.userAccount)"
