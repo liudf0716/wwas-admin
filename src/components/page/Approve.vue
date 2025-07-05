@@ -1,6 +1,6 @@
 <template>
   <div v-loading="loading">
-    <div class="crumbs">
+    <div class="bread-crumb">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item><i class="el-icon-mobile-phone"></i> 认证管理</el-breadcrumb-item>
         <el-breadcrumb-item>设置</el-breadcrumb-item>

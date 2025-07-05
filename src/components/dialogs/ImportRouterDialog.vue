@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="导入路由" :visible.sync="isVisible" @close="handleDialogClose" class="digcont">
-    <el-tabs v-model="activeTab" type="card" @tab-click="handleTabClick">
+  <el-dialog title="导入路由" :visible.sync="isVisible" @close="handleDialogClose" class="digcont" width="600px">
+    <el-tabs v-model="activeTab" @tab-click="handleTabClick">
       <el-tab-pane label="文件上传" name="1">
         <div>
           <h4>下载示范模板</h4>
@@ -20,7 +20,7 @@
                 ref="uploadComponentRef"
                 name="file_name"
                 :action="uploadUrl"
-                with-credentials="true"
+                :with-credentials="true"
                 :data="fileForm"
                 :before-upload="handleBeforeUpload"
                 :on-change="handleFileChange"
@@ -34,7 +34,7 @@
             </el-form-item>
           </el-form>
         </div>
-        <div class="mt30 dialog-footer">
+        <div class="mt30 mb30 dialog-footer">
           <el-button @click="handleDialogClose">取 消</el-button>
           <el-button type="primary" @click="submitUpload" :loading="uploading">保 存</el-button>
         </div>
@@ -47,7 +47,8 @@
           <el-form-item label="启用认证网关设备" prop="route_mac" :label-width="formLabelWidth">
             <el-input
               type="textarea"
-              :rows="2"
+              class="diainp"
+              :rows="3"
               placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
               v-model="manualForm.route_mac"
             ></el-input>
@@ -55,7 +56,8 @@
           <el-form-item label="启用单次认证网关设备" prop="route_mac_once_auth" :label-width="formLabelWidth">
             <el-input
               type="textarea"
-              :rows="2"
+              class="diainp"
+              :rows="3"
               placeholder="请输入网关ID，如果要输入多个，每行输入一个；网关ID一般为MAC地址，格式为12位字母或数字组合，不区分大小写"
               v-model="manualForm.route_mac_once_auth"
             ></el-input>
@@ -64,7 +66,7 @@
             <el-input v-model="manualForm.next_auth_time" placeholder="请输入免认证时长" class="diainp"></el-input>
           </el-form-item>
         </el-form>
-        <div class="mt30 dialog-footer">
+        <div class="mt30 mb30 dialog-footer">
           <el-button @click="handleDialogClose">取 消</el-button>
           <el-button type="primary" @click="saveManualImport" :loading="manualSaving">保 存</el-button>
         </div>
@@ -80,7 +82,7 @@ export default {
   name: 'ImportRouterDialog',
   props: {
     visible: { type: Boolean, default: false },
-    formLabelWidth: { type: String, default: '120px' },
+    formLabelWidth: { type: String, default: '160px' },
     targetAccount: { type: String, required: true },
     uploadUrlProp: { type: String, required: true }
   },
@@ -253,7 +255,7 @@ export default {
   .digcont {
   }
   .diainp {
-    width: 217px;
+    width: 320px;
   }
   .mb30 {
     margin-bottom: 30px;

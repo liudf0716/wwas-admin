@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="删除路由" :visible.sync="isVisible" @close="closeDialog" class="digcont">
+  <el-dialog title="删除路由" :visible.sync="isVisible" @close="closeDialog" class="digcont" width="600px">
     <div style="margin-bottom: 16px">*批量添加功能MAC之间以换行分割，每行一个MAC；MAC格式为12位字母或数字组合，不区分大小写:</div>
     <el-form :model="form" ref="deleteRouterForm" :rules="rules">
       <el-form-item prop="route_mac">
@@ -118,6 +118,7 @@ export default {
   }
   .mt30 {
     margin-top: 30px;
+    margin-bottom: 30px;
   }
   .dialog-footer {
     text-align: right;

@@ -29,24 +29,32 @@
       </el-form>
     </div>
 
-    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable">
-      <el-table-column type="index"></el-table-column>
-      <el-table-column prop="authType" label="认证类型"></el-table-column>
-      <el-table-column prop="authAccount" label="认证帐号" min-width="110"></el-table-column>
-      <el-table-column prop="placeCode" label="上网服务场所编码"> </el-table-column>
-      <el-table-column prop="loginTime" label="上线时间"></el-table-column>
-      <el-table-column prop="logoutTime" label="下线时间"></el-table-column>
-      <el-table-column prop="innerIP" label="内网IP"></el-table-column>
-      <el-table-column prop="srcIP" label="源外网IPv4"></el-table-column>
-      <el-table-column prop="srcPortStart" label="源起始端口号"></el-table-column>
-      <el-table-column prop="srcPortEnd" label="源结束端口号"></el-table-column>
-      <el-table-column prop="terminalMac" label="终端MAC地址"></el-table-column>
-      <el-table-column prop="apID" label="AP编号"></el-table-column>
-      <el-table-column prop="apMac" label="APMAC"></el-table-column>
-      <el-table-column prop="apLongitude" label="经度"></el-table-column>
-      <el-table-column prop="apLatitude" label="纬度"></el-table-column>
-      <el-table-column prop="signalStrength" label="场强"></el-table-column>
-      <el-table-column prop="sessionID" label="会话ID"> </el-table-column>
+    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable" highlight-current-row>
+      <el-table-column type="index" width="50"></el-table-column>
+      <el-table-column prop="authType" label="认证类型" width="100"></el-table-column>
+      <el-table-column prop="authAccount" label="认证帐号" width="120"></el-table-column>
+      <el-table-column prop="placeCode" label="场所编码" width="140"></el-table-column>
+      <el-table-column prop="loginTime" label="上线时间" width="160">
+        <template #default="scope">
+          {{ dateForm(scope.row.loginTime) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="logoutTime" label="下线时间" width="160">
+        <template #default="scope">
+          {{ dateForm(scope.row.logoutTime) }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="innerIP" label="内网IP" width="120"></el-table-column>
+      <el-table-column prop="srcIP" label="外网IPv4" width="120"></el-table-column>
+      <el-table-column prop="srcPortStart" label="起始端口" width="100"></el-table-column>
+      <el-table-column prop="srcPortEnd" label="结束端口" width="100"></el-table-column>
+      <el-table-column prop="terminalMac" label="终端MAC" width="140"></el-table-column>
+      <el-table-column prop="apID" label="AP编号" width="100"></el-table-column>
+      <el-table-column prop="apMac" label="AP MAC" width="140"></el-table-column>
+      <el-table-column prop="apLongitude" label="经度" width="100"></el-table-column>
+      <el-table-column prop="apLatitude" label="纬度" width="100"></el-table-column>
+      <el-table-column prop="signalStrength" label="场强" width="80"></el-table-column>
+      <el-table-column prop="sessionID" label="会话ID" width="180"></el-table-column>
     </el-table>
 
     <div class="pagination">

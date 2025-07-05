@@ -284,6 +284,9 @@ body {
   width: 217px;
 }
 
+.bread-crumb {
+  margin-bottom: 10px;
+}
 /* Animations */
 @keyframes fadeIn {
   from {

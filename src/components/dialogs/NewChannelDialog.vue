@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="新建子渠道" :visible.sync="isVisible" @close="closeDialog" class="digcont">
+  <el-dialog title="新建子渠道" :visible.sync="isVisible" @close="closeDialog" class="digcont" width="600px">
     <el-form :model="form" :rules="rules" ref="newChannelForm">
       <el-form-item label="账号/渠道名称" prop="user" :label-width="formLabelWidth">
         <el-input v-model="form.user" class="diainp" auto-complete="off"></el-input>
@@ -14,16 +14,17 @@
         <el-input v-model="form.tel" class="diainp" auto-complete="off"></el-input>
       </el-form-item>
       <el-form-item label="地址" :label-width="formLabelWidth">
-        <el-select size="small" style="width: 110px" v-model="form.selectProv" placeholder="请选择省份" @change="handleProvinceChangeInDialog">
+        <!-- <el-select size="small" style="width: 110px" v-model="form.selectProv" placeholder="请选择省份" @change="handleProvinceChangeInDialog">
           <el-option v-for="item in provs" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
         <el-select size="small" style="width: 104px" v-if="form.selectProv" v-model="form.selectCity" placeholder="请选择城市" @change="handleCityChangeInDialog">
           <el-option v-for="item in cityOptions" :key="item.value" :label="item.label" :value="item.value"></el-option>
-        </el-select>
+        </el-select> -->
+        <el-input v-model="form.addr" type="textarea" class="diainp" auto-complete="off" placeholder="请输入详细地址"></el-input>
       </el-form-item>
-      <el-form-item label="" :label-width="formLabelWidth">
+      <!-- <el-form-item label="" :label-width="formLabelWidth">
         <el-input v-model="form.addr" class="diainp2" auto-complete="off" placeholder="请输入详细地址"></el-input>
-      </el-form-item>
+      </el-form-item> -->
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="closeDialog">取 消</el-button>
@@ -177,7 +178,7 @@ export default {
   .digcont {
   }
   .diainp {
-    width: 217px;
+    width: 340px;
   }
   .diainp2 {
     width: 400px;

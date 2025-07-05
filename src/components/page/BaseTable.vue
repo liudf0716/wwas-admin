@@ -1,114 +1,172 @@
 <template>
-  <div class="table" v-loading="loading2">
-    <!-- User Management View (Super Admin) -->
-    <div v-if="isUser === '0'">
-      <div class="crumbs">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
-          <el-breadcrumb-item>渠道列表</el-breadcrumb-item>
-        </el-breadcrumb>
+  <div class="bg-gray-50 min-h-screen">
+    <!-- 页面容器 -->
+    <div class="container mx-auto px-4 py-6">
+      <!-- 用户管理视图 (超级管理员) -->
+      <div v-if="isUser === '0'" class="bg-white rounded-lg">
+        <!-- 面包屑导航 -->
+        <div class="bread-crumb">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道管理</el-breadcrumb-item>
+            <el-breadcrumb-item>渠道列表</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+
+        <!-- 筛选和搜索区域 -->
+        <div>
+          <el-radio-group v-model="userStatusFilter" @change="handleUserStatusFilterChange">
+            <el-radio-button label="all">全部</el-radio-button>
+            <el-radio-button label="0">未冻结</el-radio-button>
+            <el-radio-button label="1">已冻结</el-radio-button>
+          </el-radio-group>
+
+          <el-form :inline="true" style="float: right">
+            <el-form-item class="flex-1 max-w-md">
+              <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" clearable class="w-full">
+                <template #append>
+                  <el-button type="primary" icon="search" @click="searchUsers">
+                    <i class="el-icon-search"></i>
+                  </el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" icon="plus" @click="openNewChannelDialog"> <i class="el-icon-plus mr-2"></i>新建子渠道 </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <!-- 表格内容区域 -->
+        <div class="overflow-hidden rounded-lg shadow-sm border border-gray-200">
+          <el-table :data="userData" stripe style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading" class="min-w-full">
+            <el-table-column prop="userAccount" label="账 号"></el-table-column>
+            <el-table-column prop="userName" label="渠道名称"></el-table-column>
+            <el-table-column prop="userPhone" label="联系电话"></el-table-column>
+            <el-table-column prop="userStatus" label="冻结状态">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.userStatus == '1' ? 'warning' : 'success'" close-transition>{{ scope.row.userStatus == '1' ? '已冻结' : '未冻结' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="渠道类型">
+              <template slot-scope="scope">
+                <el-tag :type="scope.row.userType == '0' ? 'danger' : 'info'" close-transition>{{ scope.row.userType == '0' ? '超级管理员' : '管理员' }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="userCreateTime" label="创建时间" width="150"></el-table-column>
+            <el-table-column label="在线设备">
+              <template slot-scope="scope">
+                <el-tag type="warning">{{ scope.row.userOnlineCount + '/ ' + scope.row.userDeviceCount }}</el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" min-width="100">
+              <template slot-scope="scope">
+                <div class="flex flex-wrap gap-1">
+                  <el-button size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">重置密码</el-button>
+                  <el-button size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
+
+                  <el-dropdown style="margin-left: 10px">
+                    <!-- <span class="el-dropdown-link"><i class="el-icon-arrow-down el-icon--right"></i> </span> -->
+                    <el-button size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">更多...</el-button>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item>
+                        <el-button size="small" v-if="scope.row.userType == '1' ? true : false" type="success" @click="switchToChannelView(scope.row.userAccount)"
+                          >点击进入</el-button
+                        ></el-dropdown-item
+                      >
+                      <el-dropdown-item>
+                        <el-button
+                          size="mini"
+                          v-if="scope.row.userStatus == '0' && scope.row.userType == '1'"
+                          @click="freezeUserAccount(scope.row.userAccount)"
+                          :type="scope.row.userStatus == '1' ? 'warning' : 'danger'"
+                          >冻结账户</el-button
+                        >
+                        <el-button size="mini" v-else @click="unfreezeUserAccount(scope.row.userAccount)" :type="scope.row.userStatus == '1' ? 'warning' : 'danger'">解冻账户</el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item> <el-button size="small" type="primary" @click="openImportRouterDialogForUser(scope.row.userAccount)">导入路由</el-button> </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-button size="small" type="danger" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
+        <!-- 分页区域 -->
+        <div class="mt-6 flex justify-center">
+          <el-pagination @current-change="handleTablePageChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal" class="bg-white p-3 rounded-lg shadow-sm"></el-pagination>
+        </div>
       </div>
 
-      <div class="rad-group">
-        <el-radio-group v-model="userStatusFilter" @change="handleUserStatusFilterChange">
-          <el-radio-button label="all">全部</el-radio-button>
-          <el-radio-button label="0">未冻结</el-radio-button>
-          <el-radio-button label="1">已冻结</el-radio-button>
-        </el-radio-group>
+      <!-- 渠道设备视图 (渠道管理员) -->
+      <div v-if="isUser === '1'">
+        <!-- 面包屑导航 -->
+        <div class="bread-crumb">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道设备</el-breadcrumb-item>
+            <el-breadcrumb-item>认证设备</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
 
-        <el-form :inline="true" class="handle-box">
-          <el-form-item>
-            <el-button type="primary" icon="plus" class="handle-del mr10" @click="openNewChannelDialog">新建子渠道</el-button>
-          </el-form-item>
-          <el-form-item label="">
-            <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" class="handle-input mr10" clearable></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="search" @click="searchUsers">查询</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-      <el-table :data="userData" stripe style="width: 100%" ref="multipleTable" :empty-text="emptyMsg" v-loading="loading">
-        <el-table-column prop="userAccount" label="账 号"></el-table-column>
-        <el-table-column prop="userName" label="渠道名称"></el-table-column>
-        <el-table-column prop="userPhone" label="联系电话"></el-table-column>
-        <el-table-column prop="userStatus" label="冻结状态">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.userStatus == '1' ? 'warning' : 'success'" close-transition>{{ scope.row.userStatus == '1' ? '已冻结' : '未冻结' }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="渠道类型">
-          <template slot-scope="scope">
-            <el-tag :type="scope.row.userType == '0' ? 'danger' : 'info'" close-transition>{{ scope.row.userType == '0' ? '超级管理员' : '管理员' }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="userCreateTime" label="创建时间" width="150"></el-table-column>
-        <el-table-column label="在线设备">
-          <template slot-scope="scope">
-            <el-tag type="warning">{{ scope.row.userOnlineCount + '/ ' + scope.row.userDeviceCount }}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" min-width="250">
-          <template slot-scope="scope">
-            <el-button size="small" type="text" @click="adminResetPassword(scope.row.userAccount)">重置密码</el-button>
-            <el-button
-              size="mini"
-              v-if="scope.row.userStatus == '0' && scope.row.userType == '1'"
-              @click="freezeUserAccount(scope.row.userAccount)"
-              :type="scope.row.userStatus == '1' ? 'warning' : 'danger'"
-              >冻结账户</el-button
-            >
-            <el-button
-              size="small"
-              v-else-if="scope.row.userStatus == '1' && scope.row.userType == '1'"
-              @click="unfreezeUserAccount(scope.row.userAccount)"
-              :type="scope.row.userStatus == '1' ? 'warning' : 'danger'"
-              >解冻账户</el-button
-            >
-            <el-button size="small" v-if="scope.row.userType == '1' ? true : false" type="success" @click="switchToChannelView(scope.row.userAccount)">点击进入</el-button>
-            <el-button size="small" type="text" @click="openChangePasswordDialogForUser(scope.row.userAccount)">修改密码</el-button>
-            <el-button size="small" type="text" @click="openImportRouterDialogForUser(scope.row.userAccount)">导入路由</el-button>
-            <el-button size="small" type="text" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination">
-        <el-pagination @current-change="handleTablePageChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal"> </el-pagination>
+        <!-- 网关设备列表 -->
+        <div v-if="gatewayData.length === 0 && !showNewGatewayRow">
+          <p class="text-lg">no device available</p>
+        </div>
+        <el-table :data="gatewayData" stripe style="width: 100%" ref="gatewayTable">
+          <el-table-column label="渠道">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwChannel" size="small" placeholder="请输入渠道"></el-input>
+              <span v-else>{{ scope.row.gwChannel }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="设备ID">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.deviceID" size="small" placeholder="请输入设备ID"></el-input>
+              <span v-else>{{ scope.row.deviceID }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="网关ID">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwID" size="small" placeholder="请输入网关ID"></el-input>
+              <span v-else>{{ scope.row.gwID }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="单次认证网关ID">
+            <template slot-scope="scope">
+              <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949" @change="updateGatewayAuthStatus(scope.row)" class="transform scale-90"></el-switch>
+            </template>
+          </el-table-column>
+          <el-table-column label="单次认证免认证时长">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.nextAuthTime" size="small" placeholder="请输入免认证时长"></el-input>
+              <span v-else>{{ scope.row.nextAuthTime }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <div class="flex flex-wrap gap-1">
+                <el-button size="small" type="danger" v-if="!scope.row.isNew && !scope.row.isEditing" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
+                <el-button size="small" type="primary" v-if="!scope.row.isNew && !scope.row.isEditing" @click="toggleEditGateway(scope.row)">
+                  {{ '编辑' }}
+                </el-button>
+                <el-button size="small" type="success" v-if="scope.row.isEditing || scope.row.isNew" @click="saveGateway(scope.row)">保存网关</el-button>
+                <el-button size="small" type="warning" v-if="scope.row.isEditing || scope.row.isNew" @click="cancelEditGateway(scope.row)">取消</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+
+        <!-- 添加网关按钮 -->
+        <div style="margin-top: 10px">
+          <el-button type="primary" icon="plus" @click="addNewGatewayRow"> <i class="el-icon-plus mr-2"></i>添加认证网关设备 </el-button>
+        </div>
       </div>
     </div>
 
-    <div v-if="isUser === '1'">
-      <div class="crumbs">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item><i class="el-icon-menu"></i> 渠道设备</el-breadcrumb-item>
-          <el-breadcrumb-item>认证设备</el-breadcrumb-item>
-        </el-breadcrumb>
-      </div>
-      <el-form :inline="true" class="handle-box">
-        <el-form-item>
-          <el-button type="primary" icon="plus" class="handle-del" @click="openAddGatewayDialog">添加认证网关设备</el-button>
-        </el-form-item>
-      </el-form>
-      <div v-if="gatewayData.length === 0" class="no-device">no device available</div>
-      <el-table v-else :data="gatewayData" stripe style="width: 100%" ref="gatewayTable">
-        <el-table-column prop="gwChannel" label="渠道"></el-table-column>
-        <el-table-column prop="deviceID" label="设备ID"></el-table-column>
-        <el-table-column prop="gwID" label="网关ID"></el-table-column>
-        <el-table-column prop="onceAuth" label="单次认证网关ID">
-          <template slot-scope="scope">
-            <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949" @change="updateGatewayAuthStatus(scope.row)"></el-switch>
-          </template>
-        </el-table-column>
-        <el-table-column prop="nextAuthTime" label="单次认证免认证时长"></el-table-column>
-        <el-table-column label="操作">
-          <template slot-scope="scope">
-            <el-button size="small" type="danger" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
-            <el-button size="small" type="primary" @click="openUpdateGatewayDialog(scope.row)">更新网关</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-
+    <!-- 对话框组件 -->
     <new-channel-dialog
       :visible.sync="dialogs.newChannel.visible"
       :form-label-width="formLabelWidth"
@@ -127,19 +185,8 @@
       ref="changePasswordDialogRef"
     ></change-password-dialog>
 
-    <add-update-gateway-dialog
-      :visible.sync="dialogs.addUpdateGateway.visible"
-      :form-label-width="formLabelWidth"
-      :is-update="dialogs.addUpdateGateway.isUpdate"
-      :initial-data="dialogs.addUpdateGateway.form"
-      @save="handleSaveGateway"
-      @close="dialogs.addUpdateGateway.visible = false"
-      ref="addUpdateGatewayDialogRef"
-    ></add-update-gateway-dialog>
-
     <import-router-dialog
       :visible.sync="dialogs.importRouter.visible"
-      :form-label-width="formLabelWidth"
       :target-account="dialogs.importRouter.currentAccount"
       :upload-url-prop="dialogs.importRouter.uploadUrl"
       @upload-success="handleImportRouterUploadSuccess"
@@ -163,10 +210,9 @@
 import md5 from 'js-md5';
 import global_ from 'components/common/Global';
 
-// Import Dialog Components
+// 导入对话框组件
 import NewChannelDialog from '@/components/dialogs/NewChannelDialog.vue';
 import ChangePasswordDialog from '@/components/dialogs/ChangePasswordDialog.vue';
-import AddUpdateGatewayDialog from '@/components/dialogs/AddUpdateGatewayDialog.vue';
 import ImportRouterDialog from '@/components/dialogs/ImportRouterDialog.vue';
 import DeleteRouterDialog from '@/components/dialogs/DeleteRouterDialog.vue';
 
@@ -175,27 +221,27 @@ export default {
   components: {
     NewChannelDialog,
     ChangePasswordDialog,
-    AddUpdateGatewayDialog,
     ImportRouterDialog,
     DeleteRouterDialog
   },
   data: function () {
     return {
-      // General Page State & User Type
+      // 通用页面状态和用户类型
       isUser: localStorage.getItem('userType') || '0',
       loading: false,
       loading2: false,
       fullscreenLoading: false,
 
-      // User (Channel) Management
+      // 用户(渠道)管理
       userData: [],
       search_word: '',
       userStatusFilter: 'all',
 
-      // Device/Gateway Management (for channel admin view)
+      // 设备/网关管理(渠道管理员视图)
       gatewayData: [],
+      showNewGatewayRow: false,
 
-      // Table & Pagination
+      // 表格和分页
       pageTotal: 0,
       currentPage: 1,
       emptyMsg: '暂无数据',
@@ -210,16 +256,6 @@ export default {
         changePassword: {
           visible: false,
           currentAccount: ''
-        },
-        addUpdateGateway: {
-          visible: false,
-          isUpdate: false,
-          form: {
-            device_id: '',
-            gw_id: '',
-            once_auth: false,
-            next_auth_time: ''
-          }
         },
         importRouter: {
           visible: false,
@@ -292,7 +328,13 @@ export default {
           if (res.data.ret_code === '1001') {
             this.handleApiError(res.data.extra, true);
           } else if (res.data.ret_code === 0) {
-            this.gatewayData = res.data.extra;
+            this.gatewayData = res.data.extra || [];
+            // 确保数据中有isEditing和isNew字段
+            this.gatewayData.forEach(item => {
+              // 使用Vue.set确保属性是响应式的
+              this.$set(item, 'isEditing', false);
+              this.$set(item, 'isNew', false);
+            });
           } else {
             this.handleApiError(res.data.extra);
             this.gatewayData = [];
@@ -437,50 +479,87 @@ export default {
           if (this.$refs.changePasswordDialogRef) this.$refs.changePasswordDialogRef.onSaveError();
         });
     },
-    openAddGatewayDialog: function () {
-      const dlg = this.dialogs.addUpdateGateway;
-      dlg.isUpdate = false;
-      dlg.form = {
-        user_account: localStorage.getItem('ms_username'),
-        gw_channel: localStorage.getItem('ms_username'),
-        device_id: '',
-        gw_id: '',
-        once_auth: false,
-        next_auth_time: ''
+    addNewGatewayRow: function () {
+      // 检查是否已有正在编辑的行
+      const editingRow = this.gatewayData.find(item => item.isEditing || item.isNew);
+      if (editingRow) {
+        this.$message.warning('请先完成当前行的操作');
+        return;
+      }
+
+      // 添加新行
+      const newRow = {
+        gwChannel: localStorage.getItem('ms_username'),
+        deviceID: '',
+        gwID: '',
+        onceAuth: false,
+        nextAuthTime: '',
+        isNew: true,
+        isEditing: true
       };
-      dlg.visible = true;
+      this.gatewayData.push(newRow);
     },
-    openUpdateGatewayDialog: function (gatewayRowData) {
-      const dlg = this.dialogs.addUpdateGateway;
-      dlg.isUpdate = true;
-      dlg.form = {
-        ...gatewayRowData,
+    toggleEditGateway: function (row) {
+      // 检查是否已有正在编辑的行
+      const editingRow = this.gatewayData.find(item => item.isEditing && item !== row);
+      if (editingRow) {
+        this.$message.warning('请先完成当前行的操作');
+        return;
+      }
+
+      row.isEditing = !row.isEditing;
+      this.$forceUpdate(); // 确保视图更新
+    },
+    cancelEditGateway: function (row) {
+      if (row.isNew) {
+        // 如果是新增的行，直接删除
+        const index = this.gatewayData.indexOf(row);
+        if (index !== -1) {
+          this.gatewayData.splice(index, 1);
+        }
+      } else {
+        // 如果是编辑已有的行，取消编辑状态
+        row.isEditing = false;
+      }
+    },
+    saveGateway: function (row) {
+      // 验证必填字段
+      if (!row.deviceID || !row.gwID) {
+        this.$message.warning('设备ID和网关ID不能为空');
+        return;
+      }
+
+      // 准备保存数据
+      const params = {
         user_account: localStorage.getItem('ms_username'),
-        gw_channel: localStorage.getItem('ms_username')
+        gw_channel: row.gwChannel,
+        device_id: row.deviceID,
+        gw_id: row.gwID,
+        once_auth: row.onceAuth,
+        next_auth_time: row.nextAuthTime
       };
-      dlg.visible = true;
-    },
-    handleSaveGateway: function (formData, isUpdateFlag) {
-      const params = { ...formData };
+
+      this.loading2 = true;
       this.$axios
         .post(global_.baseUrl + '/device/updateGateway', params)
         .then(res => {
-          const dialogRef = this.$refs.addUpdateGatewayDialogRef;
+          this.loading2 = false;
           if (res.data.ret_code === '1001') {
             this.handleApiError(res.data.extra, true);
-            if (dialogRef) dialogRef.onSaveError();
           } else if (res.data.ret_code === 0) {
-            this.$message({ message: (isUpdateFlag ? '修改' : '添加') + '成功', type: 'success' });
-            this.fetchGatewayDataForChannel(params.gw_channel || localStorage.getItem('ms_username'));
-            if (dialogRef) dialogRef.onSaveSuccess();
+            this.$message({ message: row.isNew ? '添加成功' : '更新成功', type: 'success' });
+            // 重置行状态
+            row.isEditing = false;
+            row.isNew = false;
+            // 刷新数据
+            this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
           } else {
             this.handleApiError(res.data.extra || '操作失败');
-            if (dialogRef) dialogRef.onSaveError();
           }
         })
         .catch(err => {
+          this.loading2 = false;
           this.handleApiError('网关操作请求失败: ' + err.message);
-          if (this.$refs.addUpdateGatewayDialogRef) this.$refs.addUpdateGatewayDialogRef.onSaveError();
         });
     },
     updateGatewayAuthStatus: function (gatewayRow) {
@@ -504,30 +583,26 @@ export default {
           } else {
             this.handleApiError(res.data.extra || '更新失败');
           }
-          this.fetchGatewayDataForChannel(localStorage.getItem('ms_username')); // Refresh state
         })
         .catch(err => {
           this.loading2 = false;
           this.handleApiError('认证状态更新请求失败: ' + err.message);
-          this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
         });
     },
     deleteGateway: function (device_id, gw_id) {
-      this.$confirm('此操作将删除该网关, 是否继续?', '提示', { type: 'warning' })
-        .then(() => {
-          const params = { device_id: device_id, gw_id: gw_id, user_account: localStorage.getItem('ms_username'), gw_channel: localStorage.getItem('ms_username') };
-          this.$axios
-            .post(global_.baseUrl + '/device/deleteGateway', params)
-            .then(res => {
-              if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
-              else if (res.data.ret_code === 0) {
-                this.$message({ message: '删除成功', type: 'success' });
-                this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
-              } else this.handleApiError(res.data.extra || '删除失败');
-            })
-            .catch(err => this.handleApiError('删除网关请求失败: ' + err.message));
-        })
-        .catch(() => this.$message({ type: 'info', message: '已取消删除' }));
+      this.$confirm('此操作将删除该网关, 是否继续?', '提示', { type: 'warning' }).then(() => {
+        const params = { device_id: device_id, gw_id: gw_id, user_account: localStorage.getItem('ms_username'), gw_channel: localStorage.getItem('ms_username') };
+        this.$axios
+          .post(global_.baseUrl + '/device/deleteGateway', params)
+          .then(res => {
+            if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+            else if (res.data.ret_code === 0) {
+              this.$message({ message: '删除成功', type: 'success' });
+              this.fetchGatewayDataForChannel(localStorage.getItem('ms_username'));
+            } else this.handleApiError(res.data.extra || '删除失败');
+          })
+          .catch(err => this.handleApiError('删除网关请求失败: ' + err.message));
+      });
     },
     openImportRouterDialogForUser: function (account) {
       this.dialogs.importRouter.currentAccount = account;
@@ -645,43 +720,19 @@ export default {
 </script>
 
 <style scoped>
-  .handle-box {
-    /* margin-bottom: 10px; */
-    float: right;
+  /* 配置 Tailwind 颜色和字体 */
+  @layer utilities {
+    .content-auto {
+      content-visibility: auto;
+    }
+    .bg-primary {
+      background-color: #409eff;
+    }
+    .text-primary {
+      color: #409eff;
+    }
+    .hover\:bg-primary\/90:hover {
+      background-color: rgba(64, 158, 255, 0.9);
+    }
   }
-  .handle-select {
-    width: 120px;
-  }
-  .handle-input {
-    width: 300px;
-    display: inline-block;
-  }
-  .rad-group {
-    margin-bottom: 20px;
-  }
-  /*.digcont{width:600px;}*/ /* This was commented out, good to keep as is or remove */
-  .diainp {
-    width: 217px;
-  }
-  .diainp2 {
-    width: 400px;
-  }
-  .upload-demo {
-  }
-  .mb30 {
-    margin-bottom: 30px;
-  }
-  .mt30 {
-    margin-top: 30px;
-  }
-  .no-device {
-    /* Added this from inspection of original template if needed */
-    padding: 20px;
-    text-align: center;
-    color: #888;
-  }
-  .form-item-center .el-form-item__content {
-    /* For AddUpdateGatewayDialog specific style if needed, though this is broad */
-    /* text-align: center; */ /* Example, if it was meant to center the input itself */
-  }
-</style>
+</style>  
