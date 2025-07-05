@@ -66,6 +66,11 @@ export default new Router({
                     component: (resolve) =>
                         require(["../components/page/AuthLog.vue"], resolve),
                 },
+                {
+                    path: "/sysinfo",
+                    component: (resolve) =>
+                        require(["../components/page/Sysinfo.vue"], resolve),
+                },
             ],
         },
         {

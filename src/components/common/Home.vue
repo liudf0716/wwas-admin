@@ -105,6 +105,17 @@ export default {
               title: '上网日志'
             }
           ]
+        },
+        {
+          icon: 'el-icon-setting',
+          index: '7',
+          title: '系统设置',
+          subs: [
+            {
+              index: 'sysinfo',
+              title: '系统信息'
+            }
+          ]
         }
       ],
       userItems: [

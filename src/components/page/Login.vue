@@ -1,9 +1,13 @@
 <template>
   <div class="login-container">
-    <div class="login-box">
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-overlay" v-loading="loading"></div>
+
+    <!-- 登录表单 -->
+    <div v-else class="login-box">
       <div class="login-left">
         <h2 class="login-title">欢迎登录</h2>
-        <p class="login-subtitle">AWAS认证服务器管理平台</p>
+        <p class="login-subtitle">{{ systemInfo.systemName || 'AWAS认证服务器管理平台' }}</p>
         <el-tabs v-model="activeTab" stretch>
           <el-tab-pane label="密码登录" name="password">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="login-form">
@@ -32,7 +36,7 @@
         <!-- 可设置背景图或svg图形 -->
       </div>
       <footer class="login-footer">
-        <p>© 2025 AWAS认证服务器管理平台 ICP备案号: 京ICP备12345678号</p>
+        <p>{{ systemInfo.copyright || '© 2025 AWAS认证服务器管理平台' }} {{ 'ICP备案号: ' }} {{ systemInfo.icpRecord || '京ICP备12345678号' }}</p>
       </footer>
     </div>
   </div>
@@ -58,18 +62,14 @@ export default {
           { min: 3, max: 32, message: '长度在3到32个字符', trigger: 'blur' },
           { pattern: /^\S*$/, message: '密码不能包含空格', trigger: 'blur' }
         ]
-      }
+      },
+      loading: true, // 加载状态
+      systemInfo: {} // 系统信息
     };
   },
   mounted() {
     document.addEventListener('keydown', this.handleEnterKey);
-    // 等 DOM 渲染完毕后聚焦
-    this.$nextTick(() => {
-      const usernameInput = this.$el.querySelector('input[placeholder="请输入账号"]');
-      if (usernameInput) {
-        usernameInput.focus();
-      }
-    });
+    this.fetchSystemInfo();
   },
   beforeDestroy() {
     document.removeEventListener('keydown', this.handleEnterKey);
@@ -79,6 +79,31 @@ export default {
       if (event.key === 'Enter') {
         this.submitForm('ruleForm');
       }
+    },
+    // 获取系统信息
+    fetchSystemInfo() {
+      this.$axios
+        .get(global_.baseUrl + '/sysinfo/detail')
+        .then(res => {
+          if (res.data.ret_code === 0) {
+            this.systemInfo = res.data.extra;
+            // 等 DOM 渲染完毕后聚焦
+            this.$nextTick(() => {
+              const usernameInput = this.$el.querySelector('input[placeholder="请输入账号"]');
+              if (usernameInput) {
+                usernameInput.focus();
+              }
+            });
+          } else {
+            this.$message.error('获取系统信息失败');
+          }
+        })
+        .catch(() => {
+          this.$message.error('获取系统信息失败');
+        })
+        .finally(() => {
+          this.loading = false; // 无论成功或失败都关闭加载状态
+        });
     },
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -121,11 +146,10 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%); */
     background: linear-gradient(120deg, #1a2980 0%, #26d0ce 100%);
-
     height: 100vh;
     overflow: hidden;
+    position: relative;
   }
 
   .login-box {
@@ -136,6 +160,7 @@ export default {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
+    z-index: 1;
   }
 
   .login-left {
@@ -180,6 +205,7 @@ export default {
     background: url('/static/img/login-bg.svg') no-repeat center;
     background-size: cover;
   }
+
   .login-footer {
     width: 100%;
     text-align: center;
@@ -189,5 +215,29 @@ export default {
     left: 0;
     font-size: 12px;
     color: #3b3a41;
+    z-index: 2;
   }
-</style>
+
+  /* 加载状态样式 */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .loading-spinner {
+    text-align: center;
+  }
+
+  .loading-spinner p {
+    margin-top: 16px;
+    color: #666;
+  }
+</style>  
