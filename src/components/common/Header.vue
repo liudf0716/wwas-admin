@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="logo"><img class="header-logo" src="../../../static/img/logo.png" />认证服务器管理平台</div>
+    <div class="logo"><img class="header-logo" :src="logoUrl" />{{ systemName }}</div>
     <div class="user-info">
       <el-dropdown trigger="click" @command="handleCommand">
         <span class="el-dropdown-link">
@@ -43,8 +43,10 @@ export default {
   data() {
     return {
       name: 'linxin',
-
       showDialogPwd: false,
+      username: localStorage.getItem('ms_username') || '未登录',
+      logoUrl: localStorage.getItem('logoUrl') || require('../../../static/img/logo.png'),
+      systemName: localStorage.getItem('systemName'),
       form: {
         user_account: localStorage.getItem('ms_username'),
         user_password: '',
@@ -71,11 +73,11 @@ export default {
       }
     };
   },
-  computed: {
-    username() {
-      let username = localStorage.getItem('ms_username');
-      return username ? username : this.name;
-    }
+  mounted() {
+    this.$bus.$on('updateSysinfo', data => {
+      this.logoUrl = data.logo || require('../../../static/img/logo.png');
+      this.systemName = data.systemName;
+    });
   },
   methods: {
     saveChange: function (formName) {

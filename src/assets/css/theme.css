@@ -36,11 +36,12 @@ body {
   overflow: hidden;
 }
 
-.el-menu-vertical-demo {
+.el-menu-vertical {
   float: left;
+  user-select: none;
 }
 
-.el-menu-vertical-demo:not(.el-menu--collapse) {
+.el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
 }
 
@@ -236,7 +237,7 @@ body {
 
 .header .logo {
   float: left;
-  width: 250px;
+  width: 350px;
   font-weight: 600;
   /* text-align: center; */
   margin-left: 20px;

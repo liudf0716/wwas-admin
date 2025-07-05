@@ -69,6 +69,13 @@ export default {
   },
   mounted() {
     document.addEventListener('keydown', this.handleEnterKey);
+    // 等 DOM 渲染完毕后聚焦
+    this.$nextTick(() => {
+      const usernameInput = this.$el.querySelector('input[placeholder="请输入账号"]');
+      if (usernameInput) {
+        usernameInput.focus();
+      }
+    });
     this.fetchSystemInfo();
   },
   beforeDestroy() {
@@ -87,13 +94,8 @@ export default {
         .then(res => {
           if (res.data.ret_code === 0) {
             this.systemInfo = res.data.extra;
-            // 等 DOM 渲染完毕后聚焦
-            this.$nextTick(() => {
-              const usernameInput = this.$el.querySelector('input[placeholder="请输入账号"]');
-              if (usernameInput) {
-                usernameInput.focus();
-              }
-            });
+            localStorage.setItem('systemName', res.data.extra.systemName);
+            localStorage.setItem('logoUrl', res.data.extra.logo);
           } else {
             this.$message.error('获取系统信息失败');
           }
