@@ -117,20 +117,19 @@
         <el-table :data="gatewayData" stripe style="width: 100%" ref="gatewayTable">
           <el-table-column label="渠道">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwChannel" size="small" placeholder="请输入渠道"></el-input>
-              <span v-else>{{ scope.row.gwChannel }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="设备ID">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.deviceID" size="small" placeholder="请输入设备ID"></el-input>
-              <span v-else>{{ scope.row.deviceID }}</span>
+              <span>{{ scope.row.gwChannel }}</span>
             </template>
           </el-table-column>
           <el-table-column label="网关ID">
             <template slot-scope="scope">
               <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwID" size="small" placeholder="请输入网关ID"></el-input>
               <span v-else>{{ scope.row.gwID }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="设备ID">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.deviceID" size="small" placeholder="请输入设备ID"></el-input>
+              <span v-else>{{ scope.row.deviceID }}</span>
             </template>
           </el-table-column>
           <el-table-column label="单次认证网关ID">
@@ -160,7 +159,7 @@
 
         <!-- 添加网关按钮 -->
         <div style="margin-top: 10px">
-          <el-button type="primary" icon="plus" @click="addNewGatewayRow"> <i class="el-icon-plus mr-2"></i>添加认证网关设备 </el-button>
+          <el-button type="primary" icon="plus" size="small" @click="addNewGatewayRow"> <i class="el-icon-plus mr-2"></i>添加认证网关设备 </el-button>
         </div>
       </div>
     </div>
