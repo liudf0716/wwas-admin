@@ -223,7 +223,7 @@
                   <button type="button" class="btn" v-show="forms.wxpay.enable">微信支付认证上网</button>
                   <button type="button" class="btn" v-show="forms.ali.enable">短信认证上网</button>
                   <button type="button" class="btn" v-show="forms.user.enable">密码认证上网</button>
-                  <button type="button" class="btn" v-show="forms.onekey">一键上网</button>
+                  <button type="button" class="btn" v-show="forms.onekey.enable">一键上网</button>
                   <!-- <button type="button" class="btn" id="tmppass">临时放行</button> !-->
                   <p class="msg"><input type="checkbox" class="checkbox" id="checkbox" checked /> <label for="checkbox">已阅读并同意</label> <span class="xieyihref">上网服务条款</span></p>
                 </div>
@@ -961,8 +961,8 @@ export default {
     line-height: 28px;
     color: #fff;
     background-color: #0abcdf;
-    border-radius: 1px;
-    border: 1px solid #000;
+    border-radius: 4px;
+    border: 0px solid #000;
     text-decoration: none;
     font-size: 8px;
   }

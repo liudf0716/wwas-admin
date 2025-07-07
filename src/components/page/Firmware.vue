@@ -37,7 +37,6 @@
             :limit="1"
             :data="uploadForm"
             :on-success="handleUploadSuccess"
-            :before-upload="handleBeforUpload"
             :on-change="handleFileChange"
             :auto-upload="false"
             :on-exceed="handleBeforExced"
