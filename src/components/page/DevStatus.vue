@@ -25,19 +25,25 @@
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
       <el-table-column prop="deviceID" label="设备ID"></el-table-column>
       <el-table-column prop="name" label="设备名称"></el-table-column>
+      <el-table-column prop="macAddress" label="MAC地址"></el-table-column>
+      <el-table-column prop="locationID" label="场所编码"></el-table-column>
+
       <el-table-column prop="awVersion" label="AW版本"></el-table-column>
       <el-table-column prop="fmVersion" label="固件版本"></el-table-column>
       <el-table-column prop="onlineClients" label="在线客户数"></el-table-column>
-      <el-table-column prop="wiredPassed" label="有线免认证">
+      <el-table-column label="位置坐标">
+        <template slot-scope="scope"> {{ scope.row.longitude }},{{ scope.row.latitude }} </template>
+      </el-table-column>
+      <!-- <el-table-column prop="wiredPassed" label="有线免认证">
         <template slot-scope="scope">
           <el-tag :type="scope.row.wiredPassed == '0' ? 'warning' : 'success'" close-transition>{{ scope.row.wiredPassed == '1' ? '已开启' : '未开启' }}</el-tag>
         </template>
-      </el-table-column>
-      <el-table-column prop="wifidogUptime" label="wifidog运行时长">
+      </el-table-column> -->
+      <!-- <el-table-column prop="wifidogUptime" label="wifidog运行时长">
         <template slot-scope="scope">
           <span>{{ timeStamp(scope.row.wifidogUptime) }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="deviceStatus" label="状态">
         <template slot-scope="scope">
           <el-tag :type="scope.row.deviceStatus == '1' ? 'success' : 'danger'" close-transition>
@@ -53,22 +59,44 @@
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
           <el-button type="text" @click="showDetail(scope.row)">详情</el-button>
+          <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
 
+    <el-dialog title="编辑设备信息" :visible.sync="showEditDeviceDialog" width="550px">
+      <el-alert title="设备基础信息修改后会同步到设备端, 请勿随意修改.(仅允许修改在线设备)" type="warning" :closable="false" show-icon> </el-alert>
+      <el-form :model="editDeviceForm" label-width="120px" style="margin-top: 10px">
+        <el-form-item label="设备ID">
+          {{ editDeviceForm.deviceID }}
+        </el-form-item>
+        <el-form-item label="MAC地址">
+          <el-input v-model="editDeviceForm.macAddress" style="width: 300px"></el-input>
+        </el-form-item>
+        <el-form-item label="场所编码">
+          <el-input v-model="editDeviceForm.locationID" style="width: 300px"></el-input>
+        </el-form-item>
+        <el-form-item label="经纬度">
+          <el-input v-model="editDeviceForm.longitude" placeholder="经度" style="width: 145px"></el-input>
+          <span> - </span>
+          <el-input v-model="editDeviceForm.latitude" placeholder="纬度" style="width: 145px"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showEditDeviceDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveDeviceEdit">保存</el-button>
+      </span>
+    </el-dialog>
+
     <el-dialog title="设备详情" :visible.sync="showDeviceDetailDialog" width="50%">
-      <div class="dialog-content">
-        <div class="dialog-section">
-          <div class="dialog-title">设备详细信息</div>
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="运行状态" name="first">
           <el-table :data="selectedDevice" border style="width: 100%">
             <el-table-column prop="key" label="描述"></el-table-column>
             <el-table-column prop="value" label="值"></el-table-column>
           </el-table>
-        </div>
-
-        <div class="dialog-section">
-          <div class="dialog-title">设备所属认证网关信息</div>
+        </el-tab-pane>
+        <el-tab-pane label="认证网关" name="second">
           <el-table :data="selectedGwSettings" border style="width: 100%">
             <el-table-column prop="gwID" label="网关ID"></el-table-column>
             <el-table-column prop="gwChannel" label="网关渠道"></el-table-column>
@@ -78,11 +106,13 @@
               </template>
             </el-table-column>
           </el-table>
-        </div>
-      </div>
+        </el-tab-pane>
+        <el-tab-pane label="放行规则" name="third">放行规则</el-tab-pane>
+        <el-tab-pane label="域名白名单" name="fourth">域名白名单</el-tab-pane>
+      </el-tabs>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="showDeviceDetailDialog = false">确定</el-button>
+        <el-button type="primary" @click="showDeviceDetailDialog = false">返回</el-button>
       </span>
     </el-dialog>
     <div class="pagination">
@@ -96,10 +126,6 @@ import { timeStamp, dateForm, bytesLabel, cpuLabel } from 'components/common/Hel
 import { baseUrl } from 'components/common/Global';
 
 const deviceDetailMap = [
-  { key: 'deviceID', label: '设备ID' },
-  { key: 'name', label: '设备名称' },
-  { key: 'type', label: '设备型号' },
-  { key: 'remoteAddress', label: '设备地址' },
   { key: 'awVersion', label: 'AW版本' },
   { key: 'fmVersion', label: '固件版本' },
   { key: 'onlineClients', label: '在线客户数' },
@@ -117,20 +143,22 @@ export default {
   data: function () {
     return {
       activeFilterTab: 'all',
+      activeName: 'first',
       searchQuery: '',
       loading: false,
       pageTotal: 0,
       listData: [],
       currentPage: 1,
-      currentUserType: '',
       showDeviceDetailDialog: false,
+      showEditDeviceDialog: false,
       selectedDevice: [],
-      selectedGwSettings: []
+      selectedGwSettings: [],
+      editDeviceForm: {}
     };
   },
 
   created: function () {
-    this.getUser();
+    this.getData('/all');
   },
 
   methods: {
@@ -139,34 +167,37 @@ export default {
     bytesLabel: bytesLabel,
     cpuLabel: cpuLabel,
 
-    async getUser() {
-      try {
-        const res = await this.$axios.post(baseUrl + '/admin/info');
-        if (res.data.ret_code === 1001) {
-          this._handleApiError(res.data.extra, true);
-        } else if (res.data.ret_code === 0) {
-          const user = res.data.extra;
-          this.currentUserType = user.userType;
-          if (this.currentUserType === 1 || this.currentUserType === 0) {
-            this.getData('/all');
-          } else {
-            // Specific error message for this case, not using _handleApiError
-            this.$message({ message: '用户类型错误', type: 'warning' });
-          }
-        } else {
-          // Handle other non-successful ret_codes from admin/info
-          this._handleApiError(res.data.extra || 'Failed to get user info', false);
-        }
-      } catch (error) {
-        this._handleApiError('Network error or request failed while fetching user info: ' + error.message, false);
-      }
-    },
-
     getData: function (url) {
       // Accepts a URL string
       this._fetchDeviceData(url, {});
     },
 
+    handleEdit(row) {
+      this.showEditDeviceDialog = true;
+      this.editDeviceForm = {
+        deviceID: row.deviceID,
+        macAddress: row.macAddress,
+        locationID: row.locationID,
+        longitude: row.longitude,
+        latitude: row.latitude
+      };
+    },
+    async saveDeviceEdit() {
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/updateDeviceInfo', this.editDeviceForm);
+
+        if (res.data.ret_code == 0) {
+          this.$message({ message: '设备信息更新成功', type: 'success' });
+          this.showEditDeviceDialog = false;
+          this.changeTab();
+        } else {
+          // For other non-successful ret_codes (not 0 and not 1001)
+          this._handleApiError(res.data.extra || 'Unknown error occurred', false);
+        }
+      } catch (error) {
+        this._handleApiError('Network error or request failed: ' + error.message, false);
+      }
+    },
     showDetail: function (row) {
       this.selectedDevice = [];
       this.selectedGwSettings = []; // Clear previous settings
@@ -237,9 +268,7 @@ export default {
       let fullUrl = baseUrl + '/device/list' + url;
       let requestParams = { ...params };
 
-      if (this.currentUserType == '1') {
-        requestParams['gw_channel'] = localStorage.getItem('ms_username');
-      }
+      requestParams['gw_channel'] = localStorage.getItem('ms_username');
 
       try {
         const res = await this.$axios.post(fullUrl, requestParams);
