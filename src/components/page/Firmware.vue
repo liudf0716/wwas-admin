@@ -137,9 +137,25 @@ export default {
       // 提取设备型号
       const modelMatch = fileName.match(/_([^-]+)/);
       this.uploadForm.deviceModel = modelMatch ? modelMatch[1] : '';
+
+      if (!this.uploadForm.deviceModel || !this.uploadForm.version) {
+        this.$message.warning('固件不合法, 请确保文件符合格式要求');
+        this.$refs.fileUpload.clearFiles();
+        this.clearForm();
+      }
     },
     handleDialogClose() {
       this.showUploadDialogVisible = false;
+      this.clearForm();
+    },
+    handleDialogVisible() {
+      this.showUploadDialogVisible = true;
+      this.clearForm();
+    },
+    handleUploadError() {
+      this.uploading = false;
+    },
+    clearForm() {
       this.uploadForm = {
         deviceModel: '',
         version: '',
@@ -150,16 +166,6 @@ export default {
           this.$refs.fileUpload.clearFiles();
         }
       });
-    },
-    handleDialogVisible() {
-      this.showUploadDialogVisible = true;
-      this.uploadForm = {
-        deviceModel: '',
-        version: '',
-        releaseNotes: ''
-      };
-    },
-    handleUploadError() {
       this.uploading = false;
     },
     submitUpload() {
