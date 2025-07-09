@@ -49,8 +49,8 @@
       <el-table-column prop="srcPortStart" label="起始端口" width="100"></el-table-column>
       <el-table-column prop="srcPortEnd" label="结束端口" width="100"></el-table-column>
       <el-table-column prop="terminalMac" label="终端MAC" width="140"></el-table-column>
-      <el-table-column prop="apID" label="AP编号" width="100"></el-table-column>
-      <el-table-column prop="apMac" label="AP MAC" width="140"></el-table-column>
+      <el-table-column prop="apID" label="AP设备编号" min-width="100"></el-table-column>
+      <el-table-column prop="apMac" label="AP MAC地址" width="140"></el-table-column>
       <el-table-column prop="apLongitude" label="经度" width="100"></el-table-column>
       <el-table-column prop="apLatitude" label="纬度" width="100"></el-table-column>
       <el-table-column prop="signalStrength" label="场强" width="80"></el-table-column>
