@@ -6,10 +6,19 @@
         <el-breadcrumb-item>上网日志</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
-    <div class="rad-group" v-show="false">
-      <el-form :inline="true" class="handle-box2">
-        <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备编码"></el-input>
+    <div class="rad-group">
+      <el-form :inline="true">
+        <el-form-item label="日期范围">
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="yyyy-MM-dd"
+            value-format="timestamp"
+            @change="handleDateChange"
+          ></el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
@@ -73,7 +82,7 @@ export default {
   },
   data: function () {
     return {
-      tableMaxHeight: `${window.innerHeight - 200}`,
+      tableMaxHeight: `${window.innerHeight - 270}`,
       activeFilterTab: 'online',
       searchQuery: '',
       loading: false,
@@ -89,7 +98,8 @@ export default {
         version: '',
         releaseNotes: ''
       },
-      uploadFiles: []
+      uploadFiles: [],
+      dateRange: []
     };
   },
 
@@ -201,7 +211,14 @@ export default {
       this.currentPage = val;
       this.getList();
     },
-
+    handleDateChange: function (val) {
+      if (val && val.length === 2) {
+        this.dateRange = [val[0].getTime(), val[1].getTime()];
+        this.getDataList(); // Fetch data for the new date range
+      } else {
+        this.dateRange = []; // Reset if no valid date range
+      }
+    },
     search: function () {
       this.current_page = 1;
       // Pass an empty string for the URL, as _fetchDeviceData appends '/device/list'
@@ -221,7 +238,7 @@ export default {
 </script>
 <style>
   .rad-group {
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
   }
 
   .handle-input {

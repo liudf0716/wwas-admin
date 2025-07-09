@@ -48,7 +48,11 @@
       <el-table-column prop="srcIP" label="外网IPv4" width="120"></el-table-column>
       <el-table-column prop="srcPortStart" label="起始端口" width="100"></el-table-column>
       <el-table-column prop="srcPortEnd" label="结束端口" width="100"></el-table-column>
-      <el-table-column prop="terminalMac" label="终端MAC" width="140"></el-table-column>
+      <el-table-column prop="terminalMac" label="终端MAC" width="150">
+        <template #default="scope">
+          {{ scope.row.terminalMac.toUpperCase().replace(/:/g, '-') }}
+        </template>
+      </el-table-column>
       <el-table-column prop="apID" label="AP设备编号" min-width="100"></el-table-column>
       <el-table-column prop="apMac" label="AP MAC地址" width="140"></el-table-column>
       <el-table-column prop="apLongitude" label="经度" width="100"></el-table-column>
