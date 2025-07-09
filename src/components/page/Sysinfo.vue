@@ -105,6 +105,7 @@ export default {
                 this.$message.success('系统信息更新成功');
                 // 更新默认值
                 this.defaultSystemInfo = JSON.parse(JSON.stringify(this.systemInfo));
+                document.title = this.systemInfo.systemName || 'AWAS认证服务器管理平台';
                 this.$bus.$emit('updateSysinfo', this.systemInfo);
               } else {
                 this.$message.error(res.data.extra || '更新失败，请重试');

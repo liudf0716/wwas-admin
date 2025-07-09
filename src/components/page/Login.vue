@@ -96,6 +96,7 @@ export default {
             this.systemInfo = res.data.extra;
             localStorage.setItem('systemName', res.data.extra.systemName);
             localStorage.setItem('logoUrl', res.data.extra.logo);
+            document.title = res.data.extra.systemName || 'AWAS认证服务器管理平台';
           } else {
             this.$message.error('获取系统信息失败');
           }
