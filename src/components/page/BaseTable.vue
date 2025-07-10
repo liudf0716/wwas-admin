@@ -86,6 +86,9 @@
                       <el-dropdown-item>
                         <el-button size="small" type="danger" @click="openDeleteRouterDialogForUser(scope.row.userAccount)">删除路由</el-button>
                       </el-dropdown-item>
+                      <el-dropdown-item>
+                        <el-button size="small" type="danger" @click="deleteChannel(scope.row.userAccount)" v-if="scope.row.userAccount != 'admin'">删除账户</el-button>
+                      </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
                 </div>
@@ -132,14 +135,14 @@
               <span v-else>{{ scope.row.deviceID }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="单次认证网关ID">
+          <el-table-column label="开启单次认证">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.onceAuth" active-color="#13ce66" inactive-color="#ff4949" @change="updateGatewayAuthStatus(scope.row)" class="transform scale-90"></el-switch>
+              <el-switch v-model="scope.row.onceAuth" @change="updateGatewayAuthStatus(scope.row)" class="transform scale-90"></el-switch>
             </template>
           </el-table-column>
           <el-table-column label="单次认证免认证时长">
             <template slot-scope="scope">
-              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.nextAuthTime" size="small" placeholder="请输入免认证时长"></el-input>
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.nextAuthTime" size="small" placeholder="请输入免认证时长" :disabled="!scope.row.onceAuth"> </el-input>
               <span v-else>{{ scope.row.nextAuthTime }}</span>
             </template>
           </el-table-column>
@@ -625,6 +628,25 @@ export default {
     handleImportRouterUploadError: function (err) {
       this.handleApiError('文件上传失败: ' + (err.message || '未知错误'));
       if (this.$refs.importRouterDialogRef) this.$refs.importRouterDialogRef.onUploadFinished(false);
+    },
+    deleteChannel(account) {
+      this.$confirm('此操作将删除该渠道, 是否继续?', '提示', { type: 'warning' }).then(() => {
+        this.loading = true;
+        this.$axios
+          .post(global_.baseUrl + '/admin/deleteChannel', { userAccount: account })
+          .then(res => {
+            this.loading = false;
+            if (res.data.ret_code === '1001') this.handleApiError(res.data.extra, true);
+            else if (res.data.ret_code === 0) {
+              this.$message({ message: '删除成功', type: 'success' });
+              this.handleUserStatusFilterChange();
+            } else this.handleApiError(res.data.extra || '删除失败');
+          })
+          .catch(err => {
+            this.loading = false;
+            this.handleApiError('删除渠道请求失败: ' + err.message);
+          });
+      });
     },
     handleImportRouterManualSave: function (formData) {
       this.loading2 = true;

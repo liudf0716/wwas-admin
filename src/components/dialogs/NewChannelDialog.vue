@@ -169,6 +169,13 @@ export default {
     },
     handleCityChangeInDialog(cityValue) {
       // Intentionally left blank
+    },
+    onSaveSuccess() {
+      this.loading = false;
+      this.closeDialog();
+    },
+    onSaveError() {
+      this.loading = false;
     }
   }
 };

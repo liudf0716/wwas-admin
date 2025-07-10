@@ -23,7 +23,7 @@
     </div>
 
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
-      <el-table-column prop="deviceID" label="设备ID"></el-table-column>
+      <el-table-column prop="deviceID" label="设备ID" min-width="100"></el-table-column>
       <el-table-column prop="deviceCode" label="设备编码" min-width="100"></el-table-column>
       <el-table-column prop="name" label="设备名称"></el-table-column>
       <el-table-column prop="macAddress" label="MAC地址" width="150"></el-table-column>
