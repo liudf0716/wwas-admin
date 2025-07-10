@@ -11,11 +11,10 @@
         <el-form-item label="日期范围">
           <el-date-picker
             v-model="dateRange"
-            type="daterange"
+            type="datetimerange"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
-            format="yyyy-MM-dd"
             value-format="timestamp"
             @change="handleDateChange"
           ></el-date-picker>
@@ -72,19 +71,10 @@ import { timeStamp, dateForm, convertIp, portToProtocol } from 'components/commo
 import { baseUrl } from 'components/common/Global';
 
 export default {
-  computed: {
-    queryUrl() {
-      if (this.searchQuery != '') {
-        return baseUrl + '/eventLog/query?size=10&page=' + this.currentPage + '&search=' + this.searchQuery;
-      }
-      return baseUrl + '/eventLog/query?size=10&page=' + this.currentPage;
-    }
-  },
   data: function () {
     return {
       tableMaxHeight: `${window.innerHeight - 270}`,
       activeFilterTab: 'online',
-      searchQuery: '',
       loading: false,
       pageTotal: 0,
       listData: [],
@@ -114,7 +104,12 @@ export default {
     portToProtocol: portToProtocol,
     async getList() {
       try {
-        const res = await this.$axios.get(this.queryUrl);
+        const payload = {
+          dateRange: this.dateRange,
+          page: this.currentPage,
+          size: 10
+        };
+        const res = await this.$axios.post(baseUrl + '/eventLog/query', payload);
         if (res.data.ret_code === 1001) {
           this._handleApiError(res.data.extra, true);
         } else if (res.data.ret_code === 0) {
@@ -139,7 +134,11 @@ export default {
     },
     async exportToCSV() {
       try {
-        const res = await this.$axios.get(baseUrl + '/eventLog/query?size=1000&page=1');
+        const payload = {
+          page: 1,
+          size: 1000
+        };
+        const res = await this.$axios.post(baseUrl + '/eventLog/query', payload);
         if (res.data.ret_code === 0) {
           const logList = res.data.extra.data.map(item => {
             try {
@@ -212,9 +211,10 @@ export default {
       this.getList();
     },
     handleDateChange: function (val) {
+      console.log('Date range changed:', val);
       if (val && val.length === 2) {
-        this.dateRange = [val[0].getTime(), val[1].getTime()];
-        this.getDataList(); // Fetch data for the new date range
+        this.dateRange = [val[0], val[1]];
+        this.getList(); // Fetch data for the new date range
       } else {
         this.dateRange = []; // Reset if no valid date range
       }
