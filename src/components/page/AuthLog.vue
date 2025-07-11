@@ -41,7 +41,7 @@
       </el-table-column>
       <el-table-column prop="logoutTime" label="下线时间" width="160">
         <template #default="scope">
-          {{ dateForm(scope.row.logoutTime) }}
+          {{ scope.row.logoutTime > 0 ? dateForm(scope.row.logoutTime) : '' }}
         </template>
       </el-table-column>
       <el-table-column prop="innerIP" label="内网IP" width="120"></el-table-column>

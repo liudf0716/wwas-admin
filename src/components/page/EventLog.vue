@@ -211,16 +211,16 @@ export default {
       this.getList();
     },
     handleDateChange: function (val) {
-      console.log('Date range changed:', val);
+      this.currentPage = 1;
       if (val && val.length === 2) {
         this.dateRange = [val[0], val[1]];
-        this.getList(); // Fetch data for the new date range
+        // this.getList(); // Fetch data for the new date range
       } else {
         this.dateRange = []; // Reset if no valid date range
       }
     },
     search: function () {
-      this.current_page = 1;
+      this.currentPage = 1;
       // Pass an empty string for the URL, as _fetchDeviceData appends '/device/list'
       this.getList();
     },

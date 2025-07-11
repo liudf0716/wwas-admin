@@ -206,7 +206,8 @@
                     accept="image/png,image/jpg"
                     :auto-upload="true"
                   >
-                    <el-button slot="trigger" size="small" type="primary" v-if="upload.bgImage.fileList.length < 1">选取图片</el-button>
+                    <!-- <el-button slot="trigger" size="small" type="primary" v-if="upload.bgImage.fileList.length < 1">选取图片</el-button> -->
+                    <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
                     <div slot="tip" class="el-upload__tip">只能上传jpg/png文件,且不超过2M</div>
                   </el-upload>
                 </el-form-item>
@@ -250,18 +251,20 @@ export default {
       params: {}, // Holds parameters for API calls, especially for saving settings
       task_type: 'wxpay_setting', // Controls the active tab
       durations: [
-        { value: 1, label: '1小时' },
-        { value: 2, label: '2小时' },
-        { value: 3, label: '3小时' },
-        { value: 4, label: '4小时' },
-        { value: 5, label: '5小时' },
-        { value: 6, label: '6小时' },
-        { value: 7, label: '7小时' },
-        { value: 8, label: '8小时' },
-        { value: 9, label: '9小时' },
-        { value: 10, label: '10小时' },
-        { value: 11, label: '11小时' },
-        { value: 12, label: '12小时' }
+        { value: 1 * 60, label: '1分钟' },
+        { value: 2 * 60, label: '2分钟' },
+        { value: 1 * 3600, label: '1小时' },
+        { value: 2 * 3600, label: '2小时' },
+        { value: 3 * 3600, label: '3小时' },
+        { value: 4 * 3600, label: '4小时' },
+        { value: 5 * 3600, label: '5小时' },
+        { value: 6 * 3600, label: '6小时' },
+        { value: 7 * 3600, label: '7小时' },
+        { value: 8 * 3600, label: '8小时' },
+        { value: 9 * 3600, label: '9小时' },
+        { value: 10 * 3600, label: '10小时' },
+        { value: 11 * 3600, label: '11小时' },
+        { value: 12 * 3600, label: '12小时' }
       ],
       client_timeout_op: [
         { value: 2, label: '2分钟' },
@@ -307,7 +310,7 @@ export default {
         base: {
           // Base settings form model (portal URL, session duration, client timeout, background image)
           portal_url: '',
-          duration: 1,
+          duration: 3600,
           client_timeout: 20,
           background_url: '' // URL for the portal background image
         },
@@ -623,7 +626,7 @@ export default {
     _assignBaseData: function (result) {
       const self = this;
       self.forms.base.portal_url = result.portalUrl || '';
-      self.forms.base.duration = result.duration || 1; // Ensure value is string for el-select
+      self.forms.base.duration = result.duration || 3600; // Ensure value is string for el-select
       self.forms.base.client_timeout = result.clientTimeout || 20; // Ensure value is string for el-select
       const backgroundUrl = result.backgroundUrl || '/static/img/lg_pic.png'; // Default background
       self.forms.base.background_url = backgroundUrl;
