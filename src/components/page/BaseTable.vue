@@ -1,9 +1,9 @@
 <template>
-  <div class="bg-gray-50 min-h-screen">
+  <div>
     <!-- 页面容器 -->
-    <div class="container mx-auto px-4 py-6">
+    <div class="container">
       <!-- 用户管理视图 (超级管理员) -->
-      <div v-if="isUser === '0'" class="bg-white rounded-lg">
+      <div v-if="isUser === '0'">
         <!-- 面包屑导航 -->
         <div class="bread-crumb">
           <el-breadcrumb separator="/">
@@ -21,8 +21,8 @@
           </el-radio-group>
 
           <el-form :inline="true" style="float: right">
-            <el-form-item class="flex-1 max-w-md">
-              <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" clearable class="w-full">
+            <el-form-item>
+              <el-input v-model="search_word" placeholder="请输入渠道名称或账号查找" clearable>
                 <template #append>
                   <el-button type="primary" icon="search" @click="searchUsers">
                     <i class="el-icon-search"></i>
@@ -31,7 +31,7 @@
               </el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" icon="plus" @click="openNewChannelDialog"> <i class="el-icon-plus mr-2"></i>新建子渠道 </el-button>
+              <el-button type="primary" icon="plus" @click="openNewChannelDialog"> <i class="el-icon-plus"></i>新建子渠道 </el-button>
             </el-form-item>
           </el-form>
         </div>

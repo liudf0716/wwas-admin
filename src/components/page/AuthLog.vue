@@ -18,18 +18,19 @@
             format="yyyy-MM-dd"
             value-format="timestamp"
             @change="handleDateChange"
+            size="small"
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入认证帐号" clearable></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入认证帐号" clearable size="small"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" @click="search" size="small">搜索</el-button>
         </el-form-item>
       </el-form>
     </div>
 
-    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable" highlight-current-row>
+    <el-table :data="listData" stripe resizable style="width: 100%" ref="multipleTable" highlight-current-row :max-height="tableMaxHeight">
       <el-table-column type="index" width="50"></el-table-column>
       <el-table-column prop="authType" label="认证类型" width="100"></el-table-column>
       <el-table-column prop="authAccount" label="认证帐号" width="120"></el-table-column>
@@ -74,6 +75,7 @@ import { baseUrl } from 'components/common/Global';
 export default {
   data: function () {
     return {
+      tableMaxHeight: `${window.innerHeight - 250}`,
       activeFilterTab: 'online',
       searchQuery: '',
       pageTotal: 0,

@@ -17,10 +17,11 @@
             end-placeholder="结束日期"
             value-format="timestamp"
             @change="handleDateChange"
+            size="small"
           ></el-date-picker>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" @click="search" size="small">搜索</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -73,7 +74,7 @@ import { baseUrl } from 'components/common/Global';
 export default {
   data: function () {
     return {
-      tableMaxHeight: `${window.innerHeight - 270}`,
+      tableMaxHeight: `${window.innerHeight - 250}`,
       activeFilterTab: 'online',
       loading: false,
       pageTotal: 0,

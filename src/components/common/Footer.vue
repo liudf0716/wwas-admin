@@ -1,5 +1,5 @@
 <template>
-  <div class="footer">
+  <div class="footer" v-show="false">
     <div class="p" id="communityFooter">
       Community&nbsp;<i class="fa fa-comment"></i>&nbsp;: &nbsp;<a target="_blank" href="https://jq.qq.com/?_wv=1027&k=5StVwau">QQ群(424031785)</a>
       <!--&nbsp;&nbsp;|&nbsp;&nbsp;-->
