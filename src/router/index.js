@@ -52,7 +52,7 @@ export default new Router({
                 {
                     path: "/fwUpgrade",
                     component: (resolve) =>
-                        require(["../components/page/fwUpgrade.vue"], resolve), // vue-datasource组件
+                        require(["../components/page/FwUpgrade.vue"], resolve), // vue-datasource组件
                 },
                 {
                     path: "/operation",
