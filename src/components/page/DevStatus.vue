@@ -47,7 +47,7 @@
           <span>{{ dateForm(scope.row.lastTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="250">
+      <el-table-column label="操作" width="200">
         <template slot-scope="scope">
           <el-button 
         type="text" 
@@ -56,14 +56,6 @@
         :disabled="scope.row.deviceStatus !== '1'"
         :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
         详情
-          </el-button>
-          <el-button 
-        type="text" 
-        size="small"
-        @click="handleEdit(scope.row)"
-        :disabled="scope.row.deviceStatus !== '1'"
-        :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
-        编辑
           </el-button>
           <el-dropdown 
             @command="handleCommand" 
@@ -78,15 +70,16 @@
               更多<i class="el-icon-arrow-down el-icon--right"></i>
             </el-button>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="{action: 'edit', row: scope.row}">修改位置</el-dropdown-item>
+              <el-dropdown-item :command="{action: 'wireless', row: scope.row}">无线设置</el-dropdown-item>
+              <el-dropdown-item :command="{action: 'domains', row: scope.row}">域名白名单</el-dropdown-item>
+              <el-dropdown-item :command="{action: 'wildcardDomains', row: scope.row}">泛域名白名单</el-dropdown-item>
               <el-dropdown-item 
                 :command="{action: 'reboot', row: scope.row}"
                 :disabled="rebootingDevices.has(scope.row.deviceID)"
                 :class="{ 'rebooting-item': rebootingDevices.has(scope.row.deviceID) }">
-                {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '设备重启' }}
+                {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '重启设备' }}
               </el-dropdown-item>
-              <el-dropdown-item :command="{action: 'wireless', row: scope.row}">无线设置</el-dropdown-item>
-              <el-dropdown-item :command="{action: 'domains', row: scope.row}">域名白名单</el-dropdown-item>
-              <el-dropdown-item :command="{action: 'wildcardDomains', row: scope.row}">泛域名白名单</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -844,6 +837,9 @@ export default {
       }
 
       switch (action) {
+        case 'edit':
+          this.handleEdit(row);
+          break;
         case 'reboot':
           this.rebootDevice(row);
           break;
