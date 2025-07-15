@@ -119,16 +119,16 @@
               <span>{{ scope.row.gwChannel }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="网关ID">
-            <template slot-scope="scope">
-              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwID" size="small" placeholder="请输入网关ID"></el-input>
-              <span v-else>{{ scope.row.gwID }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="设备ID">
+          <el-table-column label="设备ID" width="220">
             <template slot-scope="scope">
               <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.deviceID" size="small" placeholder="请输入设备ID"></el-input>
               <span v-else>{{ scope.row.deviceID }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="网关ID" width="150">
+            <template slot-scope="scope">
+              <el-input v-if="scope.row.isEditing || scope.row.isNew" v-model="scope.row.gwID" size="small" placeholder="请输入网关ID"></el-input>
+              <span v-else>{{ scope.row.gwID }}</span>
             </template>
           </el-table-column>
           <el-table-column label="开启单次认证">
