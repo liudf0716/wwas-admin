@@ -8,9 +8,9 @@
     </div>
     <div class="rad-group">
       <el-radio-group v-model="activeFilterTab" @change="changeTab" size="small">
-        <el-radio-button label="all">全部</el-radio-button>
         <el-radio-button label="online">在线</el-radio-button>
         <el-radio-button label="offline">离线</el-radio-button>
+        <el-radio-button label="all">全部</el-radio-button>
       </el-radio-group>
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
@@ -24,7 +24,7 @@
 
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
       <el-table-column prop="deviceID" label="设备ID" min-width="100"></el-table-column>
-      <el-table-column prop="deviceCode" label="设备编码" min-width="100"></el-table-column>
+      <!-- <el-table-column prop="deviceCode" label="设备编码" min-width="100"></el-table-column> -->
       <el-table-column prop="name" label="设备名称"></el-table-column>
       <el-table-column prop="macAddress" label="MAC地址" width="150"></el-table-column>
       <el-table-column prop="locationID" label="场所编码" width="150"></el-table-column>
@@ -59,8 +59,20 @@
       </el-table-column>
       <el-table-column label="操作" width="100">
         <template slot-scope="scope">
-          <el-button type="text" @click="showDetail(scope.row)">详情</el-button>
-          <el-button type="text" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button 
+            type="text" 
+            @click="showDetail(scope.row)"
+            :disabled="scope.row.deviceStatus !== '1'"
+            :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
+            详情
+          </el-button>
+          <el-button 
+            type="text" 
+            @click="handleEdit(scope.row)"
+            :disabled="scope.row.deviceStatus !== '1'"
+            :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
+            编辑
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -146,7 +158,7 @@ const deviceDetailMap = [
 export default {
   data: function () {
     return {
-      activeFilterTab: 'all',
+      activeFilterTab: 'online',
       activeName: 'first',
       searchQuery: '',
       loading: false,
@@ -210,7 +222,7 @@ export default {
   },
 
   created: function () {
-    this.getData('/all');
+    this.getData('/online');
   },
 
   methods: {
@@ -235,6 +247,15 @@ export default {
     },
 
     handleEdit(row) {
+      // 检查设备是否在线
+      if (row.deviceStatus !== '1') {
+        this.$message({
+          message: '设备离线时无法编辑，请等待设备上线后再试',
+          type: 'warning'
+        });
+        return;
+      }
+      
       this.showEditDeviceDialog = true;
       this.editDeviceForm = {
         deviceCode: row.deviceCode,
@@ -269,6 +290,15 @@ export default {
       });
     },
     showDetail: function (row) {
+      // 检查设备是否在线
+      if (row.deviceStatus !== '1') {
+        this.$message({
+          message: '设备离线时无法查看详情，请等待设备上线后再试',
+          type: 'warning'
+        });
+        return;
+      }
+
       this.selectedDevice = [];
       this.selectedGwSettings = []; // Clear previous settings
 
@@ -378,7 +408,6 @@ export default {
     display: inline-block;
   }
   .handle-box2 {
-    display: inline-block;
     float: right;
   }
   .orange {
@@ -387,6 +416,18 @@ export default {
   }
   .btn-search {
     position: absolute;
+  }
+
+  /* 禁用按钮样式 */
+  .disabled-button {
+    color: #c0c4cc !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+  }
+  
+  .disabled-button:hover {
+    color: #c0c4cc !important;
+    text-decoration: none !important;
   }
 
   .dialog-content {
