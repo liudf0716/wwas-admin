@@ -238,31 +238,92 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="设备详情" :visible.sync="showDeviceDetailDialog" width="50%">
-      <el-tabs v-model="activeName">
-        <el-tab-pane label="运行状态" name="first">
-          <el-table :data="selectedDevice" border style="width: 100%">
-            <el-table-column prop="key" label="描述"></el-table-column>
-            <el-table-column prop="value" label="值"></el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <el-tab-pane label="认证网关" name="second">
-          <el-table :data="selectedGwSettings" border style="width: 100%">
-            <el-table-column prop="gwID" label="网关ID"></el-table-column>
-            <el-table-column prop="gwChannel" label="网关渠道"></el-table-column>
-            <el-table-column prop="authMode" label="认证方式">
-              <template slot-scope="scope">
-                <span>{{ scope.row.authMode == '0' ? '免认证中' : '认证中' }}</span>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-tab-pane>
-        <el-tab-pane label="放行规则" name="third">放行规则</el-tab-pane>
-        <el-tab-pane label="域名白名单" name="fourth">域名白名单</el-tab-pane>
-      </el-tabs>
-
+    <el-dialog title="设备详细信息" :visible.sync="showDeviceDetailDialog" width="800px">
+      <div>
+        <!-- 运行状态区域 -->
+        <div style="border: 2px solid #409eff; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%); margin-bottom: 25px;">
+          <h3 style="margin: 0 0 20px 0; color: #409eff; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-monitor" style="margin-right: 8px;"></i>
+            设备运行状态
+          </h3>
+          
+          <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div v-if="selectedDevice.length === 0" style="text-align: center; padding: 40px; color: #909399;">
+              <i class="el-icon-loading" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+              <p style="margin: 0; font-size: 14px;">暂无运行状态数据</p>
+            </div>
+            <el-row v-else :gutter="24">
+              <el-col 
+                v-for="(item, index) in selectedDevice" 
+                :key="index" 
+                :span="12" 
+                style="margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; padding: 12px; background: #fafafa; border-radius: 4px; border-left: 4px solid #409eff;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 12px; color: #909399; margin-bottom: 4px;">{{ item.key }}</div>
+                    <div style="font-size: 14px; color: #303133; font-weight: 500;">{{ item.value || '-' }}</div>
+                  </div>
+                  <i class="el-icon-info" style="color: #409eff; font-size: 16px;"></i>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+        </div>
+        
+        <!-- 认证网关区域 -->
+        <div style="border: 2px solid #67c23a; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);">
+          <h3 style="margin: 0 0 20px 0; color: #67c23a; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-key" style="margin-right: 8px;"></i>
+            认证网关配置
+            <span style="margin-left: 10px; font-size: 14px; color: #909399; font-weight: normal;">({{ selectedGwSettings.length }} 个网关)</span>
+          </h3>
+          
+          <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div v-if="selectedGwSettings.length === 0" style="text-align: center; padding: 40px; color: #909399;">
+              <i class="el-icon-connection" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+              <p style="margin: 0; font-size: 14px;">暂无认证网关配置</p>
+              <p style="margin: 8px 0 0 0; font-size: 12px;">请检查设备网关设置</p>
+            </div>
+            <el-table 
+              v-else
+              :data="selectedGwSettings" 
+              style="width: 100%;"
+              stripe
+              :show-header="true">
+              <el-table-column prop="gwID" label="网关ID" show-overflow-tooltip>
+                <template slot-scope="scope">
+                  <div style="display: flex; align-items: center;">
+                    <i class="el-icon-connection" style="color: #67c23a; margin-right: 8px; font-size: 14px;"></i>
+                    <span>{{ scope.row.gwID || '-' }}</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="gwChannel" label="网关渠道" show-overflow-tooltip>
+                <template slot-scope="scope">
+                  <div style="display: flex; align-items: center;">
+                    <i class="el-icon-link" style="color: #409eff; margin-right: 8px; font-size: 14px;"></i>
+                    <span>{{ scope.row.gwChannel || '-' }}</span>
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="authMode" label="认证方式" width="120" align="center">
+                <template slot-scope="scope">
+                  <el-tag 
+                    :type="scope.row.authMode == '0' ? 'success' : 'warning'" 
+                    size="small">
+                    {{ scope.row.authMode == '0' ? '免认证' : '需认证' }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </div>
+      </div>
+      
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="showDeviceDetailDialog = false">返回</el-button>
+        <el-button type="primary" @click="showDeviceDetailDialog = false">
+          <i class="el-icon-back"></i> 返回
+        </el-button>
       </span>
     </el-dialog>
 
