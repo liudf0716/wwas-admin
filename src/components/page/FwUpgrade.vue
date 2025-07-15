@@ -28,24 +28,24 @@
 
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" @select-all="handleSelectAll" @select="handleCheck" @selection-change="handleSelectionChange" v-loading="loading">
       <el-table-column type="selection" width="55" :selectable="checkSelectable"> </el-table-column>
-      <el-table-column prop="deviceID" label="设备ID"></el-table-column>
-      <el-table-column prop="name" label="设备名称"></el-table-column>
-      <el-table-column prop="type" label="设备型号"></el-table-column>
-      <el-table-column prop="awVersion" label="AW版本"></el-table-column>
-      <el-table-column prop="fmVersion" label="固件版本"></el-table-column>
-      <el-table-column prop="wifidogUptime" label="wifidog运行时长">
+      <el-table-column prop="deviceID" label="设备ID" width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="name" label="设备名称" width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="type" label="设备型号" width="100" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="awVersion" label="AW版本" width="100" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="fmVersion" label="固件版本" width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="wifidogUptime" label="AW运行时长" width="140" show-overflow-tooltip>
         <template slot-scope="scope">
           <span>{{ timeStamp(scope.row.wifidogUptime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="deviceStatus" label="状态">
+      <el-table-column prop="deviceStatus" label="状态" width="80" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.deviceStatus == '1' ? 'success' : 'danger'" close-transition>
             {{ scope.row.deviceStatus == '1' ? '在线' : '离线' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="lastTime" label="最近上线时间" width="190">
+      <el-table-column prop="lastTime" label="最近上线时间" width="190" show-overflow-tooltip>
         <template slot-scope="scope">
           <span>{{ dateForm(scope.row.lastTime) }}</span>
         </template>
