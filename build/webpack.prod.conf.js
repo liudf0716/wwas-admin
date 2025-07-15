@@ -6,6 +6,7 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 var env = config.build.env
 
 var webpackConfig = merge(baseWebpackConfig, {
@@ -26,11 +27,23 @@ var webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
+    new UglifyJsPlugin({
+      uglifyOptions: {
+        compress: {
+          warnings: false,
+          drop_console: true,
+          drop_debugger: true
+        },
+        mangle: {
+          safari10: true
+        },
+        output: {
+          comments: false,
+          beautify: false
+        }
       },
-      sourceMap: true
+      sourceMap: true,
+      parallel: true
     }),
     // extract css into its own file
     new ExtractTextPlugin({
