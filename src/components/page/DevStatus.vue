@@ -47,41 +47,86 @@
           <span>{{ dateForm(scope.row.lastTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column label="操作" width="120" align="center">
         <template slot-scope="scope">
-          <el-button 
-        type="text" 
-        size="small"
-        @click="showDetail(scope.row)"
-        :disabled="scope.row.deviceStatus !== '1'"
-        :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
-        详情
-          </el-button>
-          <el-dropdown 
-            @command="handleCommand" 
-            trigger="click"
-            :disabled="scope.row.deviceStatus !== '1'"
-            :class="{ 'disabled-dropdown': scope.row.deviceStatus !== '1' }">
-            <el-button 
-              type="text" 
-              size="small"
-              :disabled="scope.row.deviceStatus !== '1'"
-              :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
-              更多<i class="el-icon-arrow-down el-icon--right"></i>
-            </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :command="{action: 'edit', row: scope.row}">修改位置</el-dropdown-item>
-              <el-dropdown-item :command="{action: 'wireless', row: scope.row}">无线设置</el-dropdown-item>
-              <el-dropdown-item :command="{action: 'domains', row: scope.row}">域名白名单</el-dropdown-item>
-              <el-dropdown-item :command="{action: 'wildcardDomains', row: scope.row}">泛域名白名单</el-dropdown-item>
-              <el-dropdown-item 
-                :command="{action: 'reboot', row: scope.row}"
-                :disabled="rebootingDevices.has(scope.row.deviceID)"
-                :class="{ 'rebooting-item': rebootingDevices.has(scope.row.deviceID) }">
-                {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '重启设备' }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+          <div class="action-buttons">
+            <!-- 详情按钮 -->
+            <el-tooltip 
+              :content="scope.row.deviceStatus !== '1' ? '设备离线时无法查看详情' : '查看设备详细信息'" 
+              placement="top">
+              <el-button 
+                type="primary" 
+                size="mini"
+                circle
+                icon="el-icon-view"
+                @click="showDetail(scope.row)"
+                :disabled="scope.row.deviceStatus !== '1'"
+                :class="{ 'action-btn-circle': true, 'action-btn-disabled': scope.row.deviceStatus !== '1' }"
+                style="margin-right: 8px;">
+              </el-button>
+            </el-tooltip>
+
+            <!-- 更多操作下拉菜单 -->
+            <el-tooltip 
+              :content="scope.row.deviceStatus !== '1' ? '设备离线时无法执行操作' : '更多设备操作'" 
+              placement="top">
+              <el-dropdown 
+                @command="handleCommand" 
+                trigger="click"
+                :disabled="scope.row.deviceStatus !== '1'"
+                :class="{ 'action-dropdown': true, 'action-dropdown-disabled': scope.row.deviceStatus !== '1' }">
+                <el-button 
+                  type="info" 
+                  size="mini"
+                  circle
+                  icon="el-icon-more"
+                  :disabled="scope.row.deviceStatus !== '1'"
+                  :class="{ 'action-btn-circle': true, 'action-btn-disabled': scope.row.deviceStatus !== '1' }">
+                </el-button>
+                <el-dropdown-menu slot="dropdown" class="action-dropdown-menu">
+                  <el-dropdown-item 
+                    :command="{action: 'edit', row: scope.row}"
+                    class="dropdown-item-with-icon">
+                    <i class="el-icon-location-outline item-icon"></i>
+                    修改位置
+                  </el-dropdown-item>
+                  <el-dropdown-item 
+                    :command="{action: 'wireless', row: scope.row}"
+                    class="dropdown-item-with-icon">
+                    <i class="el-icon-connection item-icon"></i>
+                    无线设置
+                  </el-dropdown-item>
+                  <el-dropdown-item 
+                    :command="{action: 'domains', row: scope.row}"
+                    class="dropdown-item-with-icon">
+                    <i class="el-icon-link item-icon"></i>
+                    域名白名单
+                  </el-dropdown-item>
+                  <el-dropdown-item 
+                    :command="{action: 'wildcardDomains', row: scope.row}"
+                    class="dropdown-item-with-icon">
+                    <i class="el-icon-star-on item-icon"></i>
+                    泛域名白名单
+                  </el-dropdown-item>
+                  <el-dropdown-item 
+                    divided
+                    :command="{action: 'reboot', row: scope.row}"
+                    :disabled="rebootingDevices.has(scope.row.deviceID)"
+                    :class="{ 
+                      'dropdown-item-with-icon': true,
+                      'rebooting-item': rebootingDevices.has(scope.row.deviceID),
+                      'danger-item': !rebootingDevices.has(scope.row.deviceID)
+                    }">
+                    <i :class="[
+                      'item-icon',
+                      rebootingDevices.has(scope.row.deviceID) ? 'el-icon-loading' : 'el-icon-refresh'
+                    ]"></i>
+                    {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '重启设备' }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -1344,6 +1389,43 @@ export default {
     text-decoration: none !important;
   }
 
+  /* 操作按钮样式 */
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .action-btn-circle {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  }
+
+  .action-btn-circle:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  }
+
+  .action-btn-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .action-btn-disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   /* 禁用下拉菜单样式 */
   .disabled-dropdown {
     opacity: 0.6 !important;
@@ -1351,6 +1433,60 @@ export default {
   
   .disabled-dropdown .el-dropdown__caret-button {
     cursor: not-allowed !important;
+  }
+
+  .action-dropdown-disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* 下拉菜单样式优化 */
+  .action-dropdown-menu {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    border: 1px solid #e4e7ed !important;
+    min-width: 160px !important;
+  }
+
+  .dropdown-item-with-icon {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .dropdown-item-with-icon:hover {
+    background-color: #f5f7fa !important;
+    color: #409eff !important;
+  }
+
+  .item-icon {
+    font-size: 16px !important;
+    margin-right: 8px !important;
+    color: #909399 !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .dropdown-item-with-icon:hover .item-icon {
+    color: #409eff !important;
+  }
+
+  .danger-item {
+    color: #f56c6c !important;
+  }
+
+  .danger-item:hover {
+    background-color: #fef0f0 !important;
+    color: #f56c6c !important;
+  }
+
+  .danger-item .item-icon {
+    color: #f56c6c !important;
+  }
+
+  .danger-item:hover .item-icon {
+    color: #f56c6c !important;
   }
 
   /* 重启中状态样式 */
