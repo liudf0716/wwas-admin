@@ -29,22 +29,12 @@
       <el-table-column prop="macAddress" label="MAC地址" width="150" show-overflow-tooltip></el-table-column>
       <el-table-column prop="locationID" label="场所编码" width="150" show-overflow-tooltip></el-table-column>
 
-      <!-- <el-table-column prop="awVersion" label="AW版本"></el-table-column> -->
-      <!-- <el-table-column prop="fmVersion" label="固件版本"></el-table-column> -->
+     
       <el-table-column prop="onlineClients" label="在线客户数" width="100" align="center"></el-table-column>
       <el-table-column label="位置坐标" width="180" show-overflow-tooltip>
         <template slot-scope="scope"> {{ scope.row.longitude }},{{ scope.row.latitude }} </template>
       </el-table-column>
-      <!-- <el-table-column prop="wiredPassed" label="有线免认证">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.wiredPassed == '0' ? 'warning' : 'success'" close-transition>{{ scope.row.wiredPassed == '1' ? '已开启' : '未开启' }}</el-tag>
-        </template>
-      </el-table-column> -->
-      <!-- <el-table-column prop="wifidogUptime" label="wifidog运行时长">
-        <template slot-scope="scope">
-          <span>{{ timeStamp(scope.row.wifidogUptime) }}</span>
-        </template>
-      </el-table-column> -->
+
       <el-table-column prop="deviceStatus" label="状态" width="90">
         <template slot-scope="scope">
           <el-tag :type="scope.row.deviceStatus == '1' ? 'success' : 'danger'" close-transition>
@@ -157,6 +147,28 @@
         <el-button type="primary" @click="showDeviceDetailDialog = false">返回</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog title="无线设置" :visible.sync="showWirelessDialog" width="600px">
+      <div v-if="wirelessLoading">正在加载...</div>
+      <div v-else>
+        <el-form label-width="120px">
+          <div v-for="(radio, index) in wifiInfo" :key="index">
+            <h4>{{ radio.name }}</h4>
+            <el-form-item label="SSID">
+              <el-input v-model="radio.ssid"></el-input>
+            </el-form-item>
+            <el-form-item label="Mesh ID">
+              <el-input v-model="radio.mesh_id"></el-input>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showWirelessDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveWifiSettings">保存</el-button>
+      </span>
+    </el-dialog>
+
     <div class="pagination">
       <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal"> </el-pagination>
     </div>
@@ -197,6 +209,10 @@ export default {
       selectedGwSettings: [],
       editDeviceForm: {},
       rebootingDevices: new Set(), // 追踪正在重启的设备ID
+      showWirelessDialog: false,
+      wirelessLoading: false,
+      wifiInfo: [],
+      currentDevice: null,
 
       deviceRules: {
         locationID: [
@@ -479,13 +495,47 @@ export default {
       }
     },
 
-    handleWirelessSettings(row) {
-      this.$message({
-        message: '无线设置功能开发中...',
-        type: 'info'
-      });
-      // TODO: 实现无线设置功能
-      // 可以打开一个对话框来配置无线设置
+    async handleWirelessSettings(row) {
+      this.currentDevice = row;
+      this.showWirelessDialog = true;
+      this.wirelessLoading = true;
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/getWifiInfo', { device_id: row.deviceID });
+        if (res.data.data) {
+          this.wifiInfo = Object.entries(res.data.data).map(([name, values]) => ({
+            name,
+            ...values
+          }));
+        } else {
+          this._handleApiError(res.data.error || '获取无线信息失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      } finally {
+        this.wirelessLoading = false;
+      }
+    },
+
+    async saveWifiSettings() {
+      const data = this.wifiInfo.reduce((acc, radio) => {
+        acc[radio.name] = {
+          ssid: radio.ssid,
+          mesh_id: radio.mesh_id
+        };
+        return acc;
+      }, {});
+
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/setWifiInfo', { device_id: this.currentDevice.deviceID, data });
+        if (res.data.data.status === 'success') {
+          this.$message({ message: '无线设置已保存', type: 'success' });
+          this.showWirelessDialog = false;
+        } else {
+          this._handleApiError(res.data.error || '保存无线信息失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      }
     },
 
     handleDomainWhitelist(row) {
