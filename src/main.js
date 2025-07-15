@@ -6,7 +6,7 @@ import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 
 //import '../static/css/theme-green/index.css';       // 浅绿色主题
-import "babel-polyfill";
+// babel-polyfill 已在 webpack entry 中引入，无需重复引入
 
 Vue.use(ElementUI);
 axios.defaults.withCredentials = true;

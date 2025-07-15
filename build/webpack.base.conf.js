@@ -30,7 +30,7 @@ module.exports = {
         extensions: [".js", ".vue", ".json"],
         modules: [resolve("src"), resolve("node_modules")],
         alias: {
-            vue$: "vue/dist/vue.runtime.common.js",
+            vue$: "vue/dist/vue.js",
             src: resolve("src"),
             assets: resolve("src/assets"),
             "@": resolve("src"),
@@ -45,13 +45,8 @@ module.exports = {
             {
                 test: /\.js$/,
                 loader: "babel-loader",
-                include: [
-                    resolve("src"), 
-                    resolve("test"),
-                    resolve("node_modules/vue/dist"),
-                    resolve("node_modules/@babel"),
-                    resolve("node_modules/webpack-dev-server/client")
-                ],
+                include: [resolve("src"), resolve("test")],
+                exclude: /node_modules/
             },
             {
                 test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

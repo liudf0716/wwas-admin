@@ -1,10 +1,8 @@
 <script>
-const config = require('../../../config');
-const uniUrl = 'http://wifidogx.online';
-const baseUrl = '/api';
+import { API_CONFIG } from '../../config/api.js';
 
 export default {
-  uniUrl,
-  baseUrl
+  uniUrl: API_CONFIG.UNI_URL,
+  baseUrl: API_CONFIG.BASE_URL
 };
 </script>

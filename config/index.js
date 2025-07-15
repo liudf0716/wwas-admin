@@ -23,18 +23,22 @@ module.exports = {
     },
     dev: {
         env: require("./dev.env"),
-        port: 8080,
-        autoOpenBrowser: true,
+        port: process.env.PORT || 8080,
+        autoOpenBrowser: process.env.OPEN_BROWSER !== 'false',
         assetsSubDirectory: "static",
         assetsPublicPath: "/",
         proxyTable: {
             "/api": {
-                target: "http://portal.chawrt.com:8001",
+                target: process.env.API_BASE_URL || "http://portal.chawrt.com:8001",
                 changeOrigin: true,
+                secure: false,
+                logLevel: 'debug'
             },
             "/public": {
-                target: "http://portal.chawrt.com:8001",
+                target: process.env.API_BASE_URL || "http://portal.chawrt.com:8001",
                 changeOrigin: true,
+                secure: false,
+                logLevel: 'debug'
             },
         },
         // CSS Sourcemaps off by default because relative paths are "buggy"

@@ -76,6 +76,15 @@ module.exports = app.listen(port, function (err) {
 
   // when env is testing, don't need open it
   if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {
-    opn(uri)
+    // 安全地尝试打开浏览器，如果失败则忽略
+    try {
+      opn(uri).catch(function(error) {
+        console.log('无法自动打开浏览器:', error.message)
+        console.log('请手动在浏览器中访问:', uri)
+      })
+    } catch (error) {
+      console.log('无法自动打开浏览器:', error.message)
+      console.log('请手动在浏览器中访问:', uri)
+    }
   }
 })
