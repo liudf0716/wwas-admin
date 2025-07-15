@@ -86,30 +86,155 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog title="编辑设备信息" :visible.sync="showEditDeviceDialog" width="550px" :close-on-click-modal="false">
-      <el-alert title="设备基础信息修改后会同步到设备端, 请勿随意修改.(仅允许修改在线设备)" type="warning" :closable="false" show-icon> </el-alert>
-      <el-form :model="editDeviceForm" label-width="120px" style="margin-top: 10px" ref="editForm" :rules="deviceRules">
-        <el-form-item label="设备ID">
-          {{ editDeviceForm.deviceID }}
-        </el-form-item>
-        <el-form-item label="设备编码" prop="deviceCode">
-          <el-input v-model="editDeviceForm.deviceCode" style="width: 300px" @blur="parseDeviceCode"></el-input>
-        </el-form-item>
-        <el-form-item label="MAC地址" prop="macAddress">
-          <el-input v-model="editDeviceForm.macAddress" style="width: 300px"></el-input>
-        </el-form-item>
-        <el-form-item label="场所编码" prop="locationID">
-          <el-input v-model="editDeviceForm.locationID" style="width: 300px"></el-input>
-        </el-form-item>
-        <el-form-item label="经纬度" prop="geoPosition">
-          <el-input v-model="editDeviceForm.longitude" placeholder="经度" style="width: 145px"></el-input>
-          <span> - </span>
-          <el-input v-model="editDeviceForm.latitude" placeholder="纬度" style="width: 145px"></el-input>
-        </el-form-item>
-      </el-form>
+    <el-dialog title="设备位置信息编辑" :visible.sync="showEditDeviceDialog" width="700px" :close-on-click-modal="false">
+      <div>
+        <el-alert 
+          title="提示：设备基础信息修改后会同步到设备端，请谨慎操作。仅允许修改在线设备。" 
+          type="warning" 
+          :closable="false" 
+          show-icon 
+          style="margin-bottom: 20px;">
+        </el-alert>
+        
+        <!-- 设备基本信息区域 -->
+        <div style="border: 2px solid #409eff; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%); margin-bottom: 25px;">
+          <h3 style="margin: 0 0 20px 0; color: #409eff; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-s-tools" style="margin-right: 8px;"></i>
+            设备基本信息
+          </h3>
+          
+          <el-form :model="editDeviceForm" label-width="120px" ref="editForm" :rules="deviceRules">
+            <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <el-row :gutter="24">
+                <el-col :span="24">
+                  <el-form-item label="设备ID">
+                    <el-input 
+                      :value="editDeviceForm.deviceID" 
+                      disabled
+                      style="background-color: #f5f7fa;">
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              
+              <el-row :gutter="24">
+                <el-col :span="24">
+                  <el-form-item label="设备编码" prop="deviceCode">
+                    <el-input 
+                      v-model="editDeviceForm.deviceCode" 
+                      placeholder="请输入设备编码（9位厂商码+12位MAC地址）"
+                      @blur="parseDeviceCode"
+                      maxlength="21"
+                      show-word-limit>
+                      <template slot="prepend">
+                        <i class="el-icon-cpu"></i>
+                      </template>
+                    </el-input>
+                    <div style="margin-top: 5px; font-size: 12px; color: #909399;">
+                      格式：9位厂商码 + 12位MAC地址（共21位大写字母/数字）
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              
+              <el-row :gutter="24">
+                <el-col :span="24">
+                  <el-form-item label="MAC地址" prop="macAddress">
+                    <el-input 
+                      v-model="editDeviceForm.macAddress" 
+                      placeholder="例：AA-BB-CC-DD-EE-FF"
+                      maxlength="17">
+                      <template slot="prepend">
+                        <i class="el-icon-postcard"></i>
+                      </template>
+                    </el-input>
+                    <div style="margin-top: 5px; font-size: 12px; color: #909399;">
+                      格式：XX-XX-XX-XX-XX-XX（均为大写字母和数字）
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+          </el-form>
+        </div>
+        
+        <!-- 位置信息区域 -->
+        <div style="border: 2px solid #67c23a; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);">
+          <h3 style="margin: 0 0 20px 0; color: #67c23a; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-location-outline" style="margin-right: 8px;"></i>
+            位置信息设置
+          </h3>
+          
+          <el-form :model="editDeviceForm" label-width="120px" ref="editForm2" :rules="deviceRules">
+            <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <el-row :gutter="24">
+                <el-col :span="24">
+                  <el-form-item label="场所编码" prop="locationID">
+                    <el-input 
+                      v-model="editDeviceForm.locationID" 
+                      placeholder="请输入14位场所编码"
+                      maxlength="14"
+                      show-word-limit>
+                      <template slot="prepend">
+                        <i class="el-icon-office-building"></i>
+                      </template>
+                    </el-input>
+                    <div style="margin-top: 5px; font-size: 12px; color: #909399;">
+                      必须是14位数字
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="经度" prop="geoPosition">
+                    <el-input 
+                      v-model="editDeviceForm.longitude" 
+                      placeholder="例：116.397428"
+                      type="number"
+                      step="0.000001">
+                      <template slot="prepend">
+                        <i class="el-icon-position"></i>
+                      </template>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="纬度" prop="geoPosition">
+                    <el-input 
+                      v-model="editDeviceForm.latitude" 
+                      placeholder="例：39.909005"
+                      type="number"
+                      step="0.000001">
+                      <template slot="prepend">
+                        <i class="el-icon-position"></i>
+                      </template>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <div style="margin-top: 10px; padding: 10px; background: #f0f9ff; border-radius: 4px; border-left: 4px solid #409eff;">
+                <div style="font-size: 12px; color: #606266;">
+                  <i class="el-icon-info" style="margin-right: 5px; color: #409eff;"></i>
+                  <strong>位置说明：</strong>
+                </div>
+                <div style="font-size: 12px; color: #909399; margin-top: 5px;">
+                  • 经度范围：-180 到 180<br>
+                  • 纬度范围：-33 到 39（中国境内）<br>
+                  • 经纬度必须同时填写或同时为空
+                </div>
+              </div>
+            </div>
+          </el-form>
+        </div>
+      </div>
+      
       <span slot="footer" class="dialog-footer">
         <el-button @click="showEditDeviceDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveDeviceEdit">保存</el-button>
+        <el-button type="primary" @click="saveDeviceEdit" :loading="false">
+          <i class="el-icon-check"></i> 保存修改
+        </el-button>
       </span>
     </el-dialog>
 
@@ -710,27 +835,34 @@ export default {
       };
     },
     async saveDeviceEdit() {
-      this.$refs['editForm'].validate(async valid => {
-        if (valid) {
-          try {
-            const res = await this.$axios.post(baseUrl + '/device/updateDeviceInfo', this.editDeviceForm);
-
-            if (res.data.ret_code == 0) {
-              this.$message({ message: '设备信息更新成功', type: 'success' });
-              this.showEditDeviceDialog = false;
-              this.changeTab();
-            } else {
-              // For other non-successful ret_codes (not 0 and not 1001)
-              this._handleApiError(res.data.extra || 'Unknown error occurred', false);
-            }
-          } catch (error) {
-            this._handleApiError('Network error or request failed: ' + error.message, false);
-          }
-        } else {
-          console.log('error submit!!');
-          return false;
-        }
+      // 验证两个表单
+      const form1Valid = await new Promise(resolve => {
+        this.$refs['editForm'].validate(resolve);
       });
+      
+      const form2Valid = await new Promise(resolve => {
+        this.$refs['editForm2'].validate(resolve);
+      });
+      
+      if (form1Valid && form2Valid) {
+        try {
+          const res = await this.$axios.post(baseUrl + '/device/updateDeviceInfo', this.editDeviceForm);
+
+          if (res.data.ret_code == 0) {
+            this.$message({ message: '设备信息更新成功', type: 'success' });
+            this.showEditDeviceDialog = false;
+            this.changeTab();
+          } else {
+            // For other non-successful ret_codes (not 0 and not 1001)
+            this._handleApiError(res.data.extra || 'Unknown error occurred', false);
+          }
+        } catch (error) {
+          this._handleApiError('Network error or request failed: ' + error.message, false);
+        }
+      } else {
+        console.log('表单验证失败');
+        this.$message({ message: '请检查表单填写是否正确', type: 'warning' });
+      }
     },
     showDetail: function (row) {
       // 检查设备是否在线
