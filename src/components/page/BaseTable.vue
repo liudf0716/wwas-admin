@@ -113,10 +113,6 @@
           </el-breadcrumb>
         </div>
 
-        <!-- 网关设备列表 -->
-        <div v-if="gatewayData.length === 0 && !showNewGatewayRow">
-          <p class="text-lg">no device available</p>
-        </div>
         <el-table :data="gatewayData" stripe style="width: 100%" ref="gatewayTable">
           <el-table-column label="渠道">
             <template slot-scope="scope">

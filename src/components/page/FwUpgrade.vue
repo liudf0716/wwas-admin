@@ -10,18 +10,18 @@
       <el-alert title="可以通过单选或多选向指定的设备发送固件升级指令.（目前仅支持在线设备）" type="warning" :closable="false" show-icon></el-alert>
     </div>
     <div class="rad-group">
-      <el-radio-group v-model="activeFilterTab" @change="changeTab">
+      <el-radio-group v-model="activeFilterTab" @change="changeTab" size="small">
         <el-radio-button label="all">全部</el-radio-button>
         <el-radio-button label="online">在线</el-radio-button>
         <el-radio-button label="offline">离线</el-radio-button>
       </el-radio-group>
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备ID" clearable></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入设备ID" clearable size="small"></el-input>
         </el-form-item>
-        <el-form-item> <el-button type="primary" @click="search">搜索</el-button> </el-form-item>
+        <el-form-item> <el-button type="primary" @click="search" size="small">搜索</el-button> </el-form-item>
         <el-form-item>
-          <el-button type="danger" @click="handleUpgrade(null)">批量升级</el-button>
+          <el-button type="danger" @click="handleUpgrade(null)" size="small">批量升级</el-button>
         </el-form-item>
       </el-form>
     </div>

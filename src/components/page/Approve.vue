@@ -34,7 +34,7 @@
                   :limit="1"
                 >
                   <el-button slot="trigger" size="small" type="primary">选取商户私钥</el-button>
-                  <div slot="tip" class="el-upload__tip">上传商户私钥文件,大小不能超过128K</div>
+                  <div class="upload-tip">上传商户私钥文件,大小不能超过128K</div>
                 </el-upload>
               </el-form-item>
               <el-form-item label="微信支付平台证书" prop="wx_cert">
@@ -52,7 +52,7 @@
                   accept=".crt,.pem,.cer"
                 >
                   <el-button slot="trigger" size="small" type="primary">选取微信支付平台证书</el-button>
-                  <div slot="tip" class="el-upload__tip">上传微信支付平台证书文件, 大小不能超过128K</div>
+                  <div class="upload-tip">上传微信支付平台证书文件, 大小不能超过128K</div>
                 </el-upload>
               </el-form-item>
               <el-form-item label="AppID" prop="app_id">
@@ -79,7 +79,7 @@
                 <el-switch v-model="forms.wxpay.enable" class="diainp"></el-switch>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('form_wxpay')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('form_wxpay')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -95,7 +95,7 @@
                 <el-switch v-model="forms.onekey.from_server" class="diainp"></el-switch>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('form_onekey')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('form_onekey')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -114,7 +114,7 @@
                 <el-switch v-model="forms.user.enable" class="diainp"></el-switch>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('form_user')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('form_user')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -147,7 +147,7 @@
                 <el-switch v-model="forms.ali.enable" class="diainp"></el-switch>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('form_ali')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('form_ali')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
             <el-form ref="form_wy" :model="forms.wy" :rules="rules.wy" label-width="150px" v-show="dxchoose == 'wy'">
@@ -164,12 +164,12 @@
                 <el-switch v-model="forms.wy.enable" class="diainp"></el-switch>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('formWy')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('formWy')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
             <el-form ref="formNone" :model="forms.none" label-width="150px" v-show="dxchoose == 'none'">
               <el-form-item>
-                <el-button type="primary" @click="onSaveSubmit('formNone')">保存配置</el-button>
+                <el-button type="primary" @click="onSaveSubmit('formNone')" size="small">保存配置</el-button>
               </el-form-item>
             </el-form>
           </el-form>
@@ -212,7 +212,7 @@
                   </el-upload>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="onSaveSubmit('form_base')">保存配置</el-button>
+                  <el-button type="primary" @click="onSaveSubmit('form_base')" size="small">保存配置</el-button>
                 </el-form-item>
               </el-form>
             </div>
@@ -979,5 +979,8 @@ export default {
   }
   .xieyihref {
     color: #11b8b9;
+  }
+  .upload-tip {
+    line-height: 14px;
   }
 </style>

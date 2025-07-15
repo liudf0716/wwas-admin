@@ -9,10 +9,10 @@
     <div class="rad-group">
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="search_word" placeholder="请输入设备ID"></el-input>
+          <el-input v-model="search_word" placeholder="请输入设备ID" size="small" clearable></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="queryClientsOfDevice">搜索</el-button>
+          <el-button type="primary" @click="queryClientsOfDevice" size="small">搜索</el-button>
         </el-form-item>
       </el-form>
     </div>

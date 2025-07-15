@@ -9,14 +9,14 @@
     <div class="rad-group">
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
-          <el-input v-model="searchQuery" placeholder="请输入设备型号" clearable></el-input>
+          <el-input v-model="searchQuery" placeholder="请输入设备型号" clearable size="small"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button type="primary" @click="search" size="small">搜索</el-button>
         </el-form-item>
       </el-form>
 
-      <el-button type="primary" @click="handleDialogVisible">上传固件</el-button>
+      <el-button type="primary" @click="handleDialogVisible" size="small">上传固件</el-button>
     </div>
 
     <el-dialog title="上传固件" :visible.sync="showUploadDialogVisible" size="tiny" @close="handleDialogClose" width="700px">

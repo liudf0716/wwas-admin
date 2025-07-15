@@ -29,16 +29,11 @@ module.exports = {
         assetsPublicPath: "/",
         proxyTable: {
             "/api": {
-                target: "http://121.43.123.42:8001",
+                target: "http://portal.chawrt.com:8001",
                 changeOrigin: true,
             },
             "/public": {
-                target: "http://121.43.123.42:8001",
-                changeOrigin: true,
-            },
-
-            "/ms": {
-                target: "https://www.easy-mock.com/mock/592501a391470c0ac1fab128",
+                target: "http://portal.chawrt.com:8001",
                 changeOrigin: true,
             },
         },
