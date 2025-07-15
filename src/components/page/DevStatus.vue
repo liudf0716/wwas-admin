@@ -169,6 +169,56 @@
       </span>
     </el-dialog>
 
+    <el-dialog title="域名白名单" :visible.sync="showDomainDialog" width="600px">
+      <div v-if="domainLoading">正在加载...</div>
+      <div v-else>
+        <el-input
+          placeholder="请输入要添加的域名"
+          v-model="newDomain"
+          class="input-with-select"
+        >
+          <el-button slot="append" icon="el-icon-plus" @click="addDomain"></el-button>
+        </el-input>
+        <el-table :data="trustedDomains" style="width: 100%; margin-top: 20px;">
+          <el-table-column prop="domain" label="域名"></el-table-column>
+          <el-table-column label="操作" width="100">
+            <template slot-scope="scope">
+              <el-button type="text" @click="removeDomain(scope.$index)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showDomainDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveDomainWhitelist">保存</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="泛域名白名单" :visible.sync="showWildcardDomainDialog" width="600px">
+      <div v-if="wildcardDomainLoading">正在加载...</div>
+      <div v-else>
+        <el-input
+          placeholder="请输入要添加的泛域名"
+          v-model="newWildcardDomain"
+          class="input-with-select"
+        >
+          <el-button slot="append" icon="el-icon-plus" @click="addWildcardDomain"></el-button>
+        </el-input>
+        <el-table :data="trustedWildcardDomains" style="width: 100%; margin-top: 20px;">
+          <el-table-column prop="domain" label="泛域名"></el-table-column>
+          <el-table-column label="操作" width="100">
+            <template slot-scope="scope">
+              <el-button type="text" @click="removeWildcardDomain(scope.$index)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="showWildcardDomainDialog = false">取消</el-button>
+        <el-button type="primary" @click="saveWildcardDomainWhitelist">保存</el-button>
+      </span>
+    </el-dialog>
+
     <div class="pagination">
       <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" layout="prev, pager, next" :total="pageTotal"> </el-pagination>
     </div>
@@ -213,6 +263,18 @@ export default {
       wirelessLoading: false,
       wifiInfo: [],
       currentDevice: null,
+      showDomainDialog: false,
+      domainLoading: false,
+      trustedDomains: [],
+      newDomain: '',
+      showWildcardDomainDialog: false,
+      wildcardDomainLoading: false,
+      trustedWildcardDomains: [],
+      newWildcardDomain: '',
+      showWildcardDomainDialog: false,
+      wildcardDomainLoading: false,
+      trustedWildcardDomains: [],
+      newWildcardDomain: '',
 
       deviceRules: {
         locationID: [
@@ -538,22 +600,92 @@ export default {
       }
     },
 
-    handleDomainWhitelist(row) {
-      this.$message({
-        message: '域名白名单功能开发中...',
-        type: 'info'
-      });
-      // TODO: 实现域名白名单功能
-      // 可以打开一个对话框来管理域名白名单
+    async handleDomainWhitelist(row) {
+      this.currentDevice = row;
+      this.showDomainDialog = true;
+      this.domainLoading = true;
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/getTrustedDomains', { device_id: row.deviceID });
+        if (res.data.domains) {
+          this.trustedDomains = res.data.domains.map(domain => ({ domain }));
+        } else {
+          this._handleApiError(res.data.error || '获取域名白名单失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      } finally {
+        this.domainLoading = false;
+      }
     },
 
-    handleWildcardDomainWhitelist(row) {
-      this.$message({
-        message: '泛域名白名单功能开发中...',
-        type: 'info'
-      });
-      // TODO: 实现泛域名白名单功能
-      // 可以打开一个对话框来管理泛域名白名单
+    addDomain() {
+      if (this.newDomain) {
+        this.trustedDomains.push({ domain: this.newDomain });
+        this.newDomain = '';
+      }
+    },
+
+    removeDomain(index) {
+      this.trustedDomains.splice(index, 1);
+    },
+
+    async saveDomainWhitelist() {
+      const domains = this.trustedDomains.map(item => item.domain);
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/syncTrustedDomain', { device_id: this.currentDevice.deviceID, domains });
+        if (res.data.status === 'success') {
+          this.$message({ message: '域名白名单已保存', type: 'success' });
+          this.showDomainDialog = false;
+        } else {
+          this._handleApiError(res.data.error || '保存域名白名单失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      }
+    },
+
+    async handleWildcardDomainWhitelist(row) {
+      this.currentDevice = row;
+      this.showWildcardDomainDialog = true;
+      this.wildcardDomainLoading = true;
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/getTrustedWildcardDomains', { device_id: row.deviceID });
+        if (res.data.domains) {
+          this.trustedWildcardDomains = res.data.domains.map(domain => ({ domain }));
+        } else {
+          this._handleApiError(res.data.error || '获取泛域名白名单失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      } finally {
+        this.wildcardDomainLoading = false;
+      }
+    },
+
+    addWildcardDomain() {
+      if (this.newWildcardDomain) {
+        this.trustedWildcardDomains.push({ domain: this.newWildcardDomain });
+        this.newWildcardDomain = '';
+      }
+    },
+
+    removeWildcardDomain(index) {
+      this.trustedWildcardDomains.splice(index, 1);
+    },
+
+    async saveWildcardDomainWhitelist() {
+      const domains = this.trustedWildcardDomains.map(item => item.domain);
+      try {
+        const res = await this.$axios.post(baseUrl + '/device/syncTrustedWildcardDomains', { device_id: this.currentDevice.deviceID, domains });
+        if (res.data.status === 'success') {
+          this.$message({ message: '泛域名白名单已保存', type: 'success' });
+          this.showWildcardDomainDialog = false;
+        } else {
+          this._handleApiError(res.data.error || '保存泛域名白名单失败');
+        }
+      } catch (error) {
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      }
     },
 
     _handleApiError(errorMessage, isAuthError = false) {
