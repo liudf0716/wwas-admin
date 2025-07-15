@@ -23,16 +23,16 @@
     </div>
 
     <el-table :data="listData" stripe style="width: 100%" ref="multipleTable" v-loading="loading">
-      <el-table-column prop="deviceID" label="设备ID" min-width="100"></el-table-column>
+      <el-table-column prop="deviceID" label="设备ID" width="120" show-overflow-tooltip></el-table-column>
       <!-- <el-table-column prop="deviceCode" label="设备编码" min-width="100"></el-table-column> -->
-      <el-table-column prop="name" label="设备名称"></el-table-column>
-      <el-table-column prop="macAddress" label="MAC地址" width="150"></el-table-column>
-      <el-table-column prop="locationID" label="场所编码" width="150"></el-table-column>
+      <el-table-column prop="name" label="设备名称" width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="macAddress" label="MAC地址" width="150" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="locationID" label="场所编码" width="150" show-overflow-tooltip></el-table-column>
 
       <!-- <el-table-column prop="awVersion" label="AW版本"></el-table-column> -->
       <!-- <el-table-column prop="fmVersion" label="固件版本"></el-table-column> -->
-      <el-table-column prop="onlineClients" label="在线客户数" align="center"></el-table-column>
-      <el-table-column label="位置坐标">
+      <el-table-column prop="onlineClients" label="在线客户数" width="100" align="center"></el-table-column>
+      <el-table-column label="位置坐标" width="180" show-overflow-tooltip>
         <template slot-scope="scope"> {{ scope.row.longitude }},{{ scope.row.latitude }} </template>
       </el-table-column>
       <!-- <el-table-column prop="wiredPassed" label="有线免认证">
@@ -57,22 +57,48 @@
           <span>{{ dateForm(scope.row.lastTime) }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="100">
+      <el-table-column label="操作" width="250">
         <template slot-scope="scope">
           <el-button 
-            type="text" 
-            @click="showDetail(scope.row)"
-            :disabled="scope.row.deviceStatus !== '1'"
-            :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
-            详情
+        type="text" 
+        size="small"
+        @click="showDetail(scope.row)"
+        :disabled="scope.row.deviceStatus !== '1'"
+        :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
+        详情
           </el-button>
           <el-button 
-            type="text" 
-            @click="handleEdit(scope.row)"
-            :disabled="scope.row.deviceStatus !== '1'"
-            :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
-            编辑
+        type="text" 
+        size="small"
+        @click="handleEdit(scope.row)"
+        :disabled="scope.row.deviceStatus !== '1'"
+        :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
+        编辑
           </el-button>
+          <el-dropdown 
+            @command="handleCommand" 
+            trigger="click"
+            :disabled="scope.row.deviceStatus !== '1'"
+            :class="{ 'disabled-dropdown': scope.row.deviceStatus !== '1' }">
+            <el-button 
+              type="text" 
+              size="small"
+              :disabled="scope.row.deviceStatus !== '1'"
+              :class="{ 'disabled-button': scope.row.deviceStatus !== '1' }">
+              更多<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item 
+                :command="{action: 'reboot', row: scope.row}"
+                :disabled="rebootingDevices.has(scope.row.deviceID)"
+                :class="{ 'rebooting-item': rebootingDevices.has(scope.row.deviceID) }">
+                {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '设备重启' }}
+              </el-dropdown-item>
+              <el-dropdown-item :command="{action: 'wireless', row: scope.row}">无线设置</el-dropdown-item>
+              <el-dropdown-item :command="{action: 'domains', row: scope.row}">域名白名单</el-dropdown-item>
+              <el-dropdown-item :command="{action: 'wildcardDomains', row: scope.row}">泛域名白名单</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -170,6 +196,7 @@ export default {
       selectedDevice: [],
       selectedGwSettings: [],
       editDeviceForm: {},
+      rebootingDevices: new Set(), // 追踪正在重启的设备ID
 
       deviceRules: {
         locationID: [
@@ -230,6 +257,47 @@ export default {
     dateForm: dateForm,
     bytesLabel: bytesLabel,
     cpuLabel: cpuLabel,
+    rebootDevice: async function(row) {
+      if (row.deviceStatus !== '1') {
+        this.$message({
+          message: '设备离线时无法重启',
+          type: 'warning'
+        });
+        return;
+      }
+
+      // 检查设备是否正在重启中
+      if (this.rebootingDevices.has(row.deviceID)) {
+        this.$message({
+          message: '设备正在重启中，请稍后再试',
+          type: 'warning'
+        });
+        return;
+      }
+
+      try {
+        // 添加到重启中设备列表
+        this.rebootingDevices.add(row.deviceID);
+        
+        const res = await this.$axios.post(baseUrl + '/device/reboot', { device_id: row.deviceID });
+        if (res.data.success) {
+          this.$message({ message: '重启命令已发送，10秒后可再次重启', type: 'success' });
+          
+          // 10秒后移除禁用状态
+          setTimeout(() => {
+            this.rebootingDevices.delete(row.deviceID);
+          }, 10000);
+        } else {
+          // 如果重启失败，立即移除禁用状态
+          this.rebootingDevices.delete(row.deviceID);
+          this._handleApiError(res.data.error || '重启失败');
+        }
+      } catch (error) {
+        // 如果请求失败，立即移除禁用状态
+        this.rebootingDevices.delete(row.deviceID);
+        this._handleApiError('网络错误或请求失败: ' + error.message);
+      }
+    },
     parseDeviceCode() {
       const code = this.editDeviceForm.deviceCode || '';
       if (code.length === 21) {
@@ -316,13 +384,40 @@ export default {
         }
       });
 
-      for (let i in row.gwSettings) {
-        this.selectedGwSettings.push({
-          gwID: row.gwSettings[i].gwID,
-          gwChannel: row.gwSettings[i].gwChannel,
-          authMode: row.gwSettings[i].authMode
-        });
+      // 调试信息：打印原始数据结构
+      console.log('gwSettings原始数据:', row.gwSettings);
+      console.log('gwSettings类型:', Array.isArray(row.gwSettings) ? 'Array' : typeof row.gwSettings);
+      console.log('gwSettings长度:', row.gwSettings ? row.gwSettings.length : 'undefined');
+
+      // 修复：确保gwSettings存在且为数组，并使用正确的遍历方式
+      if (row.gwSettings && Array.isArray(row.gwSettings)) {
+        for (let i = 0; i < row.gwSettings.length; i++) {
+          const gwSetting = row.gwSettings[i];
+          if (gwSetting && (gwSetting.gwID || gwSetting.gwChannel)) { // 只添加有效数据
+            this.selectedGwSettings.push({
+              gwID: gwSetting.gwID,
+              gwChannel: gwSetting.gwChannel,
+              authMode: gwSetting.authMode
+            });
+          }
+        }
+      } else if (row.gwSettings && typeof row.gwSettings === 'object') {
+        // 如果是对象而不是数组，使用for...in但过滤无效数据
+        for (let i in row.gwSettings) {
+          if (row.gwSettings.hasOwnProperty(i)) {
+            const gwSetting = row.gwSettings[i];
+            if (gwSetting && (gwSetting.gwID || gwSetting.gwChannel)) { // 只添加有效数据
+              this.selectedGwSettings.push({
+                gwID: gwSetting.gwID,
+                gwChannel: gwSetting.gwChannel,
+                authMode: gwSetting.authMode
+              });
+            }
+          }
+        }
       }
+
+      console.log('处理后的selectedGwSettings:', this.selectedGwSettings);
 
       this.showDeviceDetailDialog = true;
     },
@@ -353,6 +448,62 @@ export default {
       const params = { device_id: this.searchQuery };
       // Pass an empty string for the URL, as _fetchDeviceData appends '/device/list'
       this._fetchDeviceData('', params);
+    },
+
+    handleCommand(command) {
+      const { action, row } = command;
+      
+      if (row.deviceStatus !== '1') {
+        this.$message({
+          message: '设备离线时无法执行操作，请等待设备上线后再试',
+          type: 'warning'
+        });
+        return;
+      }
+
+      switch (action) {
+        case 'reboot':
+          this.rebootDevice(row);
+          break;
+        case 'wireless':
+          this.handleWirelessSettings(row);
+          break;
+        case 'domains':
+          this.handleDomainWhitelist(row);
+          break;
+        case 'wildcardDomains':
+          this.handleWildcardDomainWhitelist(row);
+          break;
+        default:
+          console.log('Unknown command:', action);
+      }
+    },
+
+    handleWirelessSettings(row) {
+      this.$message({
+        message: '无线设置功能开发中...',
+        type: 'info'
+      });
+      // TODO: 实现无线设置功能
+      // 可以打开一个对话框来配置无线设置
+    },
+
+    handleDomainWhitelist(row) {
+      this.$message({
+        message: '域名白名单功能开发中...',
+        type: 'info'
+      });
+      // TODO: 实现域名白名单功能
+      // 可以打开一个对话框来管理域名白名单
+    },
+
+    handleWildcardDomainWhitelist(row) {
+      this.$message({
+        message: '泛域名白名单功能开发中...',
+        type: 'info'
+      });
+      // TODO: 实现泛域名白名单功能
+      // 可以打开一个对话框来管理泛域名白名单
     },
 
     _handleApiError(errorMessage, isAuthError = false) {
@@ -428,6 +579,25 @@ export default {
   .disabled-button:hover {
     color: #c0c4cc !important;
     text-decoration: none !important;
+  }
+
+  /* 禁用下拉菜单样式 */
+  .disabled-dropdown {
+    opacity: 0.6 !important;
+  }
+  
+  .disabled-dropdown .el-dropdown__caret-button {
+    cursor: not-allowed !important;
+  }
+
+  /* 重启中状态样式 */
+  .rebooting-item {
+    color: #909399 !important;
+    cursor: not-allowed !important;
+  }
+  
+  .rebooting-item:hover {
+    background-color: transparent !important;
   }
 
   .dialog-content {
