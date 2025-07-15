@@ -148,24 +148,172 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="无线设置" :visible.sync="showWirelessDialog" width="600px">
+    <el-dialog title="无线设置" :visible.sync="showWirelessDialog" width="800px">
       <div v-if="wirelessLoading">正在加载...</div>
       <div v-else>
-        <el-form label-width="120px">
-          <div v-for="(radio, index) in wifiInfo" :key="index">
-            <h4>{{ radio.name }}</h4>
-            <el-form-item label="SSID">
-              <el-input v-model="radio.ssid"></el-input>
-            </el-form-item>
-            <el-form-item label="Mesh ID">
-              <el-input v-model="radio.mesh_id"></el-input>
-            </el-form-item>
-          </div>
-        </el-form>
+        <el-alert title="提示：空值字段不会被修改。如需修改某个字段，请提供非空值。" type="info" :closable="false" show-icon style="margin-bottom: 20px;"></el-alert>
+        
+        <div style="text-align: right; margin-bottom: 15px;">
+          <el-button size="small" @click="clearAllSettings" type="text" style="color: #909399;">
+            <i class="el-icon-refresh-left"></i> 清空所有设置
+          </el-button>
+        </div>
+        
+        <!-- 2.4G 设置 -->
+        <div style="margin-bottom: 40px; border: 2px solid #67c23a; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);">
+          <h3 style="margin: 0 0 20px 0; color: #67c23a; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-connection" style="margin-right: 8px;"></i>
+            2.4GHz 频段设置
+          </h3>
+          
+          <el-form label-width="100px">
+            <div style="background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: #606266; font-size: 16px; border-bottom: 1px solid #e4e7ed; padding-bottom: 8px;">
+                <i class="el-icon-wifi" style="margin-right: 5px; color: #409eff;"></i>
+                Wi-Fi 热点设置
+              </h4>
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="SSID">
+                    <el-input 
+                      v-model="radio24g.ssid" 
+                      placeholder="例：MyWiFi_2.4G（留空不修改）" 
+                      clearable
+                      maxlength="32"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="密码">
+                    <el-input 
+                      v-model="radio24g.key" 
+                      placeholder="至少8位字符（留空不修改）" 
+                      type="password" 
+                      show-password 
+                      clearable
+                      maxlength="63"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: #606266; font-size: 16px; border-bottom: 1px solid #e4e7ed; padding-bottom: 8px;">
+                <i class="el-icon-share" style="margin-right: 5px; color: #e6a23c;"></i>
+                Mesh 网络设置
+              </h4>
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="Mesh ID">
+                    <el-input 
+                      v-model="radio24g.mesh_id" 
+                      placeholder="例：MyMesh_2.4G（留空不修改）" 
+                      clearable
+                      maxlength="32"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="Mesh 密码">
+                    <el-input 
+                      v-model="radio24g.mesh_key" 
+                      placeholder="至少8位字符（留空不修改）" 
+                      type="password" 
+                      show-password 
+                      clearable
+                      maxlength="63"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+          </el-form>
+        </div>
+
+        <!-- 5G 设置 -->
+        <div style="border: 2px solid #409eff; padding: 25px; border-radius: 8px; background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%);">
+          <h3 style="margin: 0 0 20px 0; color: #409eff; font-size: 18px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-connection" style="margin-right: 8px;"></i>
+            5GHz 频段设置
+          </h3>
+          
+          <el-form label-width="100px">
+            <div style="background: #fff; padding: 20px; margin-bottom: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: #606266; font-size: 16px; border-bottom: 1px solid #e4e7ed; padding-bottom: 8px;">
+                <i class="el-icon-wifi" style="margin-right: 5px; color: #409eff;"></i>
+                Wi-Fi 热点设置
+              </h4>
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="SSID">
+                    <el-input 
+                      v-model="radio5g.ssid" 
+                      placeholder="例：MyWiFi_5G（留空不修改）" 
+                      clearable
+                      maxlength="32"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="密码">
+                    <el-input 
+                      v-model="radio5g.key" 
+                      placeholder="至少8位字符（留空不修改）" 
+                      type="password" 
+                      show-password 
+                      clearable
+                      maxlength="63"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+            
+            <div style="background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              <h4 style="margin: 0 0 15px 0; color: #606266; font-size: 16px; border-bottom: 1px solid #e4e7ed; padding-bottom: 8px;">
+                <i class="el-icon-share" style="margin-right: 5px; color: #e6a23c;"></i>
+                Mesh 网络设置
+              </h4>
+              <el-row :gutter="24">
+                <el-col :span="12">
+                  <el-form-item label="Mesh ID">
+                    <el-input 
+                      v-model="radio5g.mesh_id" 
+                      placeholder="例：MyMesh_5G（留空不修改）" 
+                      clearable
+                      maxlength="32"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                  <el-form-item label="Mesh 密码">
+                    <el-input 
+                      v-model="radio5g.mesh_key" 
+                      placeholder="至少8位字符（留空不修改）" 
+                      type="password" 
+                      show-password 
+                      clearable
+                      maxlength="63"
+                      show-word-limit>
+                    </el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </div>
+          </el-form>
+        </div>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="showWirelessDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveWifiSettings">保存</el-button>
+        <el-button type="primary" @click="saveWifiSettings">保存设置</el-button>
       </span>
     </el-dialog>
 
@@ -261,16 +409,15 @@ export default {
       rebootingDevices: new Set(), // 追踪正在重启的设备ID
       showWirelessDialog: false,
       wirelessLoading: false,
-      wifiInfo: [],
+      // 2.4G和5G无线设置分别存储
+      radio24g: { ssid: '', key: '', mesh_id: '', mesh_key: '' },
+      radio5g: { ssid: '', key: '', mesh_id: '', mesh_key: '' },
+      wifiInfo: [], // 保留用于兼容性，从API获取数据时使用
       currentDevice: null,
       showDomainDialog: false,
       domainLoading: false,
       trustedDomains: [],
       newDomain: '',
-      showWildcardDomainDialog: false,
-      wildcardDomainLoading: false,
-      trustedWildcardDomains: [],
-      newWildcardDomain: '',
       showWildcardDomainDialog: false,
       wildcardDomainLoading: false,
       trustedWildcardDomains: [],
@@ -561,13 +708,38 @@ export default {
       this.currentDevice = row;
       this.showWirelessDialog = true;
       this.wirelessLoading = true;
+      
+      // 重置数据
+      this.radio24g = { ssid: '', key: '', mesh_id: '', mesh_key: '' };
+      this.radio5g = { ssid: '', key: '', mesh_id: '', mesh_key: '' };
+      
       try {
         const res = await this.$axios.post(baseUrl + '/device/getWifiInfo', { device_id: row.deviceID });
         if (res.data.data) {
-          this.wifiInfo = Object.entries(res.data.data).map(([name, values]) => ({
-            name,
-            ...values
-          }));
+          console.log('获取的无线信息:', res.data.data); // 调试日志
+          
+          // 处理radio0 (2.4G)
+          if (res.data.data.radio0) {
+            this.radio24g = {
+              ssid: res.data.data.radio0.ssid || '',
+              key: res.data.data.radio0.key || '',
+              mesh_id: res.data.data.radio0.mesh_id || '',
+              mesh_key: res.data.data.radio0.mesh_key || ''
+            };
+          }
+          
+          // 处理radio1 (5G)
+          if (res.data.data.radio1) {
+            this.radio5g = {
+              ssid: res.data.data.radio1.ssid || '',
+              key: res.data.data.radio1.key || '',
+              mesh_id: res.data.data.radio1.mesh_id || '',
+              mesh_key: res.data.data.radio1.mesh_key || ''
+            };
+          }
+          
+          console.log('2.4G设置:', this.radio24g); // 调试日志
+          console.log('5G设置:', this.radio5g); // 调试日志
         } else {
           this._handleApiError(res.data.error || '获取无线信息失败');
         }
@@ -578,19 +750,82 @@ export default {
       }
     },
 
+    clearAllSettings() {
+      this.radio24g = { ssid: '', key: '', mesh_id: '', mesh_key: '' };
+      this.radio5g = { ssid: '', key: '', mesh_id: '', mesh_key: '' };
+      this.$message({ message: '已清空所有无线设置', type: 'info' });
+    },
+
     async saveWifiSettings() {
-      const data = this.wifiInfo.reduce((acc, radio) => {
-        acc[radio.name] = {
-          ssid: radio.ssid,
-          mesh_id: radio.mesh_id
-        };
-        return acc;
-      }, {});
+      // 基本验证
+      const validatePassword = (password, label) => {
+        if (password && password.trim() !== '' && password.trim().length < 8) {
+          this.$message({ message: `${label}密码长度不能少于8位字符`, type: 'warning' });
+          return false;
+        }
+        return true;
+      };
+      
+      // 验证所有密码
+      if (!validatePassword(this.radio24g.key, '2.4G Wi-Fi ')) return;
+      if (!validatePassword(this.radio24g.mesh_key, '2.4G Mesh ')) return;
+      if (!validatePassword(this.radio5g.key, '5G Wi-Fi ')) return;
+      if (!validatePassword(this.radio5g.mesh_key, '5G Mesh ')) return;
+      
+      // 准备发送的数据，只包含非空值
+      const data = {};
+      
+      // 处理2.4G设置 (radio0)
+      const radio0Data = {};
+      if (this.radio24g.ssid && this.radio24g.ssid.trim() !== '') {
+        radio0Data.ssid = this.radio24g.ssid.trim();
+      }
+      if (this.radio24g.key && this.radio24g.key.trim() !== '') {
+        radio0Data.key = this.radio24g.key.trim();
+      }
+      if (this.radio24g.mesh_id && this.radio24g.mesh_id.trim() !== '') {
+        radio0Data.mesh_id = this.radio24g.mesh_id.trim();
+      }
+      if (this.radio24g.mesh_key && this.radio24g.mesh_key.trim() !== '') {
+        radio0Data.mesh_key = this.radio24g.mesh_key.trim();
+      }
+      if (Object.keys(radio0Data).length > 0) {
+        data.radio0 = radio0Data;
+      }
+      
+      // 处理5G设置 (radio1)
+      const radio1Data = {};
+      if (this.radio5g.ssid && this.radio5g.ssid.trim() !== '') {
+        radio1Data.ssid = this.radio5g.ssid.trim();
+      }
+      if (this.radio5g.key && this.radio5g.key.trim() !== '') {
+        radio1Data.key = this.radio5g.key.trim();
+      }
+      if (this.radio5g.mesh_id && this.radio5g.mesh_id.trim() !== '') {
+        radio1Data.mesh_id = this.radio5g.mesh_id.trim();
+      }
+      if (this.radio5g.mesh_key && this.radio5g.mesh_key.trim() !== '') {
+        radio1Data.mesh_key = this.radio5g.mesh_key.trim();
+      }
+      if (Object.keys(radio1Data).length > 0) {
+        data.radio1 = radio1Data;
+      }
+
+      // 检查是否有数据需要发送
+      if (Object.keys(data).length === 0) {
+        this.$message({ message: '没有需要更新的无线设置（所有字段都为空）', type: 'warning' });
+        return;
+      }
+
+      console.log('发送的无线设置数据:', data); // 调试日志
 
       try {
-        const res = await this.$axios.post(baseUrl + '/device/setWifiInfo', { device_id: this.currentDevice.deviceID, data });
-        if (res.data.data.status === 'success') {
-          this.$message({ message: '无线设置已保存', type: 'success' });
+        const res = await this.$axios.post(baseUrl + '/device/setWifiInfo', { 
+          device_id: this.currentDevice.deviceID, 
+          data 
+        });
+        if (res.data.data && res.data.data.status === 'success') {
+          this.$message({ message: '无线设置已保存，Wi-Fi将自动重启以应用新配置', type: 'success' });
           this.showWirelessDialog = false;
         } else {
           this._handleApiError(res.data.error || '保存无线信息失败');
@@ -802,5 +1037,76 @@ export default {
 
   .dialog-footer {
     text-align: right;
+  }
+
+  /* 无线设置对话框样式 */
+  .el-dialog__body .el-form-item__label {
+    font-weight: 500;
+    color: #606266;
+  }
+  
+  .el-dialog__body h3 {
+    font-weight: 600;
+    font-size: 18px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  
+  .el-dialog__body h4 {
+    font-weight: 600;
+    font-size: 16px;
+    color: #606266;
+  }
+  
+  .el-alert--info .el-alert__icon {
+    color: #909399;
+  }
+
+  /* 2.4G和5G设置区域样式 */
+  .wireless-section {
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .wireless-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  }
+  
+  .wireless-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  /* Wi-Fi和Mesh设置卡片样式 */
+  .settings-card {
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+  
+  .settings-card:hover {
+    border-color: #409eff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  /* 输入框样式增强 */
+  .el-input__inner {
+    transition: all 0.3s ease;
+  }
+  
+  .el-input.is-focus .el-input__inner {
+    border-color: #409eff;
+    box-shadow: 0 0 8px rgba(64, 158, 255, 0.2);
+  }
+  
+  /* 图标样式 */
+  .wireless-icon {
+    font-size: 16px;
+    margin-right: 8px;
   }
 </style>
