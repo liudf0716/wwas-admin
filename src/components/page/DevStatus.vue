@@ -317,53 +317,210 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="域名白名单" :visible.sync="showDomainDialog" width="600px">
-      <div v-if="domainLoading">正在加载...</div>
-      <div v-else>
-        <el-input
-          placeholder="请输入要添加的域名"
-          v-model="newDomain"
-          class="input-with-select"
-        >
-          <el-button slot="append" icon="el-icon-plus" @click="addDomain"></el-button>
-        </el-input>
-        <el-table :data="trustedDomains" style="width: 100%; margin-top: 20px;">
-          <el-table-column prop="domain" label="域名"></el-table-column>
-          <el-table-column label="操作" width="100">
-            <template slot-scope="scope">
-              <el-button type="text" @click="removeDomain(scope.$index)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+    <el-dialog title="域名白名单管理" :visible.sync="showDomainDialog" width="700px">
+      <div v-if="domainLoading" style="text-align: center; padding: 40px;">
+        <i class="el-icon-loading" style="font-size: 24px; color: #409eff;"></i>
+        <p style="margin-top: 10px; color: #606266;">正在加载域名白名单...</p>
       </div>
+      <div v-else>
+        <el-alert 
+          title="域名白名单说明：添加到白名单的域名可以直接访问，无需用户认证。支持精确匹配。" 
+          type="info" 
+          :closable="false" 
+          show-icon 
+          style="margin-bottom: 20px;">
+        </el-alert>
+
+        <!-- 添加域名区域 -->
+        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #b3d8ff;">
+          <h4 style="margin: 0 0 15px 0; color: #409eff; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-plus" style="margin-right: 8px;"></i>
+            添加新域名
+          </h4>
+          <el-row :gutter="16">
+            <el-col :span="18">
+              <el-input
+                v-model="newDomain"
+                placeholder="请输入域名，例：example.com"
+                clearable
+                @keyup.enter.native="addDomain"
+                style="width: 100%;">
+                <template slot="prepend">
+                  <i class="el-icon-link"></i>
+                </template>
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button 
+                type="primary" 
+                @click="addDomain"
+                :disabled="!newDomain || newDomain.trim() === ''"
+                style="width: 100%;">
+                <i class="el-icon-plus"></i> 添加
+              </el-button>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 域名列表区域 -->
+        <div style="border: 1px solid #ebeef5; border-radius: 8px; overflow: hidden;">
+          <div style="background: #fafafa; padding: 15px; border-bottom: 1px solid #ebeef5;">
+            <h4 style="margin: 0; color: #606266; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+              <span>
+                <i class="el-icon-document-checked" style="margin-right: 8px; color: #67c23a;"></i>
+                当前白名单域名
+              </span>
+              <el-tag type="info" size="small">{{ trustedDomains.length }} 个域名</el-tag>
+            </h4>
+          </div>
+          
+          <div v-if="trustedDomains.length === 0" style="text-align: center; padding: 40px; color: #909399;">
+            <i class="el-icon-document" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+            <p style="margin: 0; font-size: 14px;">暂无域名白名单</p>
+            <p style="margin: 8px 0 0 0; font-size: 12px;">添加域名后将显示在这里</p>
+          </div>
+          
+          <el-table 
+            v-else
+            :data="trustedDomains" 
+            style="width: 100%;"
+            stripe
+            :show-header="false">
+            <el-table-column prop="domain" label="域名">
+              <template slot-scope="scope">
+                <div style="display: flex; align-items: center; padding: 8px 0;">
+                  <i class="el-icon-link" style="color: #409eff; margin-right: 12px; font-size: 16px;"></i>
+                  <span style="font-size: 14px; color: #303133;">{{ scope.row.domain }}</span>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" align="center">
+              <template slot-scope="scope">
+                <el-button 
+                  type="text" 
+                  size="small"
+                  @click="removeDomain(scope.$index)"
+                  style="color: #f56c6c;">
+                  <i class="el-icon-delete"></i> 删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+      
       <span slot="footer" class="dialog-footer">
         <el-button @click="showDomainDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveDomainWhitelist">保存</el-button>
+        <el-button type="primary" @click="saveDomainWhitelist" :loading="domainLoading">
+          <i class="el-icon-check"></i> 保存白名单
+        </el-button>
       </span>
     </el-dialog>
 
-    <el-dialog title="泛域名白名单" :visible.sync="showWildcardDomainDialog" width="600px">
-      <div v-if="wildcardDomainLoading">正在加载...</div>
-      <div v-else>
-        <el-input
-          placeholder="请输入要添加的泛域名"
-          v-model="newWildcardDomain"
-          class="input-with-select"
-        >
-          <el-button slot="append" icon="el-icon-plus" @click="addWildcardDomain"></el-button>
-        </el-input>
-        <el-table :data="trustedWildcardDomains" style="width: 100%; margin-top: 20px;">
-          <el-table-column prop="domain" label="泛域名"></el-table-column>
-          <el-table-column label="操作" width="100">
-            <template slot-scope="scope">
-              <el-button type="text" @click="removeWildcardDomain(scope.$index)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+    <el-dialog title="泛域名白名单管理" :visible.sync="showWildcardDomainDialog" width="700px">
+      <div v-if="wildcardDomainLoading" style="text-align: center; padding: 40px;">
+        <i class="el-icon-loading" style="font-size: 24px; color: #e6a23c;"></i>
+        <p style="margin-top: 10px; color: #606266;">正在加载泛域名白名单...</p>
       </div>
+      <div v-else>
+        <el-alert 
+          title="泛域名白名单说明：支持通配符匹配，如 *.example.com 可匹配所有 example.com 的子域名。" 
+          type="warning" 
+          :closable="false" 
+          show-icon 
+          style="margin-bottom: 20px;">
+        </el-alert>
+
+        <!-- 添加泛域名区域 -->
+        <div style="background: linear-gradient(135deg, #fef7e6 0%, #fef1d6 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #f5d582;">
+          <h4 style="margin: 0 0 15px 0; color: #e6a23c; font-size: 16px; font-weight: 600; display: flex; align-items: center;">
+            <i class="el-icon-magic-stick" style="margin-right: 8px;"></i>
+            添加新泛域名
+          </h4>
+          <el-row :gutter="16">
+            <el-col :span="18">
+              <el-input
+                v-model="newWildcardDomain"
+                placeholder="请输入泛域名，例：*.example.com"
+                clearable
+                @keyup.enter.native="addWildcardDomain"
+                style="width: 100%;">
+                <template slot="prepend">
+                  <i class="el-icon-star-off"></i>
+                </template>
+              </el-input>
+            </el-col>
+            <el-col :span="6">
+              <el-button 
+                type="warning" 
+                @click="addWildcardDomain"
+                :disabled="!newWildcardDomain || newWildcardDomain.trim() === ''"
+                style="width: 100%;">
+                <i class="el-icon-plus"></i> 添加
+              </el-button>
+            </el-col>
+          </el-row>
+          <div style="margin-top: 12px;">
+            <el-tag size="mini" type="info" style="margin-right: 8px;">示例</el-tag>
+            <span style="font-size: 12px; color: #909399;">
+              *.baidu.com、*.google.com、*.github.io
+            </span>
+          </div>
+        </div>
+
+        <!-- 泛域名列表区域 -->
+        <div style="border: 1px solid #ebeef5; border-radius: 8px; overflow: hidden;">
+          <div style="background: #fafafa; padding: 15px; border-bottom: 1px solid #ebeef5;">
+            <h4 style="margin: 0; color: #606266; font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: space-between;">
+              <span>
+                <i class="el-icon-star-on" style="margin-right: 8px; color: #e6a23c;"></i>
+                当前泛域名白名单
+              </span>
+              <el-tag type="warning" size="small">{{ trustedWildcardDomains.length }} 个泛域名</el-tag>
+            </h4>
+          </div>
+          
+          <div v-if="trustedWildcardDomains.length === 0" style="text-align: center; padding: 40px; color: #909399;">
+            <i class="el-icon-star-off" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
+            <p style="margin: 0; font-size: 14px;">暂无泛域名白名单</p>
+            <p style="margin: 8px 0 0 0; font-size: 12px;">添加泛域名后将显示在这里</p>
+          </div>
+          
+          <el-table 
+            v-else
+            :data="trustedWildcardDomains" 
+            style="width: 100%;"
+            stripe
+            :show-header="false">
+            <el-table-column prop="domain" label="泛域名">
+              <template slot-scope="scope">
+                <div style="display: flex; align-items: center; padding: 8px 0;">
+                  <i class="el-icon-star-on" style="color: #e6a23c; margin-right: 12px; font-size: 16px;"></i>
+                  <span style="font-size: 14px; color: #303133; font-family: monospace;">{{ scope.row.domain }}</span>
+                  <el-tag v-if="scope.row.domain.includes('*')" size="mini" type="warning" style="margin-left: 12px;">通配符</el-tag>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" align="center">
+              <template slot-scope="scope">
+                <el-button 
+                  type="text" 
+                  size="small"
+                  @click="removeWildcardDomain(scope.$index)"
+                  style="color: #f56c6c;">
+                  <i class="el-icon-delete"></i> 删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+      
       <span slot="footer" class="dialog-footer">
         <el-button @click="showWildcardDomainDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveWildcardDomainWhitelist">保存</el-button>
+        <el-button type="warning" @click="saveWildcardDomainWhitelist" :loading="wildcardDomainLoading">
+          <i class="el-icon-check"></i> 保存白名单
+        </el-button>
       </span>
     </el-dialog>
 
