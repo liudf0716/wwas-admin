@@ -145,6 +145,7 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <div class="flex flex-wrap gap-1">
+                <el-button size="small" type="info" v-if="!scope.row.isNew && !scope.row.isEditing" @click="copyGateway(scope.row)">复制</el-button>
                 <el-button size="small" type="danger" v-if="!scope.row.isNew && !scope.row.isEditing" @click="deleteGateway(scope.row.deviceID, scope.row.gwID)">删除网关</el-button>
                 <el-button size="small" type="primary" v-if="!scope.row.isNew && !scope.row.isEditing" @click="toggleEditGateway(scope.row)">
                   {{ '编辑' }}
@@ -495,6 +496,66 @@ export default {
         isEditing: true
       };
       this.gatewayData.push(newRow);
+    },
+    copyGateway: function (sourceRow) {
+      // 检查是否已有正在编辑的行
+      const editingRow = this.gatewayData.find(item => item.isEditing || item.isNew);
+      if (editingRow) {
+        this.$message.warning('请先完成当前行的操作');
+        return;
+      }
+
+      // 深度复制当前行数据，确保所有字段都被复制（包括设备ID和网关ID）
+      const copiedRow = {
+        // 复制所有原始数据字段，包括设备ID和网关ID
+        gwChannel: sourceRow.gwChannel,
+        deviceID: sourceRow.deviceID, // 复制设备ID
+        gwID: sourceRow.gwID, // 复制网关ID
+        onceAuth: sourceRow.onceAuth, // 保持单次认证状态
+        nextAuthTime: sourceRow.nextAuthTime, // 保持免认证时长
+        // 复制其他可能存在的字段（向前兼容）
+        ...Object.keys(sourceRow).reduce((acc, key) => {
+          if (!['isEditing', 'isNew'].includes(key)) {
+            acc[key] = sourceRow[key];
+          }
+          return acc;
+        }, {}),
+        // 设置新行状态
+        isNew: true,
+        isEditing: true
+      };
+
+      // 使用Vue.set确保新属性是响应式的
+      this.$set(copiedRow, 'isEditing', true);
+      this.$set(copiedRow, 'isNew', true);
+
+      // 找到当前行的索引，插入到下一行
+      const currentIndex = this.gatewayData.indexOf(sourceRow);
+      this.gatewayData.splice(currentIndex + 1, 0, copiedRow);
+      
+      // 强制更新视图
+      this.$forceUpdate();
+      
+      this.$message.success('已复制行数据，您可以修改后保存为新的设备');
+      
+      // 延迟聚焦到新行的第一个输入框（设备ID）
+      this.$nextTick(() => {
+        try {
+          const table = this.$refs.gatewayTable;
+          if (table && table.$el) {
+            const rows = table.$el.querySelectorAll('tr');
+            const newRow = rows[currentIndex + 2]; // +2 因为包含表头
+            if (newRow) {
+              const newRowInputs = newRow.querySelectorAll('input');
+              if (newRowInputs && newRowInputs[0]) {
+                newRowInputs[0].focus();
+              }
+            }
+          }
+        } catch (e) {
+          console.log('聚焦失败，但不影响功能:', e);
+        }
+      });
     },
     toggleEditGateway: function (row) {
       // 检查是否已有正在编辑的行
