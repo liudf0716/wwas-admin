@@ -29,13 +29,29 @@ module.exports = {
         assetsPublicPath: "/",
         proxyTable: {
             "/api": {
-                target: process.env.API_BASE_URL || "http://portal.chawrt.com:8001",
+                target: process.env.API_BASE_URL || "http://192.168.67.109:8001",
                 changeOrigin: true,
                 secure: false,
-                logLevel: 'debug'
+                logLevel: 'debug',
+                // 不进行路径重写，保持原始路径
+                onProxyReq: function(proxyReq, req, res) {
+                    console.log('[PROXY] ' + req.method + ' ' + req.url + ' -> ' + proxyReq.path);
+                },
+                onError: function(err, req, res) {
+                    console.log('[PROXY ERROR] ' + req.url + ' -> ' + err.message);
+                }
+            },
+            "/admin": {
+                target: process.env.API_BASE_URL || "http://192.168.67.109:8001",
+                changeOrigin: true,
+                secure: false,
+                logLevel: 'debug',
+                onProxyReq: function(proxyReq, req, res) {
+                    console.log('[PROXY] ' + req.method + ' ' + req.url + ' -> ' + proxyReq.path);
+                }
             },
             "/public": {
-                target: process.env.API_BASE_URL || "http://portal.chawrt.com:8001",
+                target: process.env.API_BASE_URL || "http://192.168.67.109:8001",
                 changeOrigin: true,
                 secure: false,
                 logLevel: 'debug'

@@ -68,11 +68,19 @@ devMiddleware.waitUntilValid(function () {
   console.log('> Listening at ' + uri + '\n')
 })
 
-module.exports = app.listen(port, function (err) {
+module.exports = app.listen(port, '0.0.0.0', function (err) {
   if (err) {
     console.log(err)
     return
   }
+
+  console.log('> Development server started successfully!')
+  console.log('> Listening on:')
+  console.log('  - Local:   http://localhost:' + port)
+  console.log('  - Network: http://192.168.67.109:' + port + ' (通过IP访问将无法使用API代理)')
+  console.log('')
+  console.log('🔴 重要提醒: 请使用 http://localhost:' + port + ' 访问以确保API代理正常工作!')
+  console.log('')
 
   // when env is testing, don't need open it
   if (autoOpenBrowser && process.env.NODE_ENV !== 'testing') {

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API配置测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>WWAS Admin API配置测试</h1>
+    
+    <div id="status"></div>
+    
+    <h2>测试操作</h2>
+    <button onclick="testApiConfig()">测试API配置</button>
+    <button onclick="testSysInfo()">测试系统信息API</button>
+    <button onclick="testCorsRequest()">测试CORS请求</button>
+    
+    <h2>测试结果</h2>
+    <div id="results"></div>
+
+    <script>
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        function testApiConfig() {
+            log('开始测试API配置...', 'info');
+            
+            // 模拟开发环境
+            const isDev = location.hostname === 'localhost';
+            log(`当前环境: ${isDev ? '开发环境 (localhost)' : '生产环境 (IP访问)'}`, isDev ? 'success' : 'error');
+            
+            // 测试API基础URL
+            const expectedBaseUrl = isDev ? '/api' : 'http://192.168.67.109:8001';
+            log(`期望的API基础URL: ${expectedBaseUrl}`, 'info');
+            
+            if (isDev) {
+                log('✅ 开发环境配置正确，将使用webpack代理', 'success');
+                log('请求路径: /api/login → 代理到 → http://192.168.67.109:8001/admin/login', 'info');
+            } else {
+                log('⚠️ 当前通过IP访问，可能遇到CORS问题', 'error');
+                log('建议改用: http://localhost:8080', 'error');
+            }
+        }
+
+        function testSysInfo() {
+            log('测试系统信息API...', 'info');
+            
+            const apiUrl = '/api/sysinfo/detail';
+            log(`发送请求到: ${apiUrl}`, 'info');
+            
+            fetch(apiUrl)
+                .then(response => {
+                    log(`响应状态: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                    return response.json();
+                })
+                .then(data => {
+                    log(`响应数据: <pre>${JSON.stringify(data, null, 2)}</pre>`, 'success');
+                })
+                .catch(error => {
+                    log(`请求失败: ${error.message}`, 'error');
+                    if (error.message.includes('CORS')) {
+                        log('🚨 CORS错误！请确保使用 http://localhost:8080 访问', 'error');
+                    }
+                });
+        }
+
+        function testCorsRequest() {
+            log('测试CORS策略...', 'info');
+            
+            // 测试OPTIONS预检请求
+            fetch('/api/admin/login', {
+                method: 'OPTIONS',
+                headers: {
+                    'Access-Control-Request-Method': 'POST',
+                    'Access-Control-Request-Headers': 'Content-Type'
+                }
+            })
+            .then(response => {
+                log(`OPTIONS预检响应: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                const corsHeaders = {};
+                response.headers.forEach((value, key) => {
+                    if (key.toLowerCase().includes('access-control')) {
+                        corsHeaders[key] = value;
+                    }
+                });
+                
+                log(`CORS头部: <pre>${JSON.stringify(corsHeaders, null, 2)}</pre>`, 'info');
+            })
+            .catch(error => {
+                log(`CORS测试失败: ${error.message}`, 'error');
+            });
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            log('页面加载完成，开始自动测试...', 'info');
+            testApiConfig();
+        };
+    </script>
+</body>
+</html>
