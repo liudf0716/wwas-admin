@@ -11,9 +11,9 @@
     </div>
     <div class="rad-group">
       <el-radio-group v-model="activeFilterTab" @change="changeTab" size="small">
-        <el-radio-button label="all">全部</el-radio-button>
         <el-radio-button label="online">在线</el-radio-button>
         <el-radio-button label="offline">离线</el-radio-button>
+        <el-radio-button label="all">全部</el-radio-button>
       </el-radio-group>
       <el-form :inline="true" class="handle-box2">
         <el-form-item label="">
@@ -110,7 +110,7 @@ export default {
   },
   data: function () {
     return {
-      activeFilterTab: 'all',
+      activeFilterTab: 'online',
       searchQuery: '',
       loading: false,
       pageTotal: 0,
@@ -148,7 +148,7 @@ export default {
           const user = res.data.extra;
           this.currentUserType = user.userType;
           if (this.currentUserType === 1 || this.currentUserType === 0) {
-            this.getDevices('/all');
+            this.getDevices('/online');
           } else {
             // Specific error message for this case, not using _handleApiError
             this.$message({ message: '用户类型错误', type: 'warning' });
@@ -201,7 +201,7 @@ export default {
     },
 
     reset: function () {
-      this.activeFilterTab = 'all';
+      this.activeFilterTab = 'online';
       this.searchQuery = '';
       this.changeTab();
     },
@@ -340,7 +340,6 @@ export default {
     display: inline-block;
   }
   .handle-box2 {
-    display: inline-block;
     float: right;
   }
   .orange {
