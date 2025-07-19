@@ -111,55 +111,164 @@
   min-width: 160px !important;
 }
 
-.dropdown-item-with-icon {
-  display: flex !important;
+/* 使用CSS Grid强制对齐所有菜单项 */
+.action-dropdown-menu .el-dropdown-menu__item {
+  display: grid !important;
+  grid-template-columns: 16px 1fr !important;
+  gap: 8px !important;
   align-items: center !important;
   padding: 10px 16px !important;
   font-size: 14px !important;
   transition: all 0.2s ease !important;
+  line-height: 1.5 !important;
+  position: relative !important;
 }
 
-.dropdown-item-with-icon:hover {
-  background-color: #f5f7fa !important;
-  color: #409eff !important;
+/* 专门处理带分割线的菜单项 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided {
+  border-top: 1px solid #ebeef5 !important;
+  margin-top: 6px !important;
+  padding-top: 10px !important;
 }
 
-.item-icon {
+/* 图标样式 - 统一使用Grid第一列 */
+.action-dropdown-menu .el-dropdown-menu__item .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item i.item-icon,
+.action-dropdown-menu .el-dropdown-menu__item .el-icon-refresh,
+.action-dropdown-menu .el-dropdown-menu__item .el-icon-loading {
+  grid-column: 1 !important;
+  justify-self: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 16px !important;
   font-size: 16px !important;
-  margin-right: 8px !important;
+  text-align: center !important;
+  position: static !important;
+  transform: none !important;
+  left: auto !important;
+  right: auto !important;
   color: #909399 !important;
   transition: color 0.2s ease !important;
 }
 
-.dropdown-item-with-icon:hover .item-icon {
+/* 文本样式 - 统一使用Grid第二列 */
+.action-dropdown-menu .el-dropdown-menu__item .dropdown-text,
+.action-dropdown-menu .el-dropdown-menu__item span.dropdown-text {
+  grid-column: 2 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  text-align: left !important;
+  display: inline-block !important;
+}
+
+/* 统一的悬停样式 - 默认蓝色 */
+.action-dropdown-menu .el-dropdown-menu__item:hover {
+  background-color: #f5f7fa !important;
   color: #409eff !important;
 }
 
-.danger-item {
+.action-dropdown-menu .el-dropdown-menu__item:hover .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item:hover i.item-icon {
+  color: #409eff !important;
+}
+
+/* 危险项样式 - 红色文本和图标 */
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item i.item-icon {
   color: #f56c6c !important;
 }
 
-.danger-item:hover {
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item {
+  color: #f56c6c !important;
+}
+
+/* 危险项悬停样式 - 使用最高优先级选择器覆盖所有可能的样式 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item:hover {
+  background: #fef0f0 !important;
   background-color: #fef0f0 !important;
   color: #f56c6c !important;
 }
 
-.danger-item .item-icon {
-  color: #f56c6c !important;
-}
-
-.danger-item:hover .item-icon {
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover i.item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item:hover .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.danger-item:hover i.item-icon {
   color: #f56c6c !important;
 }
 
 /* 重启中状态样式 */
-.rebooting-item {
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item {
   color: #909399 !important;
   cursor: not-allowed !important;
 }
 
-.rebooting-item:hover {
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item i.item-icon {
+  color: #909399 !important;
+}
+
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item:hover {
+  background: transparent !important;
   background-color: transparent !important;
+  color: #909399 !important;
+}
+
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover i.item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item:hover .item-icon,
+.action-dropdown-menu .el-dropdown-menu__item.dropdown-item-with-icon.rebooting-item:hover i.item-icon {
+  color: #909399 !important;
+}
+
+/* 强制清除Element UI可能添加的任何背景样式 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::before,
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::after {
+  display: none !important;
+}
+
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::before,
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::after {
+  display: none !important;
+}
+
+/* 额外的强制样式覆盖 - 针对Element UI的默认行为 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+.action-dropdown-menu .el-dropdown-menu__item.is-divided:hover {
+  background: #f5f7fa !important;
+  background-color: #f5f7fa !important;
+}
+
+/* 危险项分割线的特殊处理 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* 重启中项分割线的特殊处理 */
+.action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item {
+  background: none !important;
+  background-color: transparent !important;
+}
+
+/* 旋转动画 */
+.rotating-icon {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==================== 4. 对话框样式 ==================== */

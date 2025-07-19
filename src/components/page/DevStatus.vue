@@ -88,25 +88,25 @@
                     :command="{action: 'edit', row: scope.row}"
                     class="dropdown-item-with-icon">
                     <i class="el-icon-location-outline item-icon"></i>
-                    修改位置
+                    <span class="dropdown-text">修改位置</span>
                   </el-dropdown-item>
                   <el-dropdown-item 
                     :command="{action: 'wireless', row: scope.row}"
                     class="dropdown-item-with-icon">
                     <i class="el-icon-connection item-icon"></i>
-                    无线设置
+                    <span class="dropdown-text">无线设置</span>
                   </el-dropdown-item>
                   <el-dropdown-item 
                     :command="{action: 'domains', row: scope.row}"
                     class="dropdown-item-with-icon">
                     <i class="el-icon-link item-icon"></i>
-                    域名白名单
+                    <span class="dropdown-text">域名白名单</span>
                   </el-dropdown-item>
                   <el-dropdown-item 
                     :command="{action: 'wildcardDomains', row: scope.row}"
                     class="dropdown-item-with-icon">
                     <i class="el-icon-star-on item-icon"></i>
-                    泛域名白名单
+                    <span class="dropdown-text">泛域名白名单</span>
                   </el-dropdown-item>
                   <el-dropdown-item 
                     divided
@@ -119,9 +119,9 @@
                     }">
                     <i :class="[
                       'item-icon',
-                      rebootingDevices.has(scope.row.deviceID) ? 'el-icon-loading' : 'el-icon-refresh'
+                      rebootingDevices.has(scope.row.deviceID) ? 'el-icon-loading rotating-icon' : 'el-icon-refresh'
                     ]"></i>
-                    {{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '重启设备' }}
+                    <span class="dropdown-text">{{ rebootingDevices.has(scope.row.deviceID) ? '重启中...' : '重启设备' }}</span>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -858,11 +858,122 @@ export default {
     this.getData('/online');
   },
 
+  mounted() {
+    // 强制修复下拉菜单悬停样式
+    this.$nextTick(() => {
+      this.fixDropdownStyles();
+    });
+  },
+
   methods: {
     timeStamp: timeStamp,
     dateForm: dateForm,
     bytesLabel: bytesLabel,
     cpuLabel: cpuLabel,
+    
+    fixDropdownStyles() {
+      // 强制修复下拉菜单样式问题
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = `
+        /* 强制覆盖Element UI下拉菜单悬停样式 */
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover {
+          background: #fef0f0 !important;
+          background-color: #fef0f0 !important;
+          color: #f56c6c !important;
+        }
+        
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover {
+          background: transparent !important;
+          background-color: transparent !important;
+          color: #909399 !important;
+        }
+        
+        /* 清除任何Element UI添加的伪元素 */
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::before,
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::after,
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::before,
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::after {
+          content: none !important;
+          display: none !important;
+          background: none !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+        
+        /* 额外的样式覆盖 */
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided:hover {
+          background: #f5f7fa !important;
+        }
+        
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover {
+          background: #fef0f0 !important;
+        }
+        
+        .action-dropdown-menu .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover {
+          background: transparent !important;
+        }
+      `;
+      
+      // 添加到head中，确保最高优先级
+      if (!document.head.querySelector('#dropdown-fix-styles')) {
+        style.id = 'dropdown-fix-styles';
+        document.head.appendChild(style);
+      }
+      
+      // 同时监听下拉菜单的打开事件，动态修复样式
+      this.$nextTick(() => {
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === 1 && node.classList && node.classList.contains('el-dropdown-menu')) {
+                this.applyDropdownFix(node);
+              }
+            });
+          });
+        });
+        
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      });
+    },
+    
+    applyDropdownFix(dropdownMenu) {
+      // 直接通过DOM操作修复样式
+      const dangerItems = dropdownMenu.querySelectorAll('.dropdown-item-with-icon.danger-item');
+      const rebootingItems = dropdownMenu.querySelectorAll('.dropdown-item-with-icon.rebooting-item');
+      
+      dangerItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          item.style.background = '#fef0f0';
+          item.style.backgroundColor = '#fef0f0';
+          item.style.color = '#f56c6c';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          item.style.background = '';
+          item.style.backgroundColor = '';
+          item.style.color = '#f56c6c';
+        });
+      });
+      
+      rebootingItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+          item.style.background = 'transparent';
+          item.style.backgroundColor = 'transparent';
+          item.style.color = '#909399';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+          item.style.background = '';
+          item.style.backgroundColor = '';
+          item.style.color = '#909399';
+        });
+      });
+    },
+    
     rebootDevice: async function(row) {
       if (row.deviceStatus !== '1') {
         this.$message({
@@ -1356,3 +1467,32 @@ export default {
 };
 </script>
 <style src="./DevStatus.css"></style>
+<style scoped>
+/* 强制覆盖Element UI的悬停样式 - 使用Vue scoped CSS提高优先级 */
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover {
+  background: #fef0f0 !important;
+  background-color: #fef0f0 !important;
+  color: #f56c6c !important;
+}
+
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #909399 !important;
+}
+
+/* 清除任何可能的伪元素背景 */
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::before,
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.danger-item:hover::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::before,
+.action-dropdown-menu >>> .el-dropdown-menu__item.is-divided.dropdown-item-with-icon.rebooting-item:hover::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+</style>
